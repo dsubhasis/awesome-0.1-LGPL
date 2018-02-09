@@ -1,0 +1,118 @@
+
+options{
+VISITOR=true;
+MULTI=true;
+}
+
+PARSER_BEGIN(Adil)
+
+package edu.sdsc.adil;
+
+import java.io.*;
+import java.util.*;
+public class Adil {
+
+
+public static void main(String[] args) {
+    Reader sr = new StringReader(args[0]);
+    Adil p = new Adil(sr);
+    try {
+      SimpleNode node = p.ADILStatement();
+     System.out.println(node.toString());
+     node.dump(">");
+
+    } catch (ParseException pe) {
+      pe.printStackTrace();
+    }
+  }
+
+
+}
+
+PARSER_END(Adil)
+
+SKIP : {
+  " "
+}
+TOKEN : {
+  <DIGITS : (["0"-"9"])+> | <PLUS : "+" > | <SEMICOLON : ";" >
+}
+
+TOKEN [IGNORE_CASE]: {
+<CREATE : "create" >
+| <DELETE : "delete" >
+| <ALTER : "alter" >
+| <LOAD : "load" >
+| <IMPORT : "import">
+| <DATAVERSE : "dataverse" >
+}
+
+TOKEN [IGNORE_CASE]: {
+<ENV : "environment" >
+
+}
+
+
+
+
+
+
+
+TOKEN :
+{
+   < #DIGIT    : ["0"-"9"] >
+ | < #LETTER   : ["a"-"z","A"-"Z"] >
+ | < ALPHANUM : <LETTER> | <DIGIT> >
+}
+ 
+
+
+SimpleNode ADILStatement() : {} {
+ (Statement())* {return jjtThis; }
+
+}
+
+
+
+void Statement() : {Token t;}
+{
+ CreateStatement()|LoadStatement()|DeleteStatement()
+}
+
+void CreateStatement() : {Token t; }
+{
+t = <CREATE> CreateDataVerse()   <SEMICOLON> {jjtThis.setImage(t.image);}
+
+}
+void LoadStatement() : {Token t; }
+{
+t = <LOAD>  <DIGITS>  <SEMICOLON> {jjtThis.setImage(t.image);}
+
+}
+void DeleteStatement() : {Token t; }
+{
+t = <DELETE> <DIGITS>  <SEMICOLON> {jjtThis.setImage(t.image);}
+
+}
+
+void CreateDataVerse() : {Token t; }
+{
+
+ <DATAVERSE> t = <ALPHANUM> {jjtThis.setImage(t.image);}
+}
+
+
+
+void Operator() : {Token t;} {
+  Operand() | action()
+  t="+" {jjtThis.setImage(t.image);}
+  Operand()
+}
+void Operand() : {Token t;} {
+  t=<DIGITS> {jjtThis.setImage(t.image);}
+}
+
+void action() : {Token t;}{
+t = <CREATE> {jjtThis.setImage(t.image);}
+
+}

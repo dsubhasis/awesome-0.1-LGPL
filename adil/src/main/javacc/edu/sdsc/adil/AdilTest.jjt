@@ -1,0 +1,34 @@
+PARSER_BEGIN(AdilTest)
+import java.io.*;
+public class AdilTest {
+  public static void main(String[] args) {
+    Reader sr = new StringReader(args[0]);
+    AdilTest p = new AdilTest(sr);
+    try {
+      p.Expression();
+    } catch (ParseException pe) {
+      pe.printStackTrace();
+    }
+  }
+}
+PARSER_END(AdilTest)
+SKIP : {
+  " "
+}
+TOKEN : {
+  <DIGITS : (["0"-"9"])+>
+  | <PLUS : "+">
+}
+void Expression() : {} {
+  {System.out.println("Expression starts");}
+  Operator()
+  {System.out.println("Expression ends");}
+}
+void Operator() : {} {
+  Operand()
+  "+" {System.out.println("Operator: " + tokenImage[PLUS]);}
+  Operand()
+}
+void Operand() : {Token t;} {
+  t=<DIGITS> {System.out.println("Operand: " + t.image);}
+}
