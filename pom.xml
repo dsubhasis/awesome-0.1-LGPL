@@ -23,14 +23,12 @@
   <version>0.9.1</version>
   <packaging>pom</packaging>
   <name>awesome-full-stack</name>
-
   <parent>
     <groupId>org.apache</groupId>
     <artifactId>apache</artifactId>
     <version>18</version>
     <relativePath/>
   </parent>
-
   <licenses>
     <license>
       <name>Apache License, Version 2.0</name>
@@ -39,10 +37,11 @@
       <comments>A business-friendly OSS license</comments>
     </license>
   </licenses>
-
   <modules>
+
     <module>adil</module>
     <module>adil-web</module>
+    <module>awsm-webService</module>
   </modules>
 
 </project>
