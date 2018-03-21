@@ -1,0 +1,27 @@
+// ------------------------------------------------------------------
+// Transitive dependencies of this project determined from the
+// maven pom organized by organization.
+// ------------------------------------------------------------------
+
+awsm-connector-postgres
+
+
+From: 'an unknown organization'
+  - PostgreSQL JDBC Driver (http://jdbc.postgresql.org) postgresql:postgresql:jar:9.1-901-1.jdbc4
+    License: BSD License  (http://jdbc.postgresql.org/license.html)
+
+From: 'Oracle' (http://www.oracle.com)
+  - JSR 353 (JSON Processing) API (http://json-processing-spec.java.net) javax.json:javax.json-api:bundle:1.0
+    License: Dual license consisting of the CDDL v1.1 and GPL v2  (https://glassfish.java.net/public/CDDL+GPL_1_1.html)
+  - JSR 374 (JSON Processing) Default Provider (https://javaee.github.io/jsonp) org.glassfish:javax.json:bundle:1.1
+    License: Dual license consisting of the CDDL v1.1 and GPL v2  (https://oss.oracle.com/licenses/CDDL+GPL-1.1)
+
+From: 'QOS.ch' (http://www.qos.ch)
+  - SLF4J API Module (http://www.slf4j.org) org.slf4j:slf4j-api:jar:1.8.0-beta1
+    License: MIT License  (http://www.opensource.org/licenses/mit-license.php)
+  - SLF4J JDK14 Binding (http://www.slf4j.org) org.slf4j:slf4j-jdk14:jar:1.8.0-beta1
+    License: MIT License  (http://www.opensource.org/licenses/mit-license.php)
+
+
+
+

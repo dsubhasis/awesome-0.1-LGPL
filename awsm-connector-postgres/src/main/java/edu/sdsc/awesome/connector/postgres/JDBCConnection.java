@@ -4,12 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
-import java.util.Properties;
+import java.util.*;
 
 public class JDBCConnection {
 
     private  Statement stmt;
-    private Connection connect;
+
 
 
     final Logger logger = LoggerFactory.getLogger(JDBCConnection.class);
@@ -19,6 +19,8 @@ public class JDBCConnection {
     private String userName;
     private String passWord;
     private String port;
+    private Connection connect;
+
 
     public JDBCConnection()
 
@@ -30,20 +32,22 @@ public class JDBCConnection {
         this.url = url;
         this.userName = userName;
         this.passWord = passWord;
+        try {
+            connect = this.connectDB(url, userName, passWord);
 
+        } catch (SQLException e) {
+            logger.debug("Check JDBC connection : "+e.getSQLState()+e.getMessage());
+        }
     }
 
 
-    public void renewConnection()
-    {
 
-    }
     public ResultSet pgSQLQuery(String query) throws SQLException {
 
 
         ResultSet rs = null;
 
-        connect = this.connectDB(url,userName,passWord);
+
 
         try {
              rs = databaseQuery(query);
@@ -53,7 +57,38 @@ public class JDBCConnection {
         }
 
 
- return rs;
+resultSetExt(rs);
+
+        return rs;
+
+    }
+
+    public List resultSetExt(ResultSet rst) throws SQLException {
+
+        ResultSetMetaData rsmd = rst.getMetaData();
+
+        List resultList = new
+                ArrayList();
+        Map colResult = new HashMap();
+        List<Object> elementValue = new ArrayList<Object>();
+
+        Map<String, String> elementType = new HashMap<String, String>();
+
+
+        int columnCount = rsmd.getColumnCount();
+
+        for (int i = 1; i <= columnCount; i++ ) {
+            String name = rsmd.getColumnName(i);
+            colResult.put("_name",name);
+
+
+            System.out.println(rsmd.getColumnTypeName(i));
+            Integer nameId = rsmd.getColumnType(i);
+            System.out.println(nameId);
+
+
+            // Do stuff with name
+        }
 
     }
 
@@ -104,10 +139,10 @@ public class JDBCConnection {
 
     private Connection connectDB( String url,  String userName, String passWord ) throws SQLException {
         Connection conn = null;
-           url = "jdbc:postgresql://10.128.37.10/postgres";
+
             Properties props = new Properties();
-            props.setProperty("user","postgres");
-            props.setProperty("password","eTalon2018#");
+            props.setProperty("user",userName);
+            props.setProperty("password",passWord);
             //props.setProperty("ssl","true");
             conn = DriverManager.getConnection(url, props);
 
@@ -118,6 +153,8 @@ public class JDBCConnection {
 
         return conn;
     }
+
+
 
 
 

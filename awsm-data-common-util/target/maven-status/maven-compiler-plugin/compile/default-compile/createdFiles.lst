@@ -1,0 +1,6 @@
+edu/sdsc/awesome/common/connector/CommonDBUtil.class
+edu/sdsc/awesome/data/common/util/GoogleDriveConnector.class
+edu/sdsc/awesome/common/connector/PostGresQuery.class
+edu/sdsc/awesome/data/common/util/App.class
+edu/sdsc/awesome/common/connector/DiskMapStructure.class
+edu/sdsc/awesome/data/common/util/SwiftStorageConnector.class
