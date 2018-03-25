@@ -16,37 +16,39 @@
  ! KIND, either express or implied.  See the License for the
  ! specific language governing permissions and limitations
  ! under the License.
- !--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache</groupId>
-  <artifactId>awesome-full-stack</artifactId>
-  <version>0.9.1</version>
-  <packaging>pom</packaging>
-  <name>awesome-full-stack</name>
-  <parent>
+ !-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache</groupId>
-    <artifactId>apache</artifactId>
-    <version>18</version>
-    <relativePath/>
-  </parent>
-  <licenses>
-    <license>
-      <name>Apache License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-      <comments>A business-friendly OSS license</comments>
-    </license>
-  </licenses>
-  <modules>
-
-    <module>adil</module>
-    <module>adil-web</module>
-    <module>awsm-webService</module>
-    <module>awsm-connector-asterixdb</module>
-    <module>awsm-connector-postgres</module>
-    <module>awsm-connector-neo4j</module>
-    <module>awsm-connector-solr</module>
-    <module>awsm-data-common-util</module>
-  </modules>
+    <artifactId>awesome-full-stack</artifactId>
+    <version>0.9.1</version>
+    <packaging>pom</packaging>
+    <name>awesome-full-stack</name>
+    <parent>
+        <groupId>org.apache</groupId>
+        <artifactId>apache</artifactId>
+        <version>18</version>
+        <relativePath/>
+    </parent>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>A business-friendly OSS license</comments>
+        </license>
+    </licenses>
+    <modules>
+        <module>adil</module>
+        <module>adil-web</module>
+        <module>awsm-connector-asterixdb</module>
+        <module>awsm-connector-postgres</module>
+        <module>awsm-connector-neo4j</module>
+        <module>awsm-connector-solr</module>
+        <module>awsm-data-common-util</module>
+        <module>awsm-web</module>
+        <module>awsm-webService</module>
+    </modules>
 
 </project>

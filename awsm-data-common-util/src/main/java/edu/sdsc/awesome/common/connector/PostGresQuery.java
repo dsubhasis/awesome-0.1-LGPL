@@ -16,7 +16,7 @@ public class PostGresQuery {
 
         PostGresQuery pgq = new PostGresQuery();
         String query = "SELECT * FROM usnewspaper where news  LIKE '%LA%' AND news LIKE '%shooting%' AND news LIKE '%police officer%';";
-        pgq.pgsqlPassThrough(query);
+         pgq.pgsqlPassThrough(query);
     }
 
 
@@ -28,7 +28,7 @@ public class PostGresQuery {
         JDBCConnection jd = new JDBCConnection(CommonDBUtil.chinaLabURL, CommonDBUtil.chinaLabpgsqlUser,CommonDBUtil.chinaLabpgsqlPassword );
 
         try {
-            rst = jd.pgSQLQuery(query);
+            resultMap = jd.pgSQLQuery(query);
         } catch (SQLException e) {
             e.printStackTrace();
         }

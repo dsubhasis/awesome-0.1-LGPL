@@ -11,6 +11,7 @@ import javax.json.Json;
 import javax.json.JsonObjectBuilder;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class GetCount {
@@ -33,10 +34,11 @@ public class GetCount {
     }
     public String processQuery(String databaseName){
         ResultSet rst = null;
+        Map rsm;
         JDBCConnection jd = new JDBCConnection(CommonDBUtil.chinaLabURL, CommonDBUtil.chinaLabpgsqlUser,CommonDBUtil.chinaLabpgsqlPassword );
         String query = getCountQuery(databaseName);
         try {
-             rst = jd.pgSQLQuery(query);
+           rsm = jd.pgSQLQuery(query);
         } catch (SQLException e) {
             logger.debug(e.getSQLState());
         }

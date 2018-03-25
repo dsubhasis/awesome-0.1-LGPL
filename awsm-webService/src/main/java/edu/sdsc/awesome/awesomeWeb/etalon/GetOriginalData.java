@@ -32,11 +32,12 @@ public class GetOriginalData {
     public String processQuery(String databaseName) {
 
         ResultSet rst = null;
+        Map rsm;
 
         JDBCConnection jd = new JDBCConnection(CommonDBUtil.chinaLabURL, CommonDBUtil.chinaLabpgsqlUser,CommonDBUtil.chinaLabpgsqlPassword );
         String query = getQuery(databaseName);
         try {
-            rst = jd.pgSQLQuery(query);
+            rsm  = jd.pgSQLQuery(query);
         } catch (SQLException e) {
             logger.debug(e.getSQLState());
         }

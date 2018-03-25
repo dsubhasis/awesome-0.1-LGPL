@@ -33,12 +33,13 @@ public class GetGeneList {
     }
     public String processQuery(String databaseName, String geneList){
         ResultSet rst = null;
+        Map rsm ;
         Map elementList = parseString(geneList);
         JDBCConnection jd = new JDBCConnection(CommonDBUtil.chinaLabURL, CommonDBUtil.chinaLabpgsqlUser,CommonDBUtil.chinaLabpgsqlPassword );
         String query = getQuery(databaseName, elementList);
 
         try {
-            rst = jd.pgSQLQuery(query);
+            rsm = jd.pgSQLQuery(query);
         } catch (SQLException e) {
             e.getErrorCode();
         }
