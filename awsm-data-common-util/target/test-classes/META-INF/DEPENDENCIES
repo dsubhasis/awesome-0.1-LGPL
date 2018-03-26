@@ -415,11 +415,13 @@ From: 'The Apache Software Foundation' (http://www.apache.org/)
     License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
   - jclouds openstack-neutron api (http://jclouds.apache.org/openstack-neutron/) org.apache.jclouds.labs:openstack-neutron:bundle:2.0.3
     License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
-  - Apache Solr Solrj (http://lucene.apache.org/solr-parent/solr-solrj) org.apache.solr:solr-solrj:jar:6.6.1
+  - Apache Solr Solrj (http://lucene.apache.org/solr-parent/solr-solrj) org.apache.solr:solr-solrj:jar:6.6.0
     License: Apache 2  (http://www.apache.org/licenses/LICENSE-2.0.txt)
 
 From: 'The Apache Software Foundation' (https://www.apache.org/)
   - awsm-connector-postgres (http://maven.apache.org) edu.sdsc.awesome.connector.postgres:awsm-connector-postgres:jar:1.0-SNAPSHOT
+    License: Apache License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - awsm-connector-solr (http://maven.apache.org) edu.sdsc.awesome.connector.solr:awsm-connector-solr:jar:1.0-SNAPSHOT
     License: Apache License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
 
 From: 'Zaxxer.com' (https://github.com/brettwooldridge)

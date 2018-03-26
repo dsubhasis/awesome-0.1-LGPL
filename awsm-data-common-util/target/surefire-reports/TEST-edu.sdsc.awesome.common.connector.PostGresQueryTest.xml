@@ -61,6 +61,6 @@
     <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase name="testPgsqlPassThrough" classname="edu.sdsc.awesome.common.connector.PostGresQueryTest" time="0.002"/>
+  <testcase name="testPgsqlPassThrough" classname="edu.sdsc.awesome.common.connector.PostGresQueryTest" time="0.001"/>
   <testcase name="testMain" classname="edu.sdsc.awesome.common.connector.PostGresQueryTest" time="0"/>
 </testsuite>
