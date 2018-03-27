@@ -1,0 +1,8 @@
+Instruction for running topic model code:
+1. Install stm and tm package from CRAN
+2. Input file name should be matX.ldac and vocabX, X can be any string. e.g. 
+matV.ldac, vocabV.ldac
+3. Modify Experiment.sh, change the last parameter accordingly. You can also
+modify line 21 in Experiment.R, the parameter K is the number of topics; when
+K = 0 stm will find the number of topic automatically.
+4. Execute Experiment.sh or call experiment function from R console.
