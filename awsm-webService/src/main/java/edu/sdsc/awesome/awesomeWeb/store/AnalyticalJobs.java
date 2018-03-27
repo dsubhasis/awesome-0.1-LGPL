@@ -127,13 +127,6 @@ public class AnalyticalJobs {
         this.remoteStatusCode = remoteStatusCode;
     }
 
-    public String getOutputCode() {
-        return outputCode;
-    }
-
-    public void setOutputCode(String outputCode) {
-        this.outputCode = outputCode;
-    }
 
     private String jobId;
     private String executionType;
@@ -146,7 +139,7 @@ public class AnalyticalJobs {
     private boolean writeStatus;
     private String inputCode;
     private String remoteStatusCode;
-    private String outputCode;
+
 
 
 }

@@ -16,13 +16,13 @@ public class AnalyticalJobsController {
     @Autowired
     private AnalyticalJobsRepository analyticalJobsRepository;
 
-    @GetMapping(path = "/add")
+    @GetMapping(path = "/addAnalyticalJob")
     public @ResponseBody
     String addanalyticalJobsRepository(@RequestParam Integer id
             , @RequestParam String jobName, @RequestParam String jobType, @RequestParam String jobId, @RequestParam String executionType, @RequestParam String executionPlatform,
                                        @RequestParam String orgQuery, @RequestParam String outputlocation,
                                        @RequestParam String outputcode, @RequestParam boolean ipStatus, @RequestParam boolean outputStatus,
-                                       @RequestParam boolean writeStatus, @RequestParam String inputCode, @RequestParam String remoteStatusCode, @RequestParam String outputCode) {
+                                       @RequestParam boolean writeStatus, @RequestParam String inputCode, @RequestParam String remoteStatusCode) {
 
 
         AnalyticalJobs anj = new AnalyticalJobs();
@@ -40,7 +40,7 @@ public class AnalyticalJobsController {
         anj.setWriteStatus(writeStatus);
         anj.setInputCode(inputCode);
         anj.setRemoteStatusCode(remoteStatusCode);
-        anj.setOutputcode(outputcode);
+
 
         analyticalJobsRepository.save(anj);
         return "Saved";
