@@ -1,5 +1,5 @@
 package edu.sdsc.awesome.stmData;
-import java.io.File;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -8,7 +8,6 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -18,9 +17,17 @@ import java.util.Set;
 
 public class LDACMatrix {
 	private HashSet<String> vocab;
+	private HashMap<String, Integer> vocabMap;
+	private ArrayList<String> docs;
+	private ArrayList<String> fileIDs;
+	private int idx;
 
 	public LDACMatrix() {
 		this.vocab = new HashSet<>();
+		this.vocabMap = new HashMap<>();
+		this.docs = new ArrayList<>();
+		this.fileIDs = new ArrayList<>();
+		this.idx = 0;
 	}
 
 	public void populateVocab(String[]fileList,  String inDir,
@@ -51,6 +58,16 @@ public class LDACMatrix {
 		} catch (UnsupportedEncodingException | FileNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void populateVocab(String text) {
+		Scanner sc = new Scanner(text);
+		while(sc.hasNext()) {
+			String word = sc.next();
+			if(!this.vocabMap.containsKey(word))
+				this.vocabMap.put(word, new Integer(this.idx++));
+		}
+		sc.close();
 	}
 
 	public void getMatrix(String[]fileList,  String inDir, String vocabName,
@@ -112,13 +129,52 @@ public class LDACMatrix {
 		}
 	}
 
+	public void updateMatrix(String text, String id) {
+		this.populateVocab(text);
+		this.fileIDs.add(id);
+
+		Scanner sc = new Scanner(text);
+		HashMap<String, Integer> locMap = new HashMap<>();
+		while(sc.hasNext()) {
+			String term = sc.next();
+			if(locMap.containsKey(term))
+				locMap.put(term, locMap.get(term).intValue() + 1);
+			else
+				locMap.put(term, 1);
+		}
+		sc.close();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(locMap.size() + " ");
+		Set<String> set = locMap.keySet();
+		Iterator<String> it = set.iterator();
+		while(it.hasNext()) {
+			String key = it.next();
+			sb.append(this.vocabMap.get(key) +
+					":" + locMap.get(key).intValue());
+			if(it.hasNext())
+				sb.append(" ");
+		}
+		this.docs.add(sb.toString());
+	}
+
+	public ArrayList<String> getMatrix() {
+		return this.docs;
+	}
+
+	public ArrayList<String> getMappings() {
+		return this.fileIDs;
+	}
+	
+	public HashMap<String, Integer> getIndexedVocab() {
+		return this.vocabMap;
+	}
+
 	public static void main (String[] args) {
-		File dir = new File(args[0]);
-		String[] fileList = dir.list(); //Get all the files of the source folder
-		Arrays.sort(fileList);
-		LDACMatrix ldac = new LDACMatrix();
-		ldac.populateVocab(fileList, args[0], "vocab" + args[0]);
-		ldac.getMatrix(fileList, args[0], "vocab" + args[0], "mat"
-				+ args[0] + ".ldac");
+		LDACMatrix mat = new LDACMatrix();
+		mat.updateMatrix("this is a demo. How is your day?", "1234");
+		mat.updateMatrix("this is the second test", "3458");
+		System.out.println(mat.getMatrix());
+		System.out.println(mat.getMappings());
 	}
 }

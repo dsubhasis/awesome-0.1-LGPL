@@ -2,6 +2,7 @@ package edu.sdsc.awesome.dependencyExtraction;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -98,6 +99,15 @@ public class Driver {
 		LDACMatrix ldac = new LDACMatrix();
 		ldac.populateVocab(fileList, dirPath, vocabName);
 		ldac.getMatrix(fileList, dirPath, vocabName, matName);
+	}
+	
+	private static void buildMatrix(String text, String id) {
+		LDACMatrix ldac = new LDACMatrix();
+		ldac.updateMatrix(text, id); //Update matrix
+		ArrayList<String> rows = ldac.getMatrix(); //Get all rows
+		/* Index of this list map to document id */
+		ArrayList<String> mappings = ldac.getMappings();
+		HashMap<String, Integer> indexedVocab = ldac.getIndexedVocab();
 	}
 
 	public static void main(String[] args) {
