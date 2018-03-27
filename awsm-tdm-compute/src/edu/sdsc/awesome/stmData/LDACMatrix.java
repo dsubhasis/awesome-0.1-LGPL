@@ -169,6 +169,10 @@ public class LDACMatrix {
 	public HashMap<String, Integer> getIndexedVocab() {
 		return this.vocabMap;
 	}
+	
+	public void clearRows() {
+		this.docs.clear();
+	}
 
 	public static void main (String[] args) {
 		LDACMatrix mat = new LDACMatrix();

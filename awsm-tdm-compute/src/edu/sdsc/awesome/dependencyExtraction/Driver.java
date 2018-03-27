@@ -108,6 +108,7 @@ public class Driver {
 		/* Index of this list map to document id */
 		ArrayList<String> mappings = ldac.getMappings();
 		HashMap<String, Integer> indexedVocab = ldac.getIndexedVocab();
+		ldac.clearRows(); //Clear all rows to avoid memory limit error
 	}
 
 	public static void main(String[] args) {
