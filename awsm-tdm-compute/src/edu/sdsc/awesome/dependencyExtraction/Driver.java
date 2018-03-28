@@ -49,20 +49,16 @@ public class Driver {
 			gen.generate(file, criteria, outputDirs);
 	}
 
-	private static void executeStanfordParserEn(String dirPath) {
-		File dir = new File(dirPath);
+	private static void executeStanfordParserEn(String text) {
 		DependencyGeneratorEn gen = new DependencyGeneratorEn();
 		ArrayList<GrammaticalRelation> criteria = new ArrayList<>();
 		criteria.add(UniversalEnglishGrammaticalRelations.NP_ADVERBIAL_MODIFIER);
 		criteria.add(UniversalEnglishGrammaticalRelations.COMPOUND_MODIFIER);
 		criteria.add(UniversalEnglishGrammaticalRelations.ADJECTIVAL_MODIFIER);
-		String[] outputDirs = {"S/", "V/", "O/", "SV/", "VO/", "SO/"};
-		for(String outDir: outputDirs) {
-			File out = new File(outDir.substring(0, outDir.length() - 1));
-			out.mkdir();
-		}
-		for(final File file : dir.listFiles())
-			gen.generate(file, criteria, outputDirs);
+		StringBuilder[] res = new StringBuilder[6];
+		for(StringBuilder sb: res)
+			sb = new StringBuilder();
+		gen.generate(text, criteria, res);
 	}
 
 	/**

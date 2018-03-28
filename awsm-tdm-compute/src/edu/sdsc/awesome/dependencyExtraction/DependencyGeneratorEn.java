@@ -61,55 +61,23 @@ public class DependencyGeneratorEn {
 	 * @param criteria - phrase extraction criteria
 	 * @param outputDirs - a list of output directory names
 	 */
-	public void generate(File file, List<GrammaticalRelation> criteria, String[]
-			outputDirs) {
-		String text = this.preporcess(file.getPath());
+	public void generate(String text, List<GrammaticalRelation> criteria, 
+			StringBuilder[] outputBufs) {
+		String text = text.toLowerCase();
 		Annotation document = new Annotation(text);
 		this.corenlp.annotate(document);
-		
-		OutputStreamWriter[] writers = new OutputStreamWriter[outputDirs.length];
-		for(int i = 0; i < outputDirs.length; i++)
-			try {
-				writers[i] = new OutputStreamWriter(new 
-						FileOutputStream(outputDirs[i] + file.getName()));
-			} catch (IOException e) {
-				e.printStackTrace();
-				return;
-			}
 		
 		System.out.println("Processing file: " + file.getName());
 		List<CoreMap> sentences = document.get(SentencesAnnotation.class);
 		for(CoreMap sentence: sentences) {
 			SemanticGraph dependencies = sentence.get
 					(EnhancedDependenciesAnnotation.class);
-			this.extractDependencyPairs(dependencies, criteria, writers);
+			this.extractDependencyPairs(dependencies, criteria, outputBufs);
 		}
-		
-		for(OutputStreamWriter writer: writers)
-			try {
-				writer.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-	}
-	
-	private String preporcess(String path) {
-		StringBuilder sb = new StringBuilder();
-		try(BufferedReader reader = new BufferedReader(new InputStreamReader(new 
-				FileInputStream(path)))) {
-			String line = null;
-			while((line = reader.readLine()) != null)
-				sb.append(line + '\n');
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return sb.toString().toLowerCase();
 	}
 	
 	private void extractDependencyPairs(SemanticGraph graph,
-			List<GrammaticalRelation> criteria, OutputStreamWriter[] writers) {
+			List<GrammaticalRelation> criteria, StringBuilder[] outputBufs) {
 		/* Get all specified relationships from graph */
 		List<SemanticGraphEdge> list = graph.findAllRelns(
 				UniversalEnglishGrammaticalRelations.NOMINAL_SUBJECT);
@@ -139,27 +107,27 @@ public class DependencyGeneratorEn {
 				this.findObjs(graph, currEdge.getGovernor(), criteria, verbObjects,
 						objPhrases); //Find all verb-object relations
 				allVerbObjs.removeAll(verbObjects); //Remove all dobj edges found
-				this.writeOutput(subjects, objPhrases, verbObjects, writers);
+				this.writeOutput(subjects, objPhrases, verbObjects, outputBufs);
 				ListIterator<String> itPhrase = objPhrases.listIterator();
 				for(SemanticGraphEdge edge : verbObjects) //Store all verb-object pairs
 					dict.put(edge.getGovernor(), itPhrase.next());
 
 				this.handleCopulaSentence(graph, currEdge, subjects, criteria,
-						writers);
+						OutputBufs);
 			}
 
 			/* Write verb and object afterward to avoid duplication */
 			Set<Entry<IndexedWord, String>> voPairs = dict.entrySet();
 			for(Entry<IndexedWord, String> entry : voPairs) {
-				writers[1].write(entry.getKey().word() + " "); //verb
-				writers[2].write(entry.getValue() + " "); //object
+				outputBufs[1].append(entry.getKey().word() + " "); //verb
+				outputBufs[2].append(entry.getValue() + " "); //object
 			}
 
 			/* Extract the remaining verb-object pairs */
 			for(SemanticGraphEdge verbObject: allVerbObjs) {
-				writers[1].write(verbObject.getGovernor().word() + " "); //verb
-				writers[2].write(verbObject.getDependent().word() + " "); //object
-				writers[4].write(verbObject.getGovernor().word() + "-" + 
+				outputBufs[1].append(verbObject.getGovernor().word() + " "); //verb
+				outputBufs[2].append(verbObject.getDependent().word() + " "); //object
+				outputBufs[4].append(verbObject.getGovernor().word() + "-" + 
 						verbObject.getDependent().word() + " "); //verb-object
 			}
 		} catch (IOException e) {
@@ -168,24 +136,24 @@ public class DependencyGeneratorEn {
 	}
 	
 	private void writeOutput(LinkedList<String> subjects, LinkedList<String>
-	objPhrases, LinkedList<SemanticGraphEdge> verbObjects, OutputStreamWriter[]
-			writers) {
+	objPhrases, LinkedList<SemanticGraphEdge> verbObjects, StringBuilder[]
+			outputBufs) {
 		HashSet<String> printed = new HashSet<>();
 		for(String subject: subjects) {
 			try {
-				writers[0].write(subject + " ");
+				outputBufs[0].append(subject + " ");
 				ListIterator<String> it = objPhrases.listIterator();
 				for(SemanticGraphEdge verbObject: verbObjects) {
 					String objPhrase = it.next();
 					String sv = subject + "-" + verbObject.getGovernor().word() + " ";
 					if(printed.add(sv))
-						writers[3].write(sv); //subject-verb
+						outputBufs[3].append(sv); //subject-verb
 					String vo = verbObject.getGovernor().word() + "-" + objPhrase + " ";
 					if(printed.add(vo))
-						writers[4].write(vo); //verb-object
+						outputBufs[4].append(vo); //verb-object
 					String so = subject + "-" + objPhrase + " ";
 					if(printed.add(so))
-						writers[5].write(so); //subject-object
+						outputBufs[5].append(so); //subject-object
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -194,24 +162,24 @@ public class DependencyGeneratorEn {
 	}
 	
 	private void writeOutputPass(LinkedList<String> subjects, LinkedList<String>
-	verbs, LinkedList<String> objects, OutputStreamWriter[] writers) {
+	verbs, LinkedList<String> objects, StringBuilder[] outputBufs) {
 		try {
 			for(String object : objects)
-				writers[2].write(object + " ");
+				outputBufs[2].append(object + " ");
 			
 			for(String verb : verbs) { //Write verbs and verb-object pairs
-				writers[1].write(verb + " ");
+				outputBufs[1].append(verb + " ");
 				for(String object : objects)
-					writers[4].write(verb + "-" + object + " ");
+					outputBufs[4].append(verb + "-" + object + " ");
 			}
 			
 		 /* Write subjects, subject-verb pairs, and subject-object pairs */
 			for(String subject : subjects) {
-				writers[0].write(subject + " ");
+				outputBufs[0].append(subject + " ");
 				for(String verb : verbs)
-					writers[3].write(subject + "-" + verb + " ");
+					outputBufs[3].append(subject + "-" + verb + " ");
 				for(String object : objects)
-					writers[5].write(subject + "-" + object + " ");
+					outputBufs[5].append(subject + "-" + object + " ");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -250,31 +218,31 @@ public class DependencyGeneratorEn {
 	
 	private void handleCopulaSentence(SemanticGraph graph, SemanticGraphEdge
 			currEdge, LinkedList<String> subjects, List<GrammaticalRelation>
-	criteria, OutputStreamWriter[] writers) throws IOException {
+	criteria, StringBuilder[] outputBufs) throws IOException {
 		IndexedWord cop = graph.getChildWithReln(currEdge.getGovernor(), 
 				UniversalEnglishGrammaticalRelations.COPULA);
 		if(cop == null) return;
 		
 		LinkedList<String> objPhrases = new LinkedList<>();
-		writers[1].write(cop.word() + " ");
+		outputBufs[1].append(cop.word() + " ");
 		objPhrases = new LinkedList<>();
 		objPhrases.add(this.extendToPhrase(graph, currEdge.getGovernor(),
 				criteria));
 		this.findConjunctPhrases(graph, currEdge.getGovernor(), criteria,
 				objPhrases);
 		for(String phrase: subjects) {
-			writers[3].write(phrase + "-" + cop.word() + " ");
+			outputBufs[3].append(phrase + "-" + cop.word() + " ");
 			for(String objPhrase : objPhrases)
-				writers[5].write(phrase + "-" + objPhrase + " ");
+				outputBufs[5].append(phrase + "-" + objPhrase + " ");
 		}
 		for(String objPhrase : objPhrases) {
-			writers[2].write(objPhrase + " ");
-			writers[4].write(cop.word() + "-" + objPhrase + " ");
+			outputBufs[2].append(objPhrase + " ");
+			outputBufs[4].append(cop.word() + "-" + objPhrase + " ");
 		}
 	}
 	
 	private boolean handlePassiveSentence(SemanticGraph graph, 
-			List<GrammaticalRelation> criteria, OutputStreamWriter[] writers) {
+			List<GrammaticalRelation> criteria, StringBuilder[] outputBufs) {
 		boolean isPassive = false;
 		/* Passive subjects should be treated as objects in normal sentence */
 		List<SemanticGraphEdge> passSbjs = graph.findAllRelns
@@ -309,7 +277,7 @@ public class DependencyGeneratorEn {
 			this.findConjnctVerbsPass(graph, auxpassReln.getGovernor(), verbs);
 			objPhrases.add(this.extendToPhrase(graph, object, criteria));
 			this.findConjunctPhrases(graph, object, criteria, objPhrases);
-			this.writeOutputPass(nsubjs, verbs, objPhrases, writers);
+			this.writeOutputPass(nsubjs, verbs, objPhrases, outputBufs);
 			isPassive = true;
 		}
 		return isPassive;
@@ -393,21 +361,5 @@ public class DependencyGeneratorEn {
 				UniversalEnglishGrammaticalRelations.CONJUNCT);
 		for(IndexedWord conjVerb: set)
 			this.findConjnctVerbsPass(graph, conjVerb, results);
-	}
-	
-	public static void main(String[] args) {
-		File dir = new File(args[0]);
-		DependencyGeneratorEn gen = new DependencyGeneratorEn();
-		ArrayList<GrammaticalRelation> criteria = new ArrayList<>();
-		criteria.add(UniversalEnglishGrammaticalRelations.NP_ADVERBIAL_MODIFIER);
-		criteria.add(UniversalEnglishGrammaticalRelations.COMPOUND_MODIFIER);
-		criteria.add(UniversalEnglishGrammaticalRelations.ADJECTIVAL_MODIFIER);
-		String[] outputDirs = {"S/", "V/", "O/", "SV/", "VO/", "SO/"};
-		for(String outDir: outputDirs) {
-			File out = new File(outDir.substring(0, outDir.length() - 1));
-			out.mkdir();
-		}
-		for(final File file : dir.listFiles())
-			gen.generate(file, criteria, outputDirs);
 	}
 }
