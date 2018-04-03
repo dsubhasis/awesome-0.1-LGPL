@@ -1,0 +1,4 @@
+awsm-web/src/main/resources/static/sass_watch.cmd
+*.map
+awsm-web/src/main/resources/static/gitmove.cmd
+*.scss

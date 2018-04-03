@@ -1,11 +1,43 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-    <title>Hello AngularJS</title>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <!-- jQuery library -->
 
+  <link rel="stylesheet" type="text/css" href="css/main.css">
+  <script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl" crossorigin="anonymous"></script>
 </head>
 
-<body ng-app="hello">
-<H1>Hi ......</H1>
+<body>
+  <div id="histogram-wrapper" class="std-margin std-border module-background left chart-stage">
+    <canvas id="histogram"></canvas>
+  </div>
+  <div id="histograph-filter-wrapper" class="std-margin std-border module-background left">
+    <button disabled id="filter-button" class='std-margin'>Filter</button>
+  </div>
+  <div id="search-bar-wrapper" class="std-margin std-border module-background center">
+    <input id="search-bar" type="text" name="Search Bar" placeholder="Search.."></input>
+  </div>
+    
+  <div id="date-range" class="parent center module-background std-margin std-border">
+    <button id='larrow' class="glyphicon glyphicon-triangle-left child disabledButton"></button>
+    <span id='dateRangeText' class='child'></span>
+    <button id='rarrow' class="glyphicon glyphicon-triangle-right child"></button>
+  </div>
+
+  <ul id="newspaper-wrapper" class="std-margin std-border module-background center"></ul>    
+  
+  <div id="knowledge-graph-wrapper" class="std-margin std-border module-background right">
+    <div class="graph-header">Knowledge Graph</div>
+  </div>
+  <div id="topic-graph-wrapper" class="std-margin std-border module-background right">
+    <div class="graph-header">Topic Graph</div>
+  </div>
+
+  <script src="js/jquery.js"></script>
+  <script src="https://d3js.org/colorbrewer.v1.min.js"></script>
+  <script src="js/chart.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>
