@@ -27,12 +27,8 @@ public class Driver {
 			+ "[JAR NAME] -SZh [INPUT DIR]\n Execute Stanford English parser: java "
 			+ "-jar [JAR NAME] -SEn [INPUT DIR]\nGenerate LDA-C matrix: java -jar "
 			+ "[JAR NAME] -M [DIR] -v [VOCAB NAME] -m [MATRIX NAME]\n";
-	/**
-	 * Execute Stanford Parser to get dependency pairs.
-	 * @param dirPath - directory of input files
-	 */
-	private static void executeStanfordParserZh(String dirPath) {
-		File dir = new File(dirPath);
+
+	private static void executeStanfordParserZh(String text) {
 		DependencyGeneratorZh gen = new DependencyGeneratorZh();
 		ArrayList<GrammaticalRelation> criteria = new ArrayList<>();
 		criteria.add(UniversalChineseGrammaticalRelations.NOUN_COMPOUND);
@@ -40,13 +36,11 @@ public class Driver {
 		criteria.add(UniversalChineseGrammaticalRelations.CLAUSAL_MODIFIER);
 		criteria.add(UniversalChineseGrammaticalRelations.ASSOCIATIVE_MODIFIER);
 		criteria.add(UniversalChineseGrammaticalRelations.ORDINAL_MODIFIER);
-		String[] outputDirs = {"S/", "V/", "O/", "SV/", "VO/", "SO/"};
-		for(String depType: outputDirs) {
-			File directory = new File(depType.substring(0, depType.length() - 1));
-			directory.mkdir();
-		}
-		for(final File file : dir.listFiles())
-			gen.generate(file, criteria, outputDirs);
+		/* Order: S, V, O, SV, VO, SO */
+		StringBuilder[] res = new StringBuilder[6];
+		for(StringBuilder sb: res)
+			sb = new StringBuilder();
+		gen.generate(text, criteria, res);
 	}
 
 	private static void executeStanfordParserEn(String text) {
@@ -55,6 +49,7 @@ public class Driver {
 		criteria.add(UniversalEnglishGrammaticalRelations.NP_ADVERBIAL_MODIFIER);
 		criteria.add(UniversalEnglishGrammaticalRelations.COMPOUND_MODIFIER);
 		criteria.add(UniversalEnglishGrammaticalRelations.ADJECTIVAL_MODIFIER);
+		/* Order: S, V, O, SV, VO, SO */
 		StringBuilder[] res = new StringBuilder[6];
 		for(StringBuilder sb: res)
 			sb = new StringBuilder();
@@ -63,29 +58,26 @@ public class Driver {
 
 	/**
 	 * Execute one of HanLP dependency parser to get dependency pairs.
-	 * @param dirPath - directory of input files
+	 * @param text - input string to parse
 	 * @param option - name of segmenter, by default use neural network
 	 * dependency parser with NLPTokenizer; use "index" to use IndexTokenizer;
 	 * use "NShort" to use NShortSegment; use "CRF" to use CRF dependency parser.
 	 */
-	private static void executeHanLPDependencyParser(String dirPath, String 
+	private static void executeHanLPDependencyParser(String text, String 
 			option) {
-		File dir = new File(dirPath);
 		HanLPDependencyExtractor extr = new HanLPDependencyExtractor();
-		String[] outputDirs = {"S", "V", "O", "SV", "VO", "SO"};
-		for(String depType: outputDirs) {
-			File directory = new File(depType);
-			directory.mkdir();
-		}
-		for(final File file : dir.listFiles()) {
-			extr.buildDep(file.getPath(), option);
-			extr.getSingleComp(outputDirs[0], file.getName(), "S");
-			extr.getSingleComp(outputDirs[1], file.getName(), "V");
-			extr.getSingleComp(outputDirs[2], file.getName(), "O");
-			extr.getSV(outputDirs[3], file.getName());
-			extr.getVO(outputDirs[4], file.getName());
-			extr.getSO(outputDirs[5], file.getName());
-		}
+		/* Order: S, V, O, SV, VO, SO */
+		StringBuilder[] res = new StringBuilder[6];
+		for(StringBuilder sb: res)
+			sb = new StringBuilder();
+
+		extr.buildDep(text, option);
+		extr.getSingleComp(res[0], "S");
+		extr.getSingleComp(res[1], "V");
+		extr.getSingleComp(res[2], "O");
+		extr.getSV(res[3]);
+		extr.getVO(res[4]);
+		extr.getSO(res[5]);
 	}
 
 	private static void buildMatrix(String dirPath, String vocabName, String matName) {
@@ -96,7 +88,7 @@ public class Driver {
 		ldac.populateVocab(fileList, dirPath, vocabName);
 		ldac.getMatrix(fileList, dirPath, vocabName, matName);
 	}
-	
+
 	private static void buildMatrix(String text, String id) {
 		LDACMatrix ldac = new LDACMatrix();
 		ldac.updateMatrix(text, id); //Update matrix

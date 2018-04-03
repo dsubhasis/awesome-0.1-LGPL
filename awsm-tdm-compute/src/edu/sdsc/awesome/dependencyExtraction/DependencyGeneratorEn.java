@@ -59,7 +59,8 @@ public class DependencyGeneratorEn {
 	 * Generate phrases and dependencies using Stanford parser.
 	 * @param file - input file to process
 	 * @param criteria - phrase extraction criteria
-	 * @param outputDirs - a list of output directory names
+	 * @param outputBufs - a list of buffers to hold output, each buffer stores
+	 * results for S, V, O, SV, VO, SO relations, respectively.
 	 */
 	public void generate(String text, List<GrammaticalRelation> criteria, 
 			StringBuilder[] outputBufs) {
@@ -67,7 +68,6 @@ public class DependencyGeneratorEn {
 		Annotation document = new Annotation(text);
 		this.corenlp.annotate(document);
 		
-		System.out.println("Processing file: " + file.getName());
 		List<CoreMap> sentences = document.get(SentencesAnnotation.class);
 		for(CoreMap sentence: sentences) {
 			SemanticGraph dependencies = sentence.get
