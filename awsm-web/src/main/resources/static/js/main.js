@@ -411,3 +411,21 @@ function refreshDocuments(visibleDocuments){
     $("#rarrow").removeClass('disabledButton');
   }
 }
+
+
+
+/*
+ *   TOPIC GRAPH HANDLERS
+ */
+
+//data format to be later specified
+function setTopicGraphData(data){
+
+}
+
+//open to other interpretations.
+//This is just the handler for if the document list needs to be filtered
+function onTopicClicked(topicName, docIDList){
+
+}
+
