@@ -1,26 +1,215 @@
 const WORD_MAX = 10;
-const RAND_DOC_LENGTH = 100;
+const RAND_DOC_LENGTH = 1000;
 
+var docResults, docIndex = 0;
 $(document).ready(function(){
+  loadGrammar()
+  .then(setupInputBarFiringMethods)
 
   $("#rarrow").click(function(){
     if(docIndex === docResults.length - 1)
       return;
     docIndex++;
-    refreshDocuments();
+    destroyDocumentPanel();
   });
 
   $("#larrow").click(function(){
     if(docIndex === 0)
       return;
     docIndex--;
-    refreshDocuments();
+    destroyDocumentPanel();
   });
 
+  $(document).on('click', function(){
+    $("#predictedSearchList").hide();
+  })
+
   createChart();
-  loadInitialData();
-  updateHistogram({b: 4, a: 3});
+  getInitialData()
+  .then(loadData);
 });
+
+function loadGrammar(){
+  return new Promise((resolve, reject) => {
+    $.get( "data/grammar.pegjs", function( grammar ) {
+      parser = peg.generate(grammar);
+      resolve();
+    });
+  });
+}
+
+function setupInputBarFiringMethods(){
+  $("#search-bar").focusin(function(e){
+    $(this).parent().removeClass('searchNoFocus');
+    $(this).parent().addClass('searchHasFocus');
+    if($("#predictedSearchList").children().length)
+      $("#predictedSearchList").show();
+    e.stopPropagation();
+  });
+
+  $("#search-bar").click(function(e){
+    e.stopPropagation();
+    if($("#predictedSearchList").children().length)
+      $("#predictedSearchList").show();
+  });
+
+  $("#search-bar").focusout(function(){
+    $(this).parent().addClass('searchNoFocus');
+    $(this).parent().removeClass('searchHasFocus');
+  });
+
+  $("#search-bar").keyup(function(e){
+    $(this).parent().removeClass('searchHasError');
+    if(e.which === 13)
+      onSearch($(this).val().trim());
+    else
+      autoComplete($(this).val().trim());
+  });
+}
+
+
+const SEARCHABLE_KEYS = ['title', 'text', 'newspaper'];
+
+function isAlphaNumeric(str) {
+  var code, i, len;
+
+  for (i = 0, len = str.length; i < len; i++) {
+    code = str.charCodeAt(i);
+    if (!(code > 47 && code < 58) && // numeric (0-9)
+        !(code > 64 && code < 91) && // upper alpha (A-Z)
+        !(code > 96 && code < 123)) { // lower alpha (a-z)
+      return false;
+    }
+  }
+  return true;
+};
+
+function simpleSearch(text){
+  text = text.replace(/,/g , "");
+  text = text.split(/\s+/);
+  if(!text)
+    return false;
+
+  if(!isAlphaNumeric(text.join('')))
+    return false;
+
+
+
+  text = SEARCHABLE_KEYS.map(function(kval, i){
+    //all text pieces must be in at least one of these values
+    var keyValue = text.map(function(vval, j){
+      return "(" + kval + ":" + vval + ")";
+    });
+
+    return "(" + keyValue.join(" AND ") + ")";
+  });
+
+  text = text.join(" OR ");
+  submitQuery(text);
+  $("#predictedSearchList").hide();
+
+  return true;
+}
+
+function onSearch(text){
+  if(!text)
+    return;
+
+  if(simpleSearch(text))
+    return;
+
+  $("#search-bar").parent().addClass("searchHasError");
+  $("#predictedSearchList").hide();
+}
+
+var queryHash = {}
+function submitQuery(text){
+  $(".moduleLoader").show();
+  var p;
+  if(queryHash[text])
+    p = Promise.resolve(queryHash[text]);
+  else
+    p = Promise.resolve(getRandomData());
+  p.then(function(data){
+    queryHash[text] = data;
+
+    return new Promise(function(resolve, reject){
+      setTimeout(resolve, 3000);
+    })
+    .then(function(){
+      loadData(data);
+    });
+  });
+}
+
+var predictedWordsHash = {};
+function getPredictedWords(text){
+  if(predictedWordsHash[text])
+    return Promise.resolve(predictedWordsHash[text]);
+
+  var list = [];
+  var predicted_word, category, topics;
+  for(var i = 0; i < 10; i++){
+    predicted_word = text + gibberish(i);
+    category = gibberish(10);
+    topics = [gibberish(10), gibberish(10)]
+    list.push({
+      predicted_word: predicted_word,
+      category: category,
+      topics: topics
+    });
+  }
+
+  predictedWordsHash[text] = list;
+  return new Promise(function(resolve, reject){
+    setTimeout(resolve, 700);
+  }).then(function(){
+    return list;
+  })
+}
+
+function autoComplete(text){
+  if(!text)
+    return $("#predictedSearchList").hide();
+
+  getPredictedWords(text)
+  .then(function(words){
+    $("#predictedSearchList").empty();
+    if($("#search-bar").is(":focus"))
+      $("#predictedSearchList").show();
+
+    var li, span;
+    $.each(words, function(i, val){
+      li = $("<li>");
+      
+      span = $("<span>");
+      span.text(val.predicted_word);
+      span.addClass('predicted_word');
+      li.append(span);
+
+      span = $("<span>");
+      span.text(val.category);
+      span.addClass('predicted_type');
+      li.append(span);
+
+      for(var i = 0; i < val.topics.length; i++){
+        span = $("<span>");
+        span.text(val.topics[i]);
+        span.addClass('predicted_topic');
+        li.append(span);
+      }    
+
+      li.click(function(e){
+        e.stopPropagation();
+        $("#search-bar").val(val.predicted_word);
+        $("#predictedSearchList").hide();
+        onSearch(val.predicted_word);
+      });
+
+      li.appendTo($("#predictedSearchList"));
+    });
+  }).catch(console.log);
+}
 
 function createiFrame(url){
   var frameWrapper = $("<div id='frame-wrapper'></div>")
@@ -39,6 +228,7 @@ function createiFrame(url){
 
   var loader = $("<div></div>")
     .addClass("loader")
+    .addClass("frameLoader")
     .appendTo(loaderWrapper)
 
   var frame = $("<iframe id='frame' src=" + url + "></iframe>")
@@ -138,7 +328,7 @@ function createChart(){
                       display: true,
                   },
                   ticks: {
-                      fontColor: "#CCC", // this here
+                      fontColor: "#000", // this here
                       beginAtZero : true
                   },
               }],
@@ -148,7 +338,7 @@ function createChart(){
                       display: false,
                   },
                   ticks: {
-                      fontColor : "#CCC", // this here
+                      fontColor : "#000", // this here
                   },
               }],
           },
@@ -160,26 +350,25 @@ function createChart(){
                   var clickedElementindex = item[0]["_index"];
                   //get specific label by index
                   var bar_last_clicked = histogramDataSet.labels[clickedElementindex];
-                  pushTerm(bar_last_clicked);
+
+                  getAssociatedDocuments(bar_last_clicked)
+                  .then(function(docs){
+                    pushTerm(bar_last_clicked, docs);
+                  }).catch(console.log);
               }
           }
       }
   });
 }
 
-var filterWords = [];
+var filterWords = {};
 
-function pushTerm(word){
-  var index = filterWords.indexOf(word);
-  if(index !== -1){
-    $("#filterWord" + word).remove();
-    filterWords.splice(index, 1);
-    getAssociatedDocuments(word)
-    .then(slowShowDocuments);
-
-    return true;
+function pushTerm(word, docs){
+  if(filterWords[word]){
+    $("#filterWord" + word).click();
+    return;
   }
-  filterWords.push(word);
+  filterWords[word] = docs;
 
   var wrapper = $("<div>").addClass('filterWordWrapper');
   var text = $("<span>").addClass('filterWordText').text(word);
@@ -188,18 +377,15 @@ function pushTerm(word){
   wrapper.attr('id', "filterWord" + word);
   wrapper.append(text);
   wrapper.append(closeButtton);
-  wrapper.click(function(){
-    var index = filterWords.indexOf(word);
-    filterWords.splice(index, 1);
-    $(this).remove();
-    getAssociatedDocuments(word)
-    .then(slowShowDocuments);
-  });
-  $("#histograph-filter-wrapper").append(wrapper);
 
-  getAssociatedDocuments(word)
-  .then(slowHideDocuments);
-  return;
+  wrapper.click(function(){
+    delete filterWords[word];
+    $(this).remove();
+    refreshDocuments();
+  });
+
+  $("#histograph-filter-wrapper").append(wrapper);
+  refreshDocuments();
 }
 
 function slowShowDocuments(docList){
@@ -223,6 +409,7 @@ function slowHideDocuments(docList){
 }
 
 function updateHistogram(words){
+  $("#histogramLoader").hide();
   var labels = Object.keys(words).sort(function(a, b){
     return words[b] - words[a];
   });
@@ -236,15 +423,18 @@ function updateHistogram(words){
 }
 
 function gibberish(text_len){
-  if(!text_len)
-    text_len = 40;
-    var text = "";
-    var possible = "ABCD EFGHIJ KLMNOPQR STUVWXYZ abcdefghij klmnopqr stuvwxyz abcdefghij klmnopqr stuvwxyz ";
+  var text = "";
 
-    for(var i=0; i < text_len; i++)
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
+  var possible;
+  for(var i = 0; i < text_len; i++){
+    if(i === text_len - 1)
+      possible = "abcdefghijklmnopqrstuvwxyz";
+    else
+      possible = "ABCD EFGHIJ KLMNOPQR STUVWXYZ abcdefghij klmnopqr stuvwxyz abcdefghij klmnopqr stuvwxyz ";
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
 
-    return text;
+  return text;
 }
 
 function getRandomInt(max) {
@@ -262,12 +452,14 @@ function getRandomDocument(){
   doc.date = getRandomDate();
   doc.subtext = gibberish(150);
   doc.docID = getRandomInt(RAND_DOC_LENGTH ** 4);
+  doc.title = gibberish(15);
+
 
   if(Math.random() >= 0.5){
-    doc.title = gibberish(15) + " Google"
+    doc.newspaper = "Google Inc";
     doc.url = "https://www.google.com";
   }else{
-    doc.title = gibberish(15) + " SDSC"
+    doc.newspaper = "San Diego Supercomputer Center";
     doc.url = "http://www.sdsc.edu";
   }
 
@@ -275,6 +467,10 @@ function getRandomDocument(){
 }
 
 function getInitialData(){
+  return Promise.resolve(getRandomData());
+}
+
+function getRandomData(){
   var initData = {
     histogram : {
       alfa : 10,
@@ -292,8 +488,7 @@ function getInitialData(){
   for(var i = 0; i < RAND_DOC_LENGTH; i++){
     initData.documents.push(getRandomDocument());
   }
-
-  return Promise.resolve(initData);
+  return initData;
 }
 
 var wordHash = [];
@@ -315,15 +510,13 @@ function getAssociatedDocuments(word){
   return Promise.resolve(wordHash[word]);
 }
 
-function loadInitialData(){
-  getInitialData()
-  .then(function(initialData){
-    updateHistogram(initialData.histogram);
-    updateDocuments(initialData.documents);
-  }).catch(console.log);
+function loadData(data){
+  updateHistogram(data.histogram);
+  updateDocuments(data.documents);
 }
 
 function daysInMonth (month, year) {
+  console.log(month, year, new Date(year, month, 0).getDate());
   return new Date(year, month, 0).getDate();
 }
 
@@ -340,64 +533,124 @@ function monthFrom(d, months){
 }
 
 function updateDocuments(documents){
+  $("#newspaperLoader").hide();
   documents.sort(function(a, b){
     return a.date - b.date;
   });
 
-  var lastDateInSegment = monthFrom(documents[0].date);
+  var currentMonth = documents[0].date.getMonth();
   var index = 0;
   docResults = [[]];
   $.each(documents, function(i, d){
-    if(d.date > lastDateInSegment){
+    if(d.date.getMonth() > currentMonth){
       index++;
       docResults.push([]);
-      lastDateInSegment = monthFrom(d.date);
+      currentMonth = d.date.getMonth();
     }
     docResults[index].push(d);
   });
-  
   docIndex = 0;
-  console.log(docIndex);
-  refreshDocuments();
+  destroyDocumentPanel();
 }
 
-function pushDocument(d){
+function isVisible(d){
+  if($.isEmptyObject(filterWords))
+    return true;
+
+  var clickedWords = Object.keys(filterWords);
+  var lists = clickedWords.map(function(val, i){
+    return filterWords[val].indexOf(d.docID) !== -1;
+  });//returns an array of whether each word had the doc id
+  //only need one to say its visible
+  return lists.reduce(function(current, next){ return current && next; });
+}
+
+function refreshDocuments(){
+  var vDocuments = docResults[docIndex];
+  $.each(vDocuments, function(i, d){
+    refreshDocument(d);
+  });
+}
+
+function refreshDocument(d){
+  var panel = $("#doc" + d.docID);
+  var existed = !!panel.length;
+  if(!existed)
+    panel = createDocument(d);
+
+  var visible = panel.is(':visible');
+  var supposedToBeVisible = isVisible(d);
+
+  if(existed){
+    if(visible && !supposedToBeVisible){
+      panel.slideUp();
+    }else if(!visible && supposedToBeVisible){
+      panel.slideDown();
+    }
+  }else{
+    if(visible && !supposedToBeVisible){
+      panel.hide();
+    }else if(!visible && supposedToBeVisible){
+      panel.show();
+    }
+  }
+}
+
+function createDocument(d){
   var li = $("<li>").addClass('newspaper');
   var title = $("<h3>").addClass('std-margin newspaper-header').text(d.title);
-  var dateLabel = $("<div>").addClass("std-margin newspaper-date").text(d.date.toLocaleDateString());
-  var subtext = $("<p>").addClass('std-margin newspaper-content').text(d.subtext);
+  var subHeading = $("<span>").addClass("std-margin newspaper-subheading");
+  var subtext = $("<p>").addClass('std-margin newspaper-content').text(d.subtext).hide();
+  var arrow = $("<i>").addClass('fas fa-angle-down newspaper-expander');
+
+  var subHeadingText = d.newspaper + ' \u00B7 ' + d.date.toLocaleDateString();
+  subHeading.text(subHeadingText);
 
   li.attr('id', 'doc' + d.docID);
 
-  li.click(function() {
-    // createiFrame("http://www.google.com");
+  title.click(function(){
     createiFrame(d.url);
+  });
+
+  li.click(function() {
+    var expander = $(this).find(".newspaper-expander");
+    if(subtext.is(':visible')){
+      subtext.slideUp(300, function(){
+        expander.removeClass('fa-angle-up');
+        expander.addClass('fa-angle-down');
+      });
+    }else{
+      subtext.slideDown(300, function(){
+        expander.removeClass('fa-angle-down');
+        expander.addClass('fa-angle-up');
+      });
+    }
   });
 
 
   li.append(title);
-  li.append(dateLabel);
+  li.append(subHeading);
+  li.append(arrow);
   li.append(subtext);
+  li.hide();
 
   $("#newspaper-wrapper").append(li);
+
+  return li;
 }
 
-var docResults, docIndex;
-function refreshDocuments(visibleDocuments){
+function destroyDocumentPanel(){
   $("#newspaper-wrapper").empty();
-  console.log(docIndex);
-  var vDocuments = docResults[docIndex || 0];
 
-  var startMonth = docResults[0][0].date, docIndex;
-  var endMonth = monthFrom(docResults[0][0].date, docIndex + 1);
+  var startMonth = docResults[docIndex][0].date;
+  var endMonth = new Date(startMonth.getUTCFullYear(), startMonth.getMonth() + 1, 0);
 
   var text = (startMonth.getMonth() + 1) + "/" + startMonth.getDate() + " - " + (endMonth.getMonth() + 1) + "/" + endMonth.getDate();
   $("#dateRangeText").text(text);
 
-  $.each(vDocuments, function(i, d){
-    if(!visibleDocuments || visibleDocuments.indexOf(d.docID) !== -1)
-      pushDocument(d);
-  });
+  refreshDocuments();
+
+  new SimpleBar($("#newspaper-wrapper")[0]);
 
   if(docIndex === 0){
     $("#larrow").addClass('disabledButton');
