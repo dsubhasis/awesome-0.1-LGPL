@@ -27,7 +27,7 @@ public class App
     }
     public static void main( String[] args )
     {   
-        SpringApplication.run(SamepleController.class, args)
+        //SpringApplication.run(SamepleController.class, args)
 
 
     }
