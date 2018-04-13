@@ -513,6 +513,8 @@ function getAssociatedDocuments(word){
 function loadData(data){
   updateHistogram(data.histogram);
   updateDocuments(data.documents);
+  initTopicGraph();
+  // .loadAwsmDataFromUrl('test-data/tillerson30.json');
 }
 
 function daysInMonth (month, year) {
@@ -675,6 +677,83 @@ function destroyDocumentPanel(){
 function setTopicGraphData(data){
 
 }
+
+
+
+function initTopicGraph() {
+
+  /*
+  var neo4jdata = { 
+    results:[ ] };
+  var result = {columns:[],data:[]}
+
+  result.columns.push("topic");
+  result.columns.push("documents");
+
+  //var agraph = {nodes:[],relationships:[]};
+  var neo4jdata = d3.json("test-data/neo4jdata.json", function(error, data) { 
+  //  alert(data);
+  //  return data;
+    //console.log(data);
+  //});
+  //for (var topic in awsmdata.topics){
+
+  //}
+
+  //result.columns.data;
+  
+  
+  
+  
+  
+  
+  
+  //neo4jdata.results.push(result);
+*/
+  neo4jd3 = new Neo4jd3('#topic-graph', {
+      highlight: [
+          {
+              class: 'Project',
+              property: 'name',
+              value: 'neo4jd3'
+          }, {
+              class: 'User',
+              property: 'userId',
+              value: 'eisman'
+          }
+      ],
+      icons: {
+
+      },
+      images: {
+
+          'User': 'img/twemoji/1f600.svg'
+
+      },
+      minCollision: 60,
+      neo4jDataUrl: 'test-data/tillerson30.json',
+      //neo4jDataUrl: 'test-data/neo4jdata.json',
+      nodeRadius: 25,
+      onNodeDoubleClick: function(node) {
+          switch(node.id) {
+              case '25':
+                  // Google
+                  window.open(node.properties.url, '_blank');
+                  break;
+              default:
+                  var maxNodes = 5,
+                      data = neo4jd3.randomD3Data(node, maxNodes);
+                  neo4jd3.updateWithD3Data(data);
+                  break;
+          }
+      },
+      onRelationshipDoubleClick: function(relationship) {
+          console.log('double click on relationship: ' + JSON.stringify(relationship));
+      },
+      zoomFit: true
+  });
+}
+
 
 //open to other interpretations.
 //This is just the handler for if the document list needs to be filtered
