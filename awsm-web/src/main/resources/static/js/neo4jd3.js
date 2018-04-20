@@ -679,7 +679,7 @@ function Neo4jD3(_selector, _options) {
                 var relationship = {};
                 relationship.source = corr.First;
                 relationship.target = corr.Second;
-                relationship.type = "Correlation: " + corr.Corr; 
+                relationship.type = (parseFloat(corr.Corr) * 100 ).toFixed(1); 
                 graph.relationships.push(relationship);
 
             });

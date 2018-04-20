@@ -111,19 +111,61 @@ function simpleSearch(text){
   return true;
 }
 
-function onSearch(text){
-  if(!text)
+function onSearch(qString){
+  if(!qString)
     return;
 
-  if(simpleSearch(text))
+  if(simpleSearch(qString))
     return;
 
-  $("#search-bar").parent().addClass("searchHasError");
+  var _text, text = '';
+  try{
+    pObj = parser.parse(qString);
+    if(pObj['_text']){
+      _text = pObj['_text'];
+      delete pObj['_text'];
+    }
+    keys = Object.keys(pObj);
+    
+
+    for(var i = 0; i < keys.length; i++){
+      if(SEARCHABLE_KEYS.indexOf(keys[i]) === -1)
+          throw keys[i] + ' is not a searchable column';
+    }
+
+    for(var i = 0; i < keys.length; i++)
+      text += keys[i] + ":" + pObj[keys[i]] + " ";
+
+    var allSearchText = '';
+    if(_text){
+      $.each(SEARCHABLE_KEYS, function(i, key){
+        if(allSearchText)
+          allSearchText += "OR ";
+        allSearchText += key + ":" + _text + " ";
+        if(keys.indexOf(key) === -1)
+          keys.push(key);
+      });
+    }
+    
+    if(text && allSearchText){
+        text += ' (' + allSearchText + ')';
+    }else if(allSearchText){
+        text = allSearchText;
+    }
+  }catch(e){
+      console.log(e);
+      $("#search-bar").parent().addClass("searchHasError");
+      return;
+  }
+
   $("#predictedSearchList").hide();
+  submitQuery(text);
 }
 
-var queryHash = {}
+var queryPending = false;
+var queryHash = {};
 function submitQuery(text){
+  queryPending = true;
   $(".moduleLoader").show();
   var p;
   if(queryHash[text])
@@ -137,6 +179,7 @@ function submitQuery(text){
       setTimeout(resolve, 3000);
     })
     .then(function(){
+      queryPending = false;
       loadData(data);
     });
   });
@@ -172,10 +215,18 @@ function autoComplete(text){
   if(!text)
     return $("#predictedSearchList").hide();
 
+  text = text.split(/\s+/);
+  if(!text)
+    return $("#predictedSearchList").hide();
+
+  if(!isAlphaNumeric(text.join('')))
+    return $("#predictedSearchList").hide();
+  text = text.join('');
+
   getPredictedWords(text)
   .then(function(words){
     $("#predictedSearchList").empty();
-    if($("#search-bar").is(":focus"))
+    if($("#search-bar").is(":focus") && !queryPending)
       $("#predictedSearchList").show();
 
     var li, span;
@@ -478,6 +529,9 @@ function getRandomData(){
       charlie : 39,
       delta : 8,
       echo : 46,
+      zulu : 46,
+      victor : 46,
+      mike : 46,
       frank : 8,
       golf : 11,
       hotel : 29
@@ -514,7 +568,6 @@ function loadData(data){
   updateHistogram(data.histogram);
   updateDocuments(data.documents);
   initTopicGraph();
-  // .loadAwsmDataFromUrl('test-data/tillerson30.json');
 }
 
 function daysInMonth (month, year) {
@@ -621,11 +674,13 @@ function createDocument(d){
         expander.removeClass('fa-angle-up');
         expander.addClass('fa-angle-down');
       });
+      $(this).removeClass('expanded');
     }else{
       subtext.slideDown(300, function(){
         expander.removeClass('fa-angle-down');
         expander.addClass('fa-angle-up');
       });
+      $(this).addClass('expanded');
     }
   });
 
@@ -678,10 +733,16 @@ function setTopicGraphData(data){
 
 }
 
+//open to other interpretations.
+//This is just the handler for if the document list needs to be filtered
+function onTopicClicked(topicName, docIDList){
+
+}
 
 
 function initTopicGraph() {
 
+  $("#topicLoader").hide();
   /*
   var neo4jdata = { 
     results:[ ] };
@@ -753,11 +814,3 @@ function initTopicGraph() {
       zoomFit: true
   });
 }
-
-
-//open to other interpretations.
-//This is just the handler for if the document list needs to be filtered
-function onTopicClicked(topicName, docIDList){
-
-}
-
