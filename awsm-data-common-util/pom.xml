@@ -98,7 +98,7 @@
     </dependency>
     <dependency>
       <groupId>edu.sdsc.awesome</groupId>
-      <artifactId>awesomeWeb</artifactId>
+      <artifactId>awsm-web</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
