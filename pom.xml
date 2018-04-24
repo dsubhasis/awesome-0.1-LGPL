@@ -44,10 +44,11 @@
         <module>awsm-connector-postgres</module>
         <module>awsm-connector-neo4j</module>
         <module>awsm-connector-solr</module>
-        <module>awsm-data-common-util</module>
         <module>awsm-web</module>
+        <module>awsm-data-common-util</module>
         <module>awsm-webService</module>
         <module>awsm-tdm-compute</module>
+
 
         <module>awsm-connector-rserver</module>
   </modules>
