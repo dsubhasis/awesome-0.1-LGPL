@@ -27,7 +27,13 @@ $(document).ready(function(){
   createChart();
   getInitialData()
   .then(loadData);
+
+  $('#calendarText').daterangepicker();
 });
+
+function showCalendar(e){
+  $('#calendarText').data('daterangepicker').toggle();
+}
 
 function loadGrammar(){
   return new Promise((resolve, reject) => {
@@ -320,21 +326,14 @@ function removeiFrame(){
   $("#frame-wrapper").remove();
 }
 
-
-function color_generator(style,range,number) {
-    var color = [];
-    for(var i=0; i < number; i++){
-        color.push(colorbrewer[style][range][i%range])
-    }
-    return color;
-}
-
 var histogramDataSet = {
     labels: [],
     datasets: [{
         label: 'words',
-        backgroundColor: color_generator("Pastel2",8, WORD_MAX),
-        //data: [{text: 'hi', size: 30}, {text: 'yo', size: 40}]
+        backgroundColor: "#006A96",
+        borderColor : "#182B49",
+        defaultFontFamily: "Impact",
+        fontFamily: "'Impact'",
         data: []
     }]
 };
@@ -343,8 +342,8 @@ var histogram;
 
 function createChart(){
   histogram = new Chart('histogram', {
-          responsive: true,
-          maintainAspectRatio: false,
+      responsive: true,
+      maintainAspectRatio: false,
       type: 'horizontalBar',
       data: histogramDataSet,
       options: {
@@ -362,7 +361,7 @@ function createChart(){
               display: false,
           },
           title: {
-              display: true,
+              display: false,
               text: 'Words Horizontal'
           },
           tooltips: {
@@ -379,7 +378,7 @@ function createChart(){
                       display: true,
                   },
                   ticks: {
-                      fontColor: "#000", // this here
+                      fontColor: "#000",
                       beginAtZero : true
                   },
               }],
@@ -389,7 +388,8 @@ function createChart(){
                       display: false,
                   },
                   ticks: {
-                      fontColor : "#000", // this here
+                      fontColor : "#000",
+                      fontFamily: 'Helvetica'
                   },
               }],
           },
@@ -460,6 +460,7 @@ function slowHideDocuments(docList){
 }
 
 function updateHistogram(words){
+  $("#histogram-wrapper .graph-subheader").text(Object.keys(words).length + " Words");
   $("#histogramLoader").hide();
   var labels = Object.keys(words).sort(function(a, b){
     return words[b] - words[a];
@@ -493,8 +494,8 @@ function getRandomInt(max) {
 }
 
 function getRandomDate(){
-  var start = new Date(2018, 0, 1);
-  var end = new Date(2018, 11, 31);
+  var start = new Date(2015, 3, 1);
+  var end = new Date(2018, 10, 31);
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 }
 
@@ -532,6 +533,8 @@ function getRandomData(){
       zulu : 46,
       victor : 46,
       mike : 46,
+      tango : 13,
+      sierra : 7,
       frank : 8,
       golf : 11,
       hotel : 29
@@ -588,10 +591,16 @@ function monthFrom(d, months){
 }
 
 function updateDocuments(documents){
-  $("#newspaperLoader").hide();
   documents.sort(function(a, b){
     return a.date - b.date;
   });
+  try{
+    createTimeSlider(documents);
+  }catch(e){
+    console.log(e);
+  }
+  $("#newspaperLoader").hide();
+  
 
   var currentMonth = documents[0].date.getMonth();
   var index = 0;
@@ -604,7 +613,6 @@ function updateDocuments(documents){
     }
     docResults[index].push(d);
   });
-  docIndex = 0;
   destroyDocumentPanel();
 }
 
@@ -621,10 +629,18 @@ function isVisible(d){
 }
 
 function refreshDocuments(){
+  console.log('hit');
   var vDocuments = docResults[docIndex];
-  $.each(vDocuments, function(i, d){
-    refreshDocument(d);
+  var ps = vDocuments.map(function(d){
+    return refreshDocument(d);
   });
+
+  Promise.all(ps).then(function(){
+    console.log(docCount);
+    var docCount = $(".newspaper:visible").length;
+    $(".newspaper_count").text(docCount + " Newspapers");
+  });
+ 
 }
 
 function refreshDocument(d){
@@ -636,19 +652,23 @@ function refreshDocument(d){
   var visible = panel.is(':visible');
   var supposedToBeVisible = isVisible(d);
 
-  if(existed){
-    if(visible && !supposedToBeVisible){
-      panel.slideUp();
-    }else if(!visible && supposedToBeVisible){
-      panel.slideDown();
+  return new Promise(function(resolve){
+    if(existed){
+      if(visible && !supposedToBeVisible){
+        return panel.slideUp(resolve);
+      }else if(!visible && supposedToBeVisible){
+        return panel.slideDown(resolve);
+      }
+    }else{
+      if(visible && !supposedToBeVisible){
+        return panel.hide(resolve);
+      }else if(!visible && supposedToBeVisible){
+        return panel.show(resolve);
+      }
     }
-  }else{
-    if(visible && !supposedToBeVisible){
-      panel.hide();
-    }else if(!visible && supposedToBeVisible){
-      panel.show();
-    }
-  }
+    resolve();
+  });
+  
 }
 
 function createDocument(d){
@@ -723,6 +743,126 @@ function destroyDocumentPanel(){
 }
 
 
+var volumeChart = dc.barChart('#timeSlider');
+
+function createTimeSlider(documents){
+  var yearlyBubbleChart = dc.bubbleChart('#yearly-bubble-chart');
+  
+  var dateFormatSpecifier = '%m/%d/%Y';
+  var dateFormatParser = d3.timeParse(dateFormatSpecifier);
+
+  var data = {}, date, cDay
+  documents.forEach(d => {
+    date = new Date(d.date);
+    cDay = date.getDate();
+    cDay = 1;//Math.floor(cDay / 10) * 10;
+    //date.setDate(cDay);
+    date = date.toLocaleDateString();
+
+    if(data[date]){
+      data[date]++;
+    }
+    else
+      data[date] = 1;
+  });
+
+  var data = Object.keys(data).map(date => {
+    return {date: date, volume: data[date]};
+  });
+
+  // Since its a csv file we need to format the data a bit.
+
+  data.forEach(function (d) {
+
+    d.dd = dateFormatParser(d.date);
+
+    d.day = d3.timeDay(d.dd);
+    d.month = d3.timeMonth(d.dd); // pre-calculate month for better performance
+  });
+
+  //### Create Crossfilter Dimensions and Groups
+
+  //See the [crossfilter API](https://github.com/square/crossfilter/wiki/API-Reference) for reference.
+  var ndx = crossfilter(data);
+  var all = ndx.groupAll();
+
+  // Dimension by year
+  var yearlyDimension = ndx.dimension(function (d) {return null});
+  // Maintain running tallies by year as filters are applied or removed
+  var yearlyPerformanceGroup = yearlyDimension.group().reduce(
+      /* callback for when data is added to the current filter results */
+      function (p, v) {
+          return p;
+      },
+      /* callback for when data is removed from the current filter results */
+      function (p, v) {
+          return p;
+      },
+      /* initialize p */
+      function () {
+          return {
+          };
+      }
+  );
+
+  // Dimension by month
+  var moveMonths = ndx.dimension(function (d) {
+      return d.month;
+  });
+  // Group by total volume within move, and scale down result
+  var volumeByMonthGroup = moveMonths.group().reduceSum(function (d) {
+      return d.volume;
+  });
+
+var height = $("#timeSlider").height();
+height = Math.max(height, 0);
+var width = Math.max($("#timeSlider").width(), 0);
+
+
+  //#### Range Chart
+
+  // Since this bar chart is specified as "range chart" for the area chart, its brush extent
+  // will always match the zoom of the area chart.
+  volumeChart.width(width) /* dc.barChart('#monthly-volume-chart', 'chartGroup'); */
+      .height(height)
+      //.margins({top: 0, right:0 , bottom: 20, left: 40})
+      .dimension(moveMonths)
+      .group(volumeByMonthGroup)
+      .centerBar(true)
+      .gap(0)
+      .x(d3.scaleTime().domain([documents[0].date, documents[documents.length - 1].date]))
+      .round(d3.timeMonth.round)
+      .alwaysUseRounding(true);
+
+
+
+  yearlyBubbleChart 
+      .dimension(yearlyDimension)
+      .group(yearlyPerformanceGroup)
+      .x(d3.scaleLinear().domain([-2500, 2500]))
+      .y(d3.scaleLinear().domain([-100, 100]))
+
+ 
+
+  //#### Rendering
+
+  //simply call `.renderAll()` to render all charts on the page
+  dc.renderAll();
+
+  
+}
+
+$( window ).resize(function() {
+  var height = $("#timeSlider").height();
+  var width = Math.max($("#timeSlider").width(), 0);
+  height = Math.max(height, 0);
+  console.log(height);
+  volumeChart.width(width).
+  height(height)
+                .rescale()
+                .redraw();
+  dc.renderAll();
+});
 
 /*
  *   TOPIC GRAPH HANDLERS
@@ -741,7 +881,7 @@ function onTopicClicked(topicName, docIDList){
 
 
 function initTopicGraph() {
-
+  $("#topic-graph-wrapper .graph-subheader").text("27 Nodes \u00B7 48 Edges");
   $("#topicLoader").hide();
   /*
   var neo4jdata = { 
