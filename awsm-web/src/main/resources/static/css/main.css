@@ -71,9 +71,8 @@ button {
   width: 20vw; }
 
 #histogram-wrapper {
-  margin-top: 20.5vh;
   height: 67.5vh;
-  position: relative;
+  position: fixed;
   bottom: 0;
   display: inline-block;
   background-color: #F8F8F8;
@@ -99,44 +98,46 @@ button {
 
 #histograph-filter-wrapper {
   height: 18.5vh;
-  position: fixed;
-  top: 10vh;
+  position: relative;
   padding: 0.3%;
-  background-color: #F8F8F8; }
+  background-color: #F8F8F8;
+  z-index: 5;
+  transition: width 0.3s, height 0.3s; }
 
 #timeSlider {
   left: 0;
   height: 9vh;
-  width: 22vw 1vw;
+  width: 100%;
   z-index: 100;
-  position: fixed;
-  bottom: 69.5vh; }
+  position: absolute;
+  bottom: 0; }
   #timeSlider g.y {
     display: none; }
 
+#histograph-filter-wrapper:hover {
+  height: 27.75vh;
+  width: 30vw; }
+  #histograph-filter-wrapper:hover #timeSlider {
+    width: 30vw; }
+
+#histograph-filter-wrapper:hover > #timeSlider {
+  width: 30vw; }
+
 .filterWordWrapper {
+  position: relative;
   display: inline;
   border: 1px black solid;
-  margin-right: 1%;
-  margin-left: 1%;
-  margin-top: 2%;
-  margin-bottom: 2%;
+  margin-right: 0.5vw;
+  margin-left: 0.5vw;
+  margin-top: 0.5vh;
+  margin-bottom: 0.5vh;
   height: 4vh;
-  padding-bottom: 1%;
-  padding-left: 5%;
-  padding-right: 4%;
-  border-radius: 15% 15% 15% 15% / 50% 50% 50% 50%;
+  padding-bottom: 1vh;
+  padding-left: 1vw;
+  padding-right: 1vw;
+  border-radius: 25% 25% 25% 25% / 50% 50% 50% 50%;
   float: left;
   background-color: #7C7E88; }
-
-.filterWordWrapper:hover {
-  cursor: pointer;
-  background-color: #FFCCCB; }
-  .filterWordWrapper:hover .filterWordText {
-    font-style: italic;
-    color: black; }
-  .filterWordWrapper:hover .wordClose {
-    color: red; }
 
 .filterWordText, .wordClose {
   font-size: 60%;
@@ -144,16 +145,32 @@ button {
   transform: translateY(-50%); }
 
 .filterWordText {
-  padding-right: 5%;
-  padding-left: 5%;
+  padding-right: 1vw;
+  padding-left: 0.5vw;
   display: inline-block;
   color: #F8F8F8; }
 
 .wordClose {
-  display: inline;
-  margin-left: 1vw; }
+  display: none;
+  position: absolute;
+  margin-left: 1vw;
+  top: 0;
+  right: 0.5vw; }
 
-.center {
+.filterWordWrapper:hover {
+  cursor: pointer;
+  background-color: #FFCCCB;
+  border-top-right-radius: 0.5vw / 0.5vh;
+  border-bottom-right-radius: 0.5vw / 0.5vh;
+  padding-right: 1.5vw; }
+  .filterWordWrapper:hover .filterWordText {
+    font-style: italic;
+    color: black; }
+  .filterWordWrapper:hover .wordClose {
+    display: inline;
+    color: red; }
+
+.center-stack {
   left: 21vw;
   width: 38vw; }
 
@@ -186,8 +203,8 @@ button {
 
 #calendarText {
   position: fixed;
-  top: 7vh;
-  right: 42vw;
+  top: 6vh;
+  left: 22vw;
   width: 0;
   height: 0;
   z-index: -1; }
@@ -274,8 +291,96 @@ button {
   position: fixed;
   top: 11vh;
   margin-left: 1vw;
-  padding-bottom: 1vh;
+  z-index: 3;
   background-color: #F8F8F8; }
+  #newspaperlist-header .graph-header {
+    padding-top: 1vh; }
+  #newspaperlist-header .graph-subheader {
+    padding-bottom: 0.5vh; }
+
+#newspaperJumpWrapper {
+  width: auto;
+  padding-left: 0.75vw;
+  cursor: pointer;
+  padding-top: 0.5vh;
+  padding-bottom: 0.5vh;
+  display: none; }
+  #newspaperJumpWrapper span {
+    font-size: 85%;
+    display: inline-block;
+    transition: font-size 0.3s; }
+  #newspaperJumpWrapper span:hover {
+    font-size: 110%;
+    font-weight: bold; }
+  #newspaperJumpWrapper .selectedJumper {
+    font-size: 110%;
+    font-weight: bold; }
+
+#jumpIcon {
+  font-size: 70%; }
+
+#newspaperSort {
+  position: fixed;
+  top: 11vh;
+  right: 40vw;
+  margin-right: 1vw;
+  margin-top: 1vh;
+  cursor: pointer;
+  color: #747680; }
+
+#newspaperSort:hover {
+  color: black;
+  font-size: 120%; }
+
+#newspaperSortOptions {
+  position: fixed;
+  top: 15vh;
+  right: 41vw;
+  overflow: hidden;
+  list-style-type: none;
+  cursor: pointer;
+  width: 0;
+  height: 0;
+  border: 1px solid #5C5E68;
+  transition: all .6s;
+  border-radius: 0.5vw / 0.5vh;
+  background-color: #F8F8F8; }
+  #newspaperSortOptions li {
+    height: 3vh;
+    padding-left: 0.5vw;
+    position: relative; }
+  #newspaperSortOptions li:last-child {
+    border-radius: 0.5vw / 0.5vh; }
+  #newspaperSortOptions span {
+    font-size: 90%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: left;
+    left: 3vw; }
+
+#newspaperSortOptions.sortingVisible {
+  width: 18vw;
+  height: auto; }
+
+#newspaperSortOptions li:hover {
+  background-color: #E8E8E8; }
+
+#newspaperSortOptions li:active {
+  color: #00C6D7; }
+
+.selectedNewspaperSort {
+  background-color: #E8E8E8;
+  color: #2962ff; }
+
+.newspaperSortIcon {
+  margin-left: 1vw;
+  padding-right: 0.7vw;
+  font-size: 130%;
+  position: absolute;
+  left: 5%;
+  top: 50%;
+  transform: translate(-50%, -50%); }
 
 #newspaper-wrapper {
   height: 77vh;
@@ -417,7 +522,7 @@ button {
     border: none;
     cursor: pointer;
     padding-top: 1vh;
-    padding-bottom: 0.4vh;
+    padding-bottom: 0.6vh;
     margin-top: 1vh;
     margin-bottom: 1.5vh;
     padding-right: 0.5vw;
@@ -544,6 +649,9 @@ button {
     font-size: 220%; }
 
   #awesomeText {
-    font-size: 170%; } }
+    font-size: 170%; }
+
+  #calendarText {
+    left: 22.5vw; } }
 
 /*# sourceMappingURL=main.css.map */
