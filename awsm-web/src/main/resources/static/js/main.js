@@ -1,34 +1,55 @@
 const WORD_MAX = 10;
-const RAND_DOC_LENGTH = 1000;
+const RAND_DOC_LENGTH = 20;
+const TIME_OUT = 10;
 
 var docResults, docIndex = 0;
 $(document).ready(function(){
   loadGrammar()
   .then(setupInputBarFiringMethods)
 
-  $("#rarrow").click(function(){
-    if(docIndex === docResults.length - 1)
-      return;
-    docIndex++;
-    destroyDocumentPanel();
-  });
-
-  $("#larrow").click(function(){
-    if(docIndex === 0)
-      return;
-    docIndex--;
-    destroyDocumentPanel();
-  });
-
   $(document).on('click', function(){
     $("#predictedSearchList").hide();
   })
 
   createChart();
-  getInitialData()
-  .then(loadData);
+  submitQuery('');
 
   $('#calendarText').daterangepicker();
+
+  $("#histograph-filter-wrapper").hover(timeSliderResize, function(){
+    $("#timeSlider").hide();
+    setTimeout(function(){
+      timeSliderResize();
+      $("#timeSlider").show();
+    }, 300);
+  });
+
+  setTimeout(function(){
+    $("#newspaperSort").click(function(e){
+      e.stopPropagation();
+      $("#newspaperSortOptions").toggleClass('sortingVisible');
+    });
+  }, 2000);
+
+  $("#newspaperSortOptions li").click(function(e){
+    e.stopPropagation();
+    e = $(this);
+    if(e.hasClass('selectedNewspaperSort'))
+      return $("#newspaperSortOptions").removeClass('sortingVisible');
+
+    $(".selectedNewspaperSort").removeClass("selectedNewspaperSort");
+    e.addClass('selectedNewspaperSort');
+
+    submitQuery($("#search-bar").val());
+  });
+
+  $("#newspaperJumpWrapper span").click(function(e){
+    e = $(this);
+    if(e.hasClass('selectedJumper'))
+      return;
+    $(".selectedJumper").removeClass("selectedJumper");
+    e.addClass('selectedJumper');
+  });
 
   $("#topicLabel").click(function(e){
     e = $(this);
@@ -50,6 +71,12 @@ $(document).ready(function(){
     $("#knowledgeLoader").show();
     $("#topic-graph").hide();
   });
+
+  $("body").click(function(){
+    $("#newspaperSortOptions").removeClass('sortingVisible');
+  });
+
+  new SimpleBar($("#newspaper-wrapper")[0]);
 });
 
 function showCalendar(e){
@@ -189,6 +216,25 @@ function onSearch(qString){
   submitQuery(text);
 }
 
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
+
 var queryPending = false;
 var queryHash = {};
 function submitQuery(text){
@@ -201,9 +247,22 @@ function submitQuery(text){
     p = Promise.resolve(getRandomData());
   p.then(function(data){
     queryHash[text] = data;
+    var sortType = $(".selectedNewspaperSort").attr('id');
+
+
+    if(sortType === 'nRandomSort')
+      shuffle(data.documents);
+    else
+      data.documents.sort(function(a, b){
+        if(sortType === 'nDateSort'){
+          return a.date - b.date;
+        }else if(sortType === 'nHeadlineSort'){
+          return a.title.localeCompare(b.title);
+        }
+      });
 
     return new Promise(function(resolve, reject){
-      setTimeout(resolve, 3000);
+      setTimeout(resolve, TIME_OUT);
     })
     .then(function(){
       queryPending = false;
@@ -423,9 +482,9 @@ function createChart(){
                   //get specific label by index
                   var bar_last_clicked = histogramDataSet.labels[clickedElementindex];
 
-                  getAssociatedDocuments(bar_last_clicked)
-                  .then(function(docs){
-                    pushTerm(bar_last_clicked, docs);
+                  setAssociatedDocuments(bar_last_clicked)
+                  .then(function(){
+                    pushTerm(bar_last_clicked);
                   }).catch(console.log);
               }
           }
@@ -433,30 +492,94 @@ function createChart(){
   });
 }
 
-var filterWords = {};
 
-function pushTerm(word, docs){
-  if(filterWords[word]){
-    $("#filterWord" + word).click();
+function pushTerm(word){
+  if($("#filterWord" + word).length){
+    $("#filterWord" + word).remove();
+    refreshDocuments();
     return;
   }
-  filterWords[word] = docs;
 
-  var wrapper = $("<div>").addClass('filterWordWrapper');
+  var wrapper = $('<div ondrop="drop(event)" ondragover="allowDrop(event)" draggable="true" ondragstart="drag(event)"></div>').addClass('filterWordWrapper');
   var text = $("<span>").addClass('filterWordText').text(word);
   var closeButtton = $("<i>").addClass('fas fa-times wordClose');
 
-  wrapper.attr('id', "filterWord" + word);
+  wrapper.attr('id', 'filterWord' + getRandomInt(10000));
   wrapper.append(text);
   wrapper.append(closeButtton);
 
-  wrapper.click(function(){
-    delete filterWords[word];
-    $(this).remove();
+  setTimeout(function(){
+    wrapper.find(' svg').click(function(){
+      $(this).parent().remove();
+      refreshDocuments();
+    });
+  }, 100);
+
+  text.click(function(e){
+    e = $(this);
+    if(e.text().indexOf("~") !== -1){
+      e.text(e.text().substring(1));
+    }else{
+      e.text("~" + e.text());
+    }
+    e.parent().attr('id', 'filterWord' + getRandomInt(10000));
     refreshDocuments();
   });
 
   $("#histograph-filter-wrapper").append(wrapper);
+  refreshDocuments();
+}
+
+function allowDrop(ev){
+  ev.preventDefault();
+}
+
+function drag(ev){
+  ev.dataTransfer.setData("text", ev.target.id);
+}
+
+function drop(ev){
+  ev.preventDefault();
+  var data = ev.dataTransfer.getData("text");
+  var t1 = $("#" + data);
+  var t2 = $(ev.toElement);
+  if(t2.is('span'))
+    t2 = t2.parent();
+  combineTerms(t1, t2);
+}
+
+function encrypt(s){
+  s = s.split(" & ").join("_AND_");
+  return s;
+}
+
+function decrypt(s){
+  s = s.split("_AND_").join("&");
+  return s;
+}
+
+//puts the word where t1 is
+function combineTerms(t1, t2){
+  
+  t1.find(".wordClose").remove();
+  
+  var combiner = $("<span></span>");
+  combiner.addClass('filterWordCombiner');
+  combiner.click(function(e){
+    t1.attr('id', 'filterWord' + getRandomInt(10000));
+    $(this).toggleClass('andCombiner');
+    refreshDocuments();
+  });
+
+  t1.append(combiner);
+  t1.attr('id', 'filterWord' + getRandomInt(10000));
+
+  t2.children().each(function(e){
+    e = $(this);
+    e.detach().appendTo(t1);
+  });
+
+  t2.remove();
   refreshDocuments();
 }
 
@@ -500,7 +623,7 @@ function gibberish(text_len){
 
   var possible;
   for(var i = 0; i < text_len; i++){
-    if(i === text_len - 1)
+    if(i === text_len - 1 || !i)
       possible = "abcdefghijklmnopqrstuvwxyz";
     else
       possible = "ABCD EFGHIJ KLMNOPQR STUVWXYZ abcdefghij klmnopqr stuvwxyz abcdefghij klmnopqr stuvwxyz ";
@@ -527,7 +650,6 @@ function getRandomDocument(){
   doc.docID = getRandomInt(RAND_DOC_LENGTH ** 4);
   doc.title = gibberish(15);
 
-
   if(Math.random() >= 0.5){
     doc.newspaper = "Google Inc";
     doc.url = "https://www.google.com";
@@ -537,10 +659,6 @@ function getRandomDocument(){
   }
 
   return doc;
-}
-
-function getInitialData(){
-  return Promise.resolve(getRandomData());
 }
 
 function getRandomData(){
@@ -570,7 +688,7 @@ function getRandomData(){
 }
 
 var wordHash = [];
-function getAssociatedDocuments(word){
+function setAssociatedDocuments(word){
   if(wordHash[word])
     return Promise.resolve(wordHash[word]);
 
@@ -595,7 +713,6 @@ function loadData(data){
 }
 
 function daysInMonth (month, year) {
-  console.log(month, year, new Date(year, month, 0).getDate());
   return new Date(year, month, 0).getDate();
 }
 
@@ -612,14 +729,18 @@ function monthFrom(d, months){
 }
 
 function updateDocuments(documents){
-  documents.sort(function(a, b){
-    return a.date - b.date;
-  });
   try{
     createTimeSlider(documents);
   }catch(e){
     console.log(e);
   }
+
+  var sortType = $(".selectedNewspaperSort").attr('id');
+  if(sortType !== 'nRandomSort' && sortType !== 'nDateSort')
+    $("#newspaperJumpWrapper").show();
+  else
+    $("#newspaperJumpWrapper").hide();
+
   $("#newspaperLoader").hide();
   
 
@@ -627,26 +748,86 @@ function updateDocuments(documents){
   var index = 0;
   docResults = [[]];
   $.each(documents, function(i, d){
-    if(d.date.getMonth() > currentMonth){
+    /*if(d.date.getMonth() > currentMonth){
       index++;
       docResults.push([]);
       currentMonth = d.date.getMonth();
-    }
+    }*/
     docResults[index].push(d);
   });
   destroyDocumentPanel();
 }
 
 function isVisible(d){
-  if($.isEmptyObject(filterWords))
-    return true;
+ var filters = [];
+ $(".filterWordWrapper")
+ .each(function(i, e){
+  e = $(this);
+  var query = '';
+  e.find('span').each(function(j, f){
+    f = $(this);
+    var o = {}, text;
+    if(j % 2 == 0){
+      text = f.text();
+      text = text.split('_').join('');
+      if(text.startsWith('~')){
+        query += '_N';
+        text = text.substring(1);
+      }
+      query += text;
+    }else if(f.hasClass('andCombiner')){
+      query += '_A';
+    }else
+      query += '_O';
+  });
+  filters.push(query);
+ });
 
-  var clickedWords = Object.keys(filterWords);
-  var lists = clickedWords.map(function(val, i){
-    return filterWords[val].indexOf(d.docID) !== -1;
-  });//returns an array of whether each word had the doc id
-  //only need one to say its visible
-  return lists.reduce(function(current, next){ return current && next; });
+ if(!filters.length)
+  return true;
+
+ return filters.reduce(function(current, next){
+  var o = queryVisible(next, d.docID);
+  return current && o;
+ }, true);
+}
+
+function queryVisible(text, docID){
+  var o = {}, c, ret = true, not = false, or_combine = false, subtext, subval, next_underscore;
+  for(var i = 0; i < text.length; i++){
+    c = text[i];
+    if(c === '_'){
+      i++;
+      c = text[i];
+      if(c === 'N')
+        not = true;
+      else
+        or_combine = c === 'O';
+      continue;
+    }
+
+
+    //calculate next word
+    next_underscore = text.substring(i).indexOf('_');
+    if(next_underscore === -1)
+      subtext = text.substring(i);
+    else
+      subtext = text.substring(i, next_underscore + i);
+    i += subtext.length - 1;
+
+    //determine if doc should be displayed;
+    subval = wordHash[subtext].indexOf(docID) !== -1;
+    if(not)
+      subval = !subval;
+
+    if(or_combine)
+      ret = ret || subval;
+    else
+      ret = ret && subval;
+
+    not = false;
+  }
+  return ret;
 }
 
 function refreshDocuments(){
@@ -731,13 +912,13 @@ function createDocument(d){
   li.append(subtext);
   li.hide();
 
-  $("#newspaper-wrapper").append(li);
+  $(new SimpleBar($("#newspaper-wrapper")[0]).getContentElement()).append(li);
 
   return li;
 }
 
 function destroyDocumentPanel(){
-  $("#newspaper-wrapper").empty();
+  $(new SimpleBar($("#newspaper-wrapper")[0]).getContentElement()).empty();
 
   var startMonth = docResults[docIndex][0].date;
   var endMonth = new Date(startMonth.getUTCFullYear(), startMonth.getMonth() + 1, 0);
@@ -746,20 +927,6 @@ function destroyDocumentPanel(){
   $("#dateRangeText").text(text);
 
   refreshDocuments();
-
-  new SimpleBar($("#newspaper-wrapper")[0]);
-
-  if(docIndex === 0){
-    $("#larrow").addClass('disabledButton');
-  }else{
-    $("#larrow").removeClass('disabledButton');
-  }
-
-  if(docIndex === docResults.length - 1){
-    $("#rarrow").addClass('disabledButton');
-  }else{
-    $("#rarrow").removeClass('disabledButton');
-  }
 }
 
 
@@ -872,17 +1039,18 @@ var width = Math.max($("#timeSlider").width(), 0);
   
 }
 
-$( window ).resize(function() {
+function timeSliderResize(){
   var height = $("#timeSlider").height();
   var width = Math.max($("#timeSlider").width(), 0);
   height = Math.max(height, 0);
-  console.log(height);
   volumeChart.width(width).
   height(height)
                 .rescale()
                 .redraw();
   dc.renderAll();
-});
+}
+
+$( window ).resize(timeSliderResize);
 
 /*
  *   TOPIC GRAPH HANDLERS
@@ -901,6 +1069,7 @@ function onTopicClicked(topicName, docIDList){
 
 
 function initTopicGraph() {
+  return;
   $("#topic-graph-wrapper .graph-subheader").text("27 Nodes \u00B7 48 Edges");
   $("#topicLoader").hide();
   /*
