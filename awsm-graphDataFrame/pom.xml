@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>edu.sdsc.milou.awesome</groupId>
-	<artifactId>milou-ingester</artifactId>
+	<artifactId>awsm-graphDataFrame</artifactId>
 	<packaging>jar</packaging>
 	<version>1.0-SNAPSHOT</version>
 	<name>milou-ingester</name>
@@ -70,11 +70,7 @@
 			<artifactId>crawler4j</artifactId>
 			<version>4.2</version>
 		</dependency>
-		<dependency>
-			<groupId>edu.sdsc.awesome.milou</groupId>
-			<artifactId>milou</artifactId>
-			<version>1.0-SNAPSHOT</version>
-		</dependency>
+
 		<!-- http://mvnrepository.com/artifact/org.neo4j/neo4j-ogm-bolt-driver -->
 		<!-- http://mvnrepository.com/artifact/org.neo4j/neo4j-ogm-bolt-driver -->
 		<dependency>

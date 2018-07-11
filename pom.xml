@@ -48,9 +48,8 @@
         <module>awsm-data-common-util</module>
         <module>awsm-webService</module>
         <module>awsm-tdm-compute</module>
-
-
         <module>awsm-connector-rserver</module>
+        <module>awsm-remote-exec</module>
   </modules>
 
 </project>

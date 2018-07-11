@@ -1,0 +1,58 @@
+@startuml
+package edu.sdsc.awesome.awesomeWeb.awsmnode {
+
+abstract class GetNeo4jStats
+abstract class GetSolrStats
+abstract class GetPgsqlStats
+abstract class GetRserverStats {
+-numberofthread
+~getnumberofthread()
+
+}
+abstract GetDataServices
+interface GetDatabase
+interface GetComputeServer
+
+
+
+
+class performanceData {
+-cpu[]
+-memory[]
+-IO[]
+-time
+~getData()
++getagent()
+
+}
+class statisticalData {
+-datanumber[]
+-property[][]
+-time
++getData()
++getagent()
+}
+
+
+GetDataServices <|-- GetNeo4jStats
+GetDataServices <|-- GetSolrStats
+GetDataServices <|-- GetPgsqlStats
+GetDatabase <|-- GetDataServices
+GetComputeServer <|-- GetRserverStats
+performanceData <|-- GetComputeServer
+statisticalData <|--  GetComputeServer
+performanceData <|-- GetDatabase
+statisticalData <|--  GetDatabase
+
+
+
+}
+package edu.sdsc.awesome.execution.sshlib {
+
+class executessh {
+}
+
+executessh <|-- statisticalData
+executessh <|-- performanceData
+}
+@enduml

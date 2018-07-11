@@ -17,6 +17,8 @@ public class DataSource {
     private String name;
     private String store;
     private String link;
+    private String sourceId;
+    private String accessFunction;
 
 
 }

@@ -1,5 +1,7 @@
 package edu.sdsc.awesome.awesomeWeb.store;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -10,9 +12,9 @@ import java.util.Date;
 
 public class DataSet {
 
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    private Double id;
+    @Id @GeneratedValue(generator="system-uuid")
+    @GenericGenerator(name="system-uuid", strategy = "uuid")
+    private String id;
     private String DatasetName;
     private String DataSourceName;
     private Double SchemaId;
@@ -21,7 +23,7 @@ public class DataSet {
     private Date LastDate;
     private Double OwnerId;
 
-    public Double getId() {
+    public String getId() {
         return id;
     }
 
@@ -53,7 +55,7 @@ public class DataSet {
         return OwnerId;
     }
 
-    public void setId(Double id) {
+    public void setId(String id) {
         this.id = id;
     }
 
