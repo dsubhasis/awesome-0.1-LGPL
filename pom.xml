@@ -21,6 +21,33 @@
     <groupId>org.apache</groupId>
     <artifactId>awesome-full-stack</artifactId>
     <version>0.9.1</version>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>5.0.0.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>5.0.0.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+            <version>2.0.0.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+            <version>2.0.0.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+            <version>2.0.0.RELEASE</version>
+        </dependency>
+    </dependencies>
     <packaging>pom</packaging>
     <name>awesome-full-stack</name>
     <parent>
@@ -49,7 +76,7 @@
         <module>awsm-webService</module>
         <module>awsm-tdm-compute</module>
         <module>awsm-connector-rserver</module>
-        <module>awsm-remote-exec</module>
+        <module>awsm-neo4j-client</module>
   </modules>
 
 </project>
