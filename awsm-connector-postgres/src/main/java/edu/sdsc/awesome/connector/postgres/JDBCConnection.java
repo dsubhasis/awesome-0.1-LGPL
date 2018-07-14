@@ -3,6 +3,7 @@ package edu.sdsc.awesome.connector.postgres;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.json.*;
 import java.sql.*;
 import java.util.*;
 
@@ -27,7 +28,6 @@ public class JDBCConnection {
             logger.debug("Check JDBC connection : " + e.getSQLState() + e.getMessage());
         }
     }
-
     public Map pgSQLQuery(String query) throws SQLException {
         ResultSet rs = null;
         try {
@@ -36,13 +36,21 @@ public class JDBCConnection {
         } catch (InterruptedException e) {
             logger.debug(e.getLocalizedMessage() + "Connection Problem Chack the network " + query);
         }
+
+        return resultSetExt(rs);
+    }
+
+
+    public JsonObject pgSQLQueryJson(String query) throws SQLException {
+        ResultSet rs = null;
         try {
             rs = databaseQuery(query);
 
         } catch (InterruptedException e) {
             logger.debug(e.getLocalizedMessage() + "Connection Problem Chack the network " + query);
         }
-        return resultSetExt(rs);
+
+        return resultSetExtJSon(rs);
     }
 
     public Map resultSetExt(ResultSet rst) throws SQLException {
@@ -53,7 +61,6 @@ public class JDBCConnection {
         List colResult = new ArrayList();
         Map resultSet = new HashMap();
         List<Object> elementValue = new ArrayList<Object>();
-
 
         int columnCount = rsmd.getColumnCount();
         Map<String, Integer> elementType = new HashMap<String, Integer>();
@@ -68,10 +75,105 @@ public class JDBCConnection {
         resultSet.put("value", value);
         resultSet.put("type", elementType);
         resultSet.put("tuple", colResult);
+        rst.close();
 
         return resultSet;
 
     }
+
+    public JsonObject resultSetExtJSon(ResultSet rst) throws SQLException {
+
+        ResultSetMetaData rsmd = rst.getMetaData();
+
+        List resultList = new
+                ArrayList();
+        List colResult = new ArrayList();
+        JsonObjectBuilder resultSet = Json.createObjectBuilder();
+        List<Object> elementValue = new ArrayList<Object>();
+
+        int columnCount = rsmd.getColumnCount();
+        Map<String, Integer> elementType = new HashMap<String, Integer>();
+        JsonArrayBuilder colName = Json.createArrayBuilder();
+        JsonObjectBuilder elementTypeJson = Json.createObjectBuilder();
+        for (int i = 1; i <= columnCount; i++) {
+            String name = rsmd.getColumnName(i);
+            colResult.add(name);
+            colName.add(name);
+            //System.out.println(name+rsmd.getColumnType(i)+rsmd.getColumnTypeName(i)+rsmd.getSchemaName(i));
+            elementType.put(name, rsmd.getColumnType(i));
+            elementTypeJson.add(name, rsmd.getColumnTypeName(i));
+        }
+
+        JsonArray value = extractValuesJson(rst, elementType, colResult);
+        resultSet.add("value", value);
+        resultSet.add("tuple", colName);
+        resultSet.add("type", elementTypeJson);
+
+        rst.close();
+
+        return resultSet.build();
+
+    }
+    public JsonArray extractValuesJson(ResultSet rs, Map<String, Integer> elementType, List<String> colName) throws SQLException {
+
+        JsonArrayBuilder valueList = Json.createArrayBuilder();
+        while (rs.next()) {
+
+            JsonObjectBuilder rowValue = Json.createObjectBuilder();
+            for (String col : colName) {
+
+                Integer type = elementType.get(col);
+
+                if(type == -7)
+                {
+                    rowValue.add(col, rs.getBoolean(col));
+
+                }
+
+
+                if(type == 91)
+                {
+                    rowValue.add(col, rs.getDate(col).toString());
+
+                }
+
+                if (type == 12) {
+
+
+                    rowValue.add(col, rs.getString(col));
+
+                }
+
+
+                if (type == 4) {
+
+                    rowValue.add(col, rs.getInt(col));
+                }
+
+                if (type == 2003) {
+
+
+
+
+
+
+
+                    rowValue.add(col, rs.getArray(col).getArray().toString());
+                }
+                valueList.add(rowValue);
+
+            }
+
+
+        }
+
+        return valueList.build();
+
+    }
+
+
+
+
 
     public List extractValues(ResultSet rs, Map<String, Integer> elementType, List<String> colName) throws SQLException {
 
@@ -82,6 +184,12 @@ public class JDBCConnection {
             for (String col : colName) {
 
                 Integer type = elementType.get(col);
+
+                if(type == -7)
+                {
+                    rowValue.put(col, rs.getBoolean(col));
+
+                }
 
 
                 if(type == 91)
@@ -109,9 +217,10 @@ public class JDBCConnection {
 
                     rowValue.put(col, rs.getArray(col).getArray());
                 }
+                valueList.add(rowValue);
 
             }
-            valueList.add(rowValue);
+
 
         }
 
@@ -130,6 +239,7 @@ public class JDBCConnection {
         do {
             try {
                 stmt = connect.createStatement();
+                System.out.println(query);
 
                 rs = stmt.executeQuery(query);
 
