@@ -1,0 +1,5 @@
+create analysis a1 as (
+p[][] := x.y(p(x(x))) STORE
+
+
+)
