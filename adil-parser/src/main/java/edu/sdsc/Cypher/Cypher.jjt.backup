@@ -1,0 +1,177 @@
+
+
+PARSER_BEGIN(Cypher)
+package edu.sdsc.Cypher;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Cypher {
+  public static void main(String[] args) {
+    Reader sr = new StringReader(args[0]);
+
+
+    Cypher p = new Cypher(sr);
+    try {
+      p.Expression();
+    } catch (ParseException pe) {
+      pe.printStackTrace();
+    }
+  }
+}
+
+PARSER_END(Cypher)
+SKIP : {
+  " "
+}
+
+
+TOKEN [IGNORE_CASE]:
+{
+ < CREATE : "create">
+ | < CONSTRAINT : "constrain" >
+ | <ON : "on" >
+ | < ASSERT : "assert" >
+ | < UNIQUE : "unique" >
+ | < MATCH : "match" >
+ | <MERGE : "merge" >
+ |<IS : "is" >
+
+}
+
+TOKEN :
+{
+    <CARET : "^">
+  | <CONCAT : "||">
+  | <DIV : "/">
+  | <IDIV : "idiv">
+  | <MINUS : "-">
+  | <MOD : "%">
+  | <MUL : "*">
+  | <PLUS : "+">
+
+  | <LEFTPAREN : "(">
+  | <RIGHTPAREN : ")">
+  | <LEFTBRACKET : "[">
+  | <RIGHTBRACKET : "]">
+  | <LEFTCURL : "{">
+  | <RIGHTCURL : "}">
+
+
+
+
+  | <ATT : "@">
+  | <COLON : ":">
+  | <COMMA : ",">
+  | <DOT : ".">
+  | <QUES : "?">
+  | <SEMICOLON : ";">
+  | <SHARP : "#">
+
+  | <LT : "<">
+  | <GT : ">">
+  | <LE : "<=">
+  | <GE : ">=">
+  | <EQ : "=">
+  | <NE : "!=">
+  | <LG : "<>">
+  | <SIMILAR : "~=">
+}
+
+TOKEN [IGNORE_CASE]:
+{
+ < UNNEST : "unnest">
+ | <SELECT : "select" >
+ | <FROM : "from">
+ | <AS : "as" >
+ | <GROUP : "group" >
+ | <BY : "by" >
+ | <LIMIT : "limit">
+ |<DIGITS : "digita" >
+
+
+}
+
+TOKEN :
+{
+   < #DIGIT    : ["0"-"9"] >
+ | < #LETTER   : ["a"-"z","A"-"Z"] >
+ | < ALPHANUM : (<LETTER>|<DIGIT>)+>
+ | <FIELDNAME : (<ALPHANUM>(<DOT><ALPHANUM>)*)>
+ | <CYPHERFIELD : (<ALPHANUM>(<COLON><ALPHANUM>)*)>
+ |< QUOTED_IDENTIFIER: "\"" (~["\n","\r","\""])+ "\"" | ("`" (~["\n","\r","`"])+ "`") | ( "[" ~["0"-"9","]"] (~["\n","\r","]"])* "]" ) >
+
+
+}
+
+
+SimpleNode Expression() : {} {
+  (Statement())* {return jjtThis; }
+}
+void Statement() : {Token T;}
+{
+ ( LOOKAHEAD(1) SelectStatement()|createStatement() )
+}
+
+void createStatement() : {}
+{
+<CREATE> <CONSTRAINT> <ON> <LEFTPAREN> <CYPHERFIELD> <RIGHTPAREN>  <ASSERT> <FIELDNAME> <IS> <UNIQUE><SEMICOLON>
+
+}
+void SelectStatement() : {Token var; Token rename; Token srcName; Token x; List selectVar; Map selectMap = new HashMap();}
+
+{
+                           <FROM> srcName = <ALPHANUM> (rename = <ALPHANUM>)(<UNNEST> <FIELDNAME> <FIELDNAME>)+ (<GROUP> <BY> (x = <ALPHANUM> <AS> rename = <ALPHANUM>)* )+ <LIMIT> <DIGITS>
+}
+
+void createConstantStatement() : {}
+{
+ <CREATE> cypherNode()| (CypherEdge() cypherNode())+
+}
+
+void cypherNode() : {Token T;}
+{
+
+
+(<LEFTBRACKET> <CYPHERFIELD> <LEFTCURL>  nodeProperty() <RIGHTCURL><RIGHTBRACKET>)(<LEFTBRACKET> <CYPHERFIELD> <LEFTCURL>  nodeProperty() <RIGHTCURL><RIGHTBRACKET>)+
+
+
+
+}
+
+void cypherEdge() : {Token T;}
+{
+
+ <MINUS><LEFTBRACKET><COLON><ALPHANUM><RIGHTBRACKET>
+
+
+}
+
+void nodeProperty() : {Token T;}
+
+{
+
+(<ALPHANUM><COLON> <FIELDNAME>)(<COMMA> <ALPHANUM><COLON> <FIELDNAME>)+
+
+
+
+}
+
+
+
+
+/*create (u:User {id: Collection.Tweet.User.id,
+								name: Collection.Tweet.User.name})
+						-[:created]->
+					   (n:Tweet {id: Collection.Tweet.TweetID,
+						  TweetDate:Collection.Tweet.TweetDate,
+						  Text:Collection.Tweet.Text})
+
+
+
+
+
+

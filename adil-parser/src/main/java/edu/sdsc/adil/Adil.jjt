@@ -80,6 +80,7 @@ TOKEN : {
   | <COMMA : ",">
   | <StartSQBracket : "[" >
   | <EndSQBracket   : "]" >
+  | < AT : "@">
   | <OPERATOR : (<GREATER>|<LESS>|(<EQAL><EQAL>)) >
 
 
@@ -122,6 +123,7 @@ TOKEN [IGNORE_CASE]: {
 
 
 
+
 }
 TOKEN [IGNORE_CASE]: {
 <ENV : "env" >
@@ -130,6 +132,9 @@ TOKEN [IGNORE_CASE]: {
 | <FILTER : "filter" >
 | <EXECUTESQLPP : "executesqlpp" >
 | <CONSTRUCTGRAPH : "constructgraph" >
+|<CYPHERQUERY : "cypherquery" >
+| <EXECUTECYPHER : "executecypher">
+
 }
 TOKEN :
 {
@@ -227,7 +232,7 @@ JsonObjectBuilder CreateAnalysis(JsonObjectBuilder jObject) : {Token t; Token k;
 JsonObjectBuilder DeclareAnalysis(JsonObjectBuilder jObject) : {Token t; JsonObjectBuilder tempJB = Json.createObjectBuilder(); boolean variableArray = false; }
 {
 
- (<PROPERTYGRAPH>{jObject.add("type", "propG");})? t = <ALPHANUM>(<StartSQBracket><EndSQBracket>{variableArray = true; tempJB.add("Type", "array"); int n = 1;}
+  t = <ALPHANUM>(<StartSQBracket><EndSQBracket>{variableArray = true; tempJB.add("Type", "array"); int n = 1;}
 
  (<StartSQBracket><EndSQBracket>{n++;})* {tempJB.add("ArraySize", n);})?<COLON><EQAL> tempJB  = AnalysisStatement(tempJB)
 
@@ -251,38 +256,25 @@ JsonObjectBuilder DeclareAnalysis(JsonObjectBuilder jObject) : {Token t; JsonObj
 JsonObjectBuilder AnalysisStatement(JsonObjectBuilder jObject) : {Token t; JsonObjectBuilder tempJB = Json.createObjectBuilder();}
 {
 
+     (LOOKAHEAD(1)(UserDefinedFunction(tempJB)) |(AwsmDefinedFunction(tempJB))) (<STORE> )? (t = <FIELDNAME>)?
 
 
-(LOOKAHEAD(6) (tempJB = AnnotateWithStoreOperation(tempJB) {jObject.add("annotation", tempJB.build());})|(UserDefinedFunction(tempJB))|(AwsmDefinedFunction(tempJB))
-
- | (FilterOperation(tempJB) {jObject.add("filter", tempJB.build());})
-
-|( ExecuteSQLPP(tempJB) {jObject.add("SQLPP", tempJB.build());})|(ConstructGRAPH(tempJB) {jObject.add("graph", tempJB.build());} )
-
-|(FunctionAnalysis(tempJB) {jObject.add("operation", tempJB.build());} ) | (ReportAnalysis(tempJB) {jObject.add("report", tempJB.build());} ) | (CreateView(tempJB) {jObject.add("view", tempJB.build());} )  )
-
- {return jObject; }
+ {return jObject;}
 }
 
-JsonObjectBuilder AwsmDefinedFunction(JsonObjectBuilder jObject) : {Token t; Token t2; JsonObjectBuilder tempJB = Json.createObjectBuilder();}
+JsonObjectBuilder AwsmDefinedFunction(JsonObjectBuilder jObject) #JsonObjectBuilder : {Token t; Token t2; JsonObjectBuilder tempJB = Json.createObjectBuilder();}
 {
-   <ALPHANUM><FBRACKETSTART><AWSM><COLON> t = <ALPHANUM><FBRACKETSTART> (t2 = <ALPHANUM>)+
-   |(UserDefinedFunction(tempJB))+
-   |(AwesomeSafeFunction(tempJB))+
-   <FBRACKETEND><FBRACKETEND>
 
-    {return jObject; }
+  <AWSM><COLON><ALPHANUM><FBRACKETSTART>AwesomeSafeFunction(tempJB)<FBRACKETEND>
+
+    {System.out.println("xxxxxx");return jObject; }
 }
 JsonObjectBuilder UserDefinedFunction(JsonObjectBuilder jObject) : {Token t0; Token t1; Token t2; JsonObjectBuilder tempJB = Json.createObjectBuilder();}
 {
-   <ALPHANUM><FBRACKETSTART>t = <FIELDNAME><COLON> t1 = <ALPHANUM><FBRACKETSTART> (t2 = <ALPHANUM>)+
-
-   |(AwesomeSafeFunction(tempJB))+
+   t1 = <FIELDNAME><FBRACKETSTART>function(tempJB)<FBRACKETEND>
 
 
-    <FBRACKETEND><FBRACKETEND>
-
-    {return jObject; }
+    {return tempJB; }
 }
 
 /* awesome safe functions are read functions and awesome specific update functions
@@ -290,15 +282,16 @@ JsonObjectBuilder UserDefinedFunction(JsonObjectBuilder jObject) : {Token t0; To
 */
 
 
-JsonObjectBuilder AwesomeSafeFunction(JsonObjectBuilder jObject) : {Token t0; Token t1; Token t2; JsonObjectBuilder tempJB = Json.createObjectBuilder();}
+JsonObjectBuilder AwesomeSafeFunction(JsonObjectBuilder jObject) #JsonObjectBuilder : {Token t0; Token t1; Token t2; JsonObjectBuilder tempJB = Json.createObjectBuilder();}
 {
    LOOKAHEAD(6)
-    AnnotateWithStoreOperation(tempJB)
+    AnnotateWithStoreOperation(tempJB) {jObject.add("annotation", tempJB.build());}
    |( ExecuteSQLPP(tempJB) {jObject.add("SQLPP", tempJB.build());})
-   |(ConstructGRAPH(tempJB) {jObject.add("graph", tempJB.build());} )
+   |(executeCypher(tempJB) {jObject.add("graph", tempJB.build());} )
    |(CreateView(tempJB) {jObject.add("view", tempJB.build());})
    |(FilterOperation(tempJB) {jObject.add("filter", tempJB.build());})
    |(ProjectFunction(tempJB){jObject.add("PROJECT", tempJB.build());})
+   |(ReportAnalysis(tempJB) {jObject.add("report", tempJB.build());} )
 
 
     {return jObject; }
@@ -319,27 +312,10 @@ JsonObjectBuilder CreateView(JsonObjectBuilder jObject) : {boolean variableArray
 
 }
 
-JsonObjectBuilder ProjectFunction(JsonObjectBuilder jObject) : {Token t0; JsonObjectBuilder tempJB = Json.createObjectBuilder();}
+JsonObjectBuilder ProjectFunction(JsonObjectBuilder jObject) : {Token t0; JsonObjectBuilder functionObject = Json.createObjectBuilder();}
 {
 
-   <PROJECT> <FBRACKETSTART>
-               (
-               LOOKAHEAD(3)
-               ( functionObject = function(functionObject){expression.add("f()",functionObject.build());})
-               |( k = <FIELDNAME>{expression.add("param",k.image); decision.add(k.image,false);} )
-               |( k = <ALPHANUM>{expression.add("param",k.image);})
-               |( k = <DIGITS>{expression.add("param", k.image);} )
-               )
-
-              (<COMMA> (
-                  LOOKAHEAD(3)(functionObject = function(functionObject){expression.add("f()",functionObject.build());})
-                  |( k = <FIELDNAME>{expression.add("param", k.image); decision.add(k.image,false);} )
-                  |( k = <ALPHANUM>{expression.add("param", k.image);})
-                  |( k = <DIGITS>{expression.add("param", k.image);} )
-
-                  )
-              )*
-              <FBRACKETEND>
+   <PROJECT> function(functionObject)
 
 }
 
@@ -396,17 +372,41 @@ JsonObjectBuilder ExecuteSQLPP(JsonObjectBuilder jObject) : {Token t; Token var;
 }
 
 
-JsonObjectBuilder ConstructGRAPH(JsonObjectBuilder jObject) : {Token t; Token var; JsonObjectBuilder tempJB = Json.createObjectBuilder(); Token partitionVar;Token partitionField; Token partitionFunction; JsonObjectBuilder partitionJB = Json.createObjectBuilder(); boolean partitionFlag = false;}
+JsonObjectBuilder executeCypher(JsonObjectBuilder jObject) : {Token source; Token t; Token var; JsonObjectBuilder tempJB = Json.createObjectBuilder(); Token partitionVar;Token partitionField; Token partitionFunction; JsonObjectBuilder partitionJB = Json.createObjectBuilder(); boolean partitionFlag = false;}
 {
-   <CONSTRUCTGRAPH> <FBRACKETSTART> t =quetedStatement()<FBRACKETEND> ( <PARTITION> <BY> ( LOOKAHEAD(1) (partitionField = <FIELDNAME> {partitionJB.add("Field", partitionField.image); partitionFlag = true;} )
+   <EXECUTECYPHER> <FBRACKETSTART> t =quetedStatement()<FBRACKETEND><AT>source=<ALPHANUM>
+   (
+   <PARTITION> <BY>
+   ( LOOKAHEAD(1) (partitionField = <FIELDNAME> {partitionJB.add("Field", partitionField.image); partitionFlag = true;}
 
-   | ( partitionFunction = <ALPHANUM> <FBRACKETSTART> partitionField = <FIELDNAME> <FBRACKETEND> {partitionJB.add("Function", partitionFunction.image); partitionJB.add("Field", partitionField.image); partitionFlag = true;} ) )
+   )
+
+   | (
+
+       partitionFunction = <ALPHANUM> <FBRACKETSTART> partitionField = <FIELDNAME> <FBRACKETEND>
+
+       {
+
+        partitionJB.add("Function", partitionFunction.image);
+        partitionJB.add("Field", partitionField.image);
+        partitionFlag = true;
+
+       }
+
+    )
+
+    )
 
    <AS>partitionVar=<ALPHANUM> )?
 
 
    {tempJB = handleCypherQuery(t.image, tempJB, partitionJB, partitionFlag);}
-   {jObject.add("Plan" ,tempJB.build());}
+   {jObject.add("Plan" ,tempJB.build());
+   jObject.add("query", t.image);
+   jObject.add("source", source.image);
+
+   }
+
 
   {return jObject;}
 }
@@ -559,9 +559,10 @@ JsonObjectBuilder CreatEnvironment(JsonObjectBuilder jObject) : {Token t; }
  {return jObject;}
 }
 
-JsonObjectBuilder function(JsonObjectBuilder jObject) : {Token t; Token k; JsonObjectBuilder finalObject = Json.createObjectBuilder(); JsonObjectBuilder functionObject = Json.createObjectBuilder(); JsonObjectBuilder expression  =Json.createObjectBuilder();}
+JsonObjectBuilder function(JsonObjectBuilder jObject) : {Token t; Token k; JsonObjectBuilder finalObject = Json.createObjectBuilder();
+JsonObjectBuilder functionObject = Json.createObjectBuilder(); JsonObjectBuilder expression  =Json.createObjectBuilder();}
 {
-  ( LOOKAHEAD(1)(t = <ALPHANUM>)|(t = <PROJECT>))<FBRACKETSTART>
+  ( LOOKAHEAD(1)(t = <ALPHANUM>)|(t = <FIELDNAME>))<FBRACKETSTART>
   (
   LOOKAHEAD(3)
   ( functionObject = function(functionObject){expression.add("f()",functionObject.build());})
