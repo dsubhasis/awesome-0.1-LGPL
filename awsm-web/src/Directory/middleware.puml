@@ -1,0 +1,13 @@
+@startuml
+
+client -> AppServer : JS CALL
+AppServer ->client: validation
+Middleware -> AppServer: Inin
+Middleware --> client: Local Data Reseponse
+Middleware --> AWSMServer: token
+AWSMServer -> store : QUERY
+
+
+
+
+@enduml

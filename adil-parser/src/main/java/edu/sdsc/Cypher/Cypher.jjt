@@ -1,0 +1,248 @@
+options{
+
+STATIC = false;
+}
+
+PARSER_BEGIN(Cypher)
+package edu.sdsc.Cypher;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonArrayBuilder;
+
+
+import static edu.sdsc.awesome.adil.parser.StatementOperation.CypherUtil.*;
+
+public class Cypher {
+  public static void main(String[] args) {
+    Reader sr = new StringReader(args[0]);
+    JsonObjectBuilder cypherNode = Json.createObjectBuilder();
+
+
+    Cypher p = new Cypher(sr);
+    try {
+      p.Expression(cypherNode);
+    } catch (ParseException pe) {
+      pe.printStackTrace();
+    }
+  }
+}
+
+PARSER_END(Cypher)
+SKIP : {
+  " "
+}
+
+
+TOKEN [IGNORE_CASE]:
+{
+ < CREATE : "create">
+ | < CONSTRAINT : "constraint" >
+ | <ON : "on" >
+ | < ASSERT : "assert" >
+ | < UNIQUE : "unique" >
+ | < MATCH : "match" >
+ | <MERGE : "merge" >
+ |<IS : "is" >
+
+}
+
+TOKEN :
+{
+    <CARET : "^">
+  | <CONCAT : "||">
+  | <DIV : "/">
+  | <IDIV : "idiv">
+  | <MINUS : "-">
+  | <MOD : "%">
+  | <MUL : "*">
+  | <PLUS : "+">
+
+  | <LEFTPAREN : "(">
+  | <RIGHTPAREN : ")">
+  | <LEFTBRACKET : "[">
+  | <RIGHTBRACKET : "]">
+  | <LEFTCURL : "{">
+  | <RIGHTCURL : "}">
+  | <QUOT : "\"">
+
+
+
+
+  | <ATT : "@">
+  | <COLON : ":">
+  | <COMMA : ",">
+  | <DOT : ".">
+  | <QUES : "?">
+  | <SEMICOLON : ";">
+  | <SHARP : "#">
+
+  | <LT : "<">
+  | <GT : ">">
+  | <LE : "<=">
+  | <GE : ">=">
+  | <EQ : "=">
+  | <NE : "!=">
+  | <LG : "<>">
+  | <SIMILAR : "~=">
+}
+
+TOKEN [IGNORE_CASE]:
+{
+ < UNNEST : "unnest">
+ | <SELECT : "select" >
+ | <FROM : "from">
+ | <AS : "as" >
+ | <GROUP : "group" >
+ | <BY : "by" >
+ | <LIMIT : "limit">
+ |<DIGITS : "digita" >
+
+
+}
+
+TOKEN :
+{
+   < #DIGIT    : ["0"-"9"] >
+ | < #LETTER   : ["a"-"z","A"-"Z"] >
+ | < ALPHANUM : (<LETTER>|<DIGIT>)+>
+ | <FIELDNAME : (<ALPHANUM>(<DOT><ALPHANUM>)*)>
+ | <CYPHERFIELD : (<ALPHANUM>(<COLON><ALPHANUM>)?)>
+
+
+
+}
+
+
+JsonObjectBuilder Expression(JsonObjectBuilder jObject) : {JsonArrayBuilder cypherPlan = Json.createArrayBuilder();} {
+
+<QUOT> ({JsonObjectBuilder tempjObject = Json.createObjectBuilder();} tempjObject = Statement(tempjObject) {cypherPlan.add(tempjObject.build());} <SEMICOLON>)* <QUOT>
+
+  {jObject.add("Cypher", cypherPlan.build());}
+  {return jObject; }
+}
+
+JsonObjectBuilder Statement(JsonObjectBuilder jObject) : {Token T; JsonArrayBuilder tempArray = Json.createArrayBuilder();JsonObjectBuilder tempjObject = Json.createObjectBuilder();}
+{
+
+(LOOKAHEAD(1) (tempjObject = createStatement(tempjObject){tempArray.add(tempjObject);}) | (tempjObject =  MatchStatement(tempjObject){tempArray.add(tempjObject);}))
+
+{jObject.add("STATEMENT", tempArray.build());}
+ {return jObject;}
+
+
+}
+
+
+ JsonObjectBuilder createStatement(JsonObjectBuilder jObject) : {}
+{
+ <CREATE> (LOOKAHEAD(1) jObject = createConstantStatement(jObject) | jObject = createEntryStatement(jObject))
+
+  {return jObject;}
+}
+
+JsonObjectBuilder createConstantStatement(JsonObjectBuilder jObject) : {Token t; Token x; JsonObjectBuilder data = Json.createObjectBuilder();}
+{
+( LOOKAHEAD(1)(<CONSTRAINT> <ON> <LEFTPAREN> x = <CYPHERFIELD> <RIGHTPAREN>  <ASSERT> t = <FIELDNAME> <IS> <UNIQUE>) | (<SEMICOLON> <CONSTRAINT> <ON> <LEFTPAREN> x = <CYPHERFIELD> <RIGHTPAREN>  <ASSERT> t = <FIELDNAME> <IS> <UNIQUE>))
+
+
+{data.add("Node", x.image);}
+{data.add("Tuple", t.image);}
+{data.add("type", "UNIQUE");}
+
+
+{jObject.add("CONSTRAINT", data.build());}
+ {return jObject;}
+
+}
+
+JsonObjectBuilder createEntryStatement(JsonObjectBuilder jObject) : {JsonObjectBuilder cypherNode = Json.createObjectBuilder(); JsonArrayBuilder cNode = Json.createArrayBuilder();  JsonArrayBuilder cEdge = Json.createArrayBuilder(); Token t = null;}
+{
+ (cypherNode = cypherNode(cypherNode) {cNode.add(cypherNode.build());} )(t = CypherEdge() {cEdge.add(t.image ); } cypherNode = cypherNode(cypherNode) {cNode.add(cypherNode.build());})?
+
+
+ {jObject.add("node", cNode.build());}
+ {jObject.add("edge", cEdge.build());}
+ {return jObject;}
+
+}
+
+
+JsonObjectBuilder MatchStatement(JsonObjectBuilder jObject) : {JsonObjectBuilder mergeStmt = Json.createObjectBuilder(); Token t;}
+{
+ <MATCH> (<LEFTPAREN> (LOOKAHEAD(1) t = <CYPHERFIELD> |t = <ALPHANUM>)<RIGHTPAREN>  mergeStmt = MergeStatement(mergeStmt))
+
+ //(<LEFTPAREN> (LOOKAHEAD(1) t = <CYPHERFIELD> |t = <ALPHANUM>)<RIGHTPAREN><LT><MINUS><LEFTBRACKET><CYPHERFIELD><RIGHTBRACKET><MINUS><LEFTPAREN> (LOOKAHEAD(1) t = <CYPHERFIELD> |t = <ALPHANUM>)<RIGHTPAREN><MINUS><LEFTBRACKET><CYPHERFIELD><RIGHTBRACKET><MINUS><GT><LEFTPAREN> (LOOKAHEAD(1) t = <CYPHERFIELD> |t = <ALPHANUM>) <RIGHTPAREN> )
+
+
+ {jObject = handleMatchStatement(jObject, t.image, mergeStmt );}
+
+ {return jObject;}
+
+}
+
+JsonObjectBuilder MergeStatement(JsonObjectBuilder mergeStmt) : {JsonObjectBuilder createStmt = Json.createObjectBuilder();}
+{
+
+<MERGE> createStmt = createEntryStatement(createStmt)
+{mergeStmt.add("MERGE", createStmt.build());}
+
+{return mergeStmt;}
+}
+
+
+
+JsonObjectBuilder cypherNode(JsonObjectBuilder jObject) : {Token t; JsonObjectBuilder jb = Json.createObjectBuilder();}
+{
+
+(<LEFTPAREN> (LOOKAHEAD(1) t = <CYPHERFIELD> |t = <ALPHANUM>) (<LEFTCURL>  (jb = nodeProperty(jb))? <RIGHTCURL> )? <RIGHTPAREN> {jObject = handleCypherNode(jObject, jb, t.image );} )(<COMMA> <LEFTPAREN> (LOOKAHEAD(1) t = <CYPHERFIELD>|t = <ALPHANUM>) (<LEFTCURL>jb = nodeProperty(jb)<RIGHTCURL> {jObject = handleCypherNode(jObject, jb, t.image );})? <RIGHTPAREN>)?
+
+
+
+{return jObject; }
+
+}
+
+Token  CypherEdge() : {Token t;}
+{
+
+ <MINUS><LEFTBRACKET><COLON> t = <ALPHANUM><RIGHTBRACKET><MINUS><GT>
+
+{return t;}
+}
+
+ JsonObjectBuilder nodeProperty(JsonObjectBuilder jb) : { Token x; Token t;  boolean unnestFlag = false; JsonObjectBuilder tempJB = Json.createObjectBuilder();}
+
+{
+
+( x = <ALPHANUM> <COLON> (LOOKAHEAD(1)( t = <FIELDNAME>)|(<UNNEST> <LEFTPAREN> t = <FIELDNAME><RIGHTPAREN> {unnestFlag = true;}) ) {tempJB = handleNodeProperty( tempJB, x.image,  t.image, unnestFlag );} ) ( (<COMMA> x = <ALPHANUM> <COLON> ( LOOKAHEAD(1)(t = <FIELDNAME>)|(<UNNEST> <LEFTPAREN> t= <FIELDNAME><RIGHTPAREN> {unnestFlag = true;} ) ) {tempJB = handleNodeProperty( tempJB, x.image,  t.image, unnestFlag );})+)?
+
+
+{jb.add(x.image, tempJB.build());}
+{return jb;}
+
+}
+
+/*create (u:User {id: Collection.Tweet.User.id,
+								name: Collection.Tweet.User.name})
+						-[:created]->
+					   (n:Tweet {id: Collection.Tweet.TweetID,
+						  TweetDate:Collection.Tweet.TweetDate,
+						  Text:Collection.Tweet.Text})
+
+						  match (n:Tweet) merge (n)-[:hasHashTag]->(h:HashTag {tag: unnest(Collection.Tweet.Entities.HashTags)}
+                          				match (n:Tweet), (u:User) merge (n)-[:mentions]->(u:User {uname: unnest(Collection.Tweet.Entities.user_mentions.id)}
+
+*/
+
+
+
+
+
