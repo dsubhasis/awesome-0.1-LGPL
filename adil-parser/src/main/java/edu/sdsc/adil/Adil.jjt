@@ -21,11 +21,14 @@ import java.util.List;
 
 
 
+import edu.sdsc.awesome.adil.parser.ParserTable.VariableTable;
+
 
 import static edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.ImportLibraryDBCheck;
 import static edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.handleCypherQuery;
 import static edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.handleSQLPPQuery;
 import static edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.*;
+import edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil;
 
 
 public class Adil {
@@ -37,6 +40,7 @@ private JsonObjectBuilder error = Json.createObjectBuilder();
 private JsonObjectBuilder decision = Json.createObjectBuilder();
 private JsonObjectBuilder schema = Json.createObjectBuilder();
 private JsonObjectBuilder type = Json.createObjectBuilder();
+private VariableTable varTable = new VariableTable();
 
 
 public static void main(String[] args) {
@@ -72,8 +76,8 @@ TOKEN : {
   | <SEMICOLON : ";">
   | <COLON : ":" >
   | < EQAL : "=" >
-  | < #GREATER : ">">
-  | < #LESS : "<" >
+  | < GREATER : ">">
+  | < LESS : "<" >
   | <FBRACKETSTART : "(">
   | <FBRACKETEND : ")">
   | <DOT : ".">
@@ -82,6 +86,11 @@ TOKEN : {
   | <EndSQBracket   : "]" >
   | < AT : "@">
   | <OPERATOR : (<GREATER>|<LESS>|(<EQAL><EQAL>)) >
+  |< MINUS : "-" >
+
+
+
+
 
 
 }
@@ -120,6 +129,10 @@ TOKEN [IGNORE_CASE]: {
 | <WITNESS : "witness" >
 | <PROJECT : "project" >
 | <AWSM : "awsm">
+|<NODE : "node">
+|<NODES : "nodes">
+|<PATH : "path">
+|<SELECT : "select" >
 
 
 
@@ -145,6 +158,11 @@ TOKEN :
  |<FIELDNAME : (<ALPHANUM>(<DOT><ALPHANUM>)*)>
 
  |< QUOTED_IDENTIFIER: "\"" (~["\n","\r","\""])+ "\"" | ("`" (~["\n","\r","`"])+ "`") | ( "[" ~["0"-"9","]"] (~["\n","\r","]"])* "]" ) >
+ |<GraphElementType : (<COLON><ALPHANUM>)>
+ |<INPATH : (<MINUS><GREATER>) >
+ |<OUTPATH : (<LESS><MINUS>) >
+
+
 
 
 
@@ -211,10 +229,10 @@ JsonObjectBuilder CreateStatement(JsonObjectBuilder jObject) : {Token t; }
 JsonObjectBuilder CreateAnalysis(JsonObjectBuilder jObject) : {Token t; Token k; boolean scheduleFlag = true; JsonArrayBuilder array = Json.createArrayBuilder();}
 {
   <ANALYSIS> k = <ALPHANUM> <AS> <FBRACKETSTART> ({JsonObjectBuilder tempJB = Json.createObjectBuilder();}
-                                           tempJB =  DeclareAnalysis(tempJB){array.add(tempJB.build());})
+                                           tempJB =  DeclareAnalysis(tempJB)<SEMICOLON>{array.add(tempJB.build());})
 
 
-  ( {JsonObjectBuilder tempJC = Json.createObjectBuilder();} <COMMA> tempJC =  DeclareAnalysis(tempJC) {array.add(tempJC.build());})*   <FBRACKETEND>
+  ( {JsonObjectBuilder tempJC = Json.createObjectBuilder();}  tempJC =  DeclareAnalysis(tempJC) <SEMICOLON>{array.add(tempJC.build());})*   <FBRACKETEND>
   (<EXECUTE> <EVERY> t = <ALPHANUM>  {scheduleFlag = true;} {jObject.add("SCHEDULED", t.image);} )?
 
 
@@ -256,16 +274,49 @@ JsonObjectBuilder DeclareAnalysis(JsonObjectBuilder jObject) : {Token t; JsonObj
 JsonObjectBuilder AnalysisStatement(JsonObjectBuilder jObject) : {Token t; JsonObjectBuilder tempJB = Json.createObjectBuilder();}
 {
 
-     (LOOKAHEAD(1)(UserDefinedFunction(tempJB)) |(AwsmDefinedFunction(tempJB))) (<STORE> )? (t = <FIELDNAME>)?
+     (LOOKAHEAD(1)(tempJB = UserDefinedFunction(tempJB)  {jObject.add("ufn", tempJB.build());})
+     |(tempJB = AwsmDefinedFunction(tempJB) {jObject.add("nfn", tempJB.build());}))
+
+
+        (<STORE> {jObject.add("Store",true);} )? (t = <FIELDNAME>{jObject.add("type",t.image);})?
+
+
 
 
  {return jObject;}
 }
 
+JsonObjectBuilder FunctionParam(JsonObjectBuilder jObject) : {Token t; Token t2;Token t3; JsonArrayBuilder array  =Json.createArrayBuilder();JsonObjectBuilder tempJB = Json.createObjectBuilder(); }
+{
+      (t = <ALPHANUM> | t = <FIELDNAME> | t = <DIGITS>) (<EQAL> (LOOKAHEAD(2) t2 = <ALPHANUM> | t2 = <FIELDNAME> | t2 = <DIGITS>){
+
+      tempJB.add("name", t.image);tempJB.add("value", t2.image); array.add(tempJB.build());})?
+
+      (<COMMA>  (t = <ALPHANUM> | t = <FIELDNAME>| t = <DIGITS>) (<EQAL> (LOOKAHEAD(2) t2 = <ALPHANUM> | t2 = <FIELDNAME> | t2 = <DIGITS>))  { JsonObjectBuilder tempJC = Json.createObjectBuilder();
+      tempJB.add("name", t.image);tempJB.add("value", t2.image); array.add(tempJB.build());}
+      )?
+
+     {jObject.add("param",array.build());return jObject;}
+
+}
+
 JsonObjectBuilder AwsmDefinedFunction(JsonObjectBuilder jObject) #JsonObjectBuilder : {Token t; Token t2; JsonObjectBuilder tempJB = Json.createObjectBuilder();}
 {
 
-  <AWSM><COLON><ALPHANUM><FBRACKETSTART>AwesomeSafeFunction(tempJB)<FBRACKETEND>
+  <AWSM><COLON>t =<ALPHANUM><FBRACKETSTART>
+   (LOOKAHEAD(2) AwesomeSafeFunction(tempJB){jObject.add("input","cypher"); jObject.add("stmt", tempJB.build());}
+  |(AwsmDefinedFunction(tempJB){jObject.add("input","nested"); jObject.add("stmt", tempJB.build());})
+  | (FunctionParam(tempJB){jObject.add("input","function"); jObject.add("stmt", tempJB.build());})
+
+
+  )
+
+  {jObject.add("internal", true); jObject.add("name", t.image);}
+
+
+  <FBRACKETEND>
+
+  {ParserUtil pt = new ParserUtil(); pt.handleawsmfunction(jObject,  varTable);}
 
     {System.out.println("xxxxxx");return jObject; }
 }
@@ -280,18 +331,16 @@ JsonObjectBuilder UserDefinedFunction(JsonObjectBuilder jObject) : {Token t0; To
 /* awesome safe functions are read functions and awesome specific update functions
 *
 */
-
-
-JsonObjectBuilder AwesomeSafeFunction(JsonObjectBuilder jObject) #JsonObjectBuilder : {Token t0; Token t1; Token t2; JsonObjectBuilder tempJB = Json.createObjectBuilder();}
-{
-   LOOKAHEAD(6)
+JsonObjectBuilder AwesomeSafeFunction(JsonObjectBuilder jObject)  : {Token t0; Token t1; Token t2; JsonObjectBuilder tempJB = Json.createObjectBuilder();}
+{ 
+   (LOOKAHEAD(6)
     AnnotateWithStoreOperation(tempJB) {jObject.add("annotation", tempJB.build());}
    |( ExecuteSQLPP(tempJB) {jObject.add("SQLPP", tempJB.build());})
    |(executeCypher(tempJB) {jObject.add("graph", tempJB.build());} )
    |(CreateView(tempJB) {jObject.add("view", tempJB.build());})
    |(FilterOperation(tempJB) {jObject.add("filter", tempJB.build());})
    |(ProjectFunction(tempJB){jObject.add("PROJECT", tempJB.build());})
-   |(ReportAnalysis(tempJB) {jObject.add("report", tempJB.build());} )
+   |(ReportAnalysis(tempJB) {jObject.add("report", tempJB.build());} ))
 
 
     {return jObject; }
@@ -400,9 +449,9 @@ JsonObjectBuilder executeCypher(JsonObjectBuilder jObject) : {Token source; Toke
    <AS>partitionVar=<ALPHANUM> )?
 
 
-   {tempJB = handleCypherQuery(t.image, tempJB, partitionJB, partitionFlag);}
-   {jObject.add("Plan" ,tempJB.build());
-   jObject.add("query", t.image);
+   //{tempJB = handleCypherQuery(t.image, tempJB, partitionJB, partitionFlag);}
+   //{jObject.add("Plan" ,tempJB.build());
+   {jObject.add("query", t.image);
    jObject.add("source", source.image);
 
    }
@@ -433,13 +482,16 @@ t = <FILTER> <FBRACKETSTART> ( ( LOOKAHEAD(1)(x = <FIELDNAME>)| (x=<ALPHANUM>)) 
 {return jObject;}
 
 }
-JsonObjectBuilder AnnotateWithStoreOperation(JsonObjectBuilder jObject) : {boolean withnessflag=false;  JsonObjectBuilder annotateInfo = Json.createObjectBuilder(); List l1 = new ArrayList(); Token v; Token s;  Token t; List x; Token y; List l = new ArrayList(); List m = new ArrayList(); List z; JsonObjectBuilder varmap = Json.createObjectBuilder(); JsonArrayBuilder dict  =Json.createArrayBuilder();  JsonArrayBuilder fields  =Json.createArrayBuilder(); JsonObjectBuilder exp = Json.createObjectBuilder(); JsonObjectBuilder annotate = Json.createObjectBuilder();}
+JsonObjectBuilder AnnotateWithStoreOperation(JsonObjectBuilder jObject) : {boolean withnessflag=false;  JsonObjectBuilder annotateInfo = Json.createObjectBuilder();
+List l1 = new ArrayList(); Token v; Token s;  Token t; List x; Token y; List l = new ArrayList();
+List m = new ArrayList(); List z; JsonObjectBuilder varmap = Json.createObjectBuilder(); JsonArrayBuilder dict  =Json.createArrayBuilder();
+JsonArrayBuilder fields  =Json.createArrayBuilder(); JsonObjectBuilder exp = Json.createObjectBuilder(); JsonObjectBuilder annotate = Json.createObjectBuilder();}
 {
 
 t = <ANNOTATE>
  <FBRACKETSTART> x = GetField(l)<FBRACKETEND>
                 <IN> y = <ALPHANUM> <WITH> z = GetDictionary(m)
-                (( <WHERE> exp = GetConditionExpression(exp, y.image))*
+                (( CommonWhereClause(exp, y.image))*
                  (<WITNESS>( <AS> <PROJECT><FBRACKETSTART> l1 = GetField(l1)<FBRACKETEND>) ? {withnessflag=true;} ) (<STORE> <TYPE> s = <ALPHANUM>)?)
 
 //{annotate = edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.getAnnotateJSONPLAN(annotate, z, exp.build(), x, y.image, s.image, variableTable, decision, schema, type );}
@@ -462,13 +514,74 @@ t = <ANNOTATE>
 
 }
 
+JsonObjectBuilder Cypher(JsonObjectBuilder jObject):{Token a,b; JsonObjectBuilder tempJB = Json.createObjectBuilder(); Token q;JsonObjectBuilder tempAB = Json.createObjectBuilder(); JsonArrayBuilder path  =Json.createArrayBuilder();}
+{
+
+((a = <ALPHANUM>b = <GraphElementType>)|((<FBRACKETSTART> a = <ALPHANUM> b = <GraphElementType> <FBRACKETEND>))
+                 {JsonObjectBuilder tempa = Json.createObjectBuilder(); tempa.add("name", a.image);JsonObjectBuilder tempb = Json.createObjectBuilder(); tempb.add("type", b.image); tempAB.add("0", tempa.build()) ; tempAB.add("1", tempb.build()) ;})
+({JsonObjectBuilder tempJC = Json.createObjectBuilder();Token c, d, e, f, g, h;}((<INPATH>{tempAB.add( a.image, "in" );})
+|(<OUTPATH>{tempAB.add( a.image, "out" );})
+   { path.add(tempJC.build());})<StartSQBracket>c = <ALPHANUM>d = <GraphElementType> <EndSQBracket>
+      {JsonObjectBuilder tempc = Json.createObjectBuilder(); tempc.add("name", c.image+d.image);path.add(tempc.build());JsonObjectBuilder tempd = Json.createObjectBuilder(); tempd.add("type", d.image);path.add(tempd.build());  }
+
+(<INPATH>{{tempJC.add( c.image, "in" );}}
+|<OUTPATH>{tempJC.add( c.image, "out" );}{path.add(tempJC.build());})e = <ALPHANUM> f = <GraphElementType>{JsonObjectBuilder tempe = Json.createObjectBuilder(); tempe.add("name", e.image+f.image);path.add(tempe.build()); JsonObjectBuilder tempf = Json.createObjectBuilder(); tempf.add("type", f.image); path.add(tempf.build()) ;}
+|(<FBRACKETSTART> g = <ALPHANUM> h = <GraphElementType> <FBRACKETEND> ) {JsonObjectBuilder tempg = Json.createObjectBuilder(); tempg.add("name", g.image+h.image);path.add(tempg.build()); JsonObjectBuilder temph = Json.createObjectBuilder(); temph.add("type", h.image); path.add(temph.build()) ;}
+{tempAB.add("nest",path.build());})+
+
+{jObject.add("var", tempAB.build());}
+{return jObject;}
+
+}
+
+
+JsonObjectBuilder GraphSelect(JsonObjectBuilder jObject):{String t; JsonObjectBuilder cypher = Json.createObjectBuilder();JsonObjectBuilder fromCls = Json.createObjectBuilder();JsonArrayBuilder variable  =Json.createArrayBuilder();}
+
+{
+<SELECT> <NODES> <FBRACKETSTART> Cypher(cypher) <FBRACKETEND> t = FromClause(fromCls) ({JsonObjectBuilder whereC = Json.createObjectBuilder();}CommonWhereClause(whereC, t ){jObject.add("where",whereC.build());})?
+({jObject.add("cypher", cypher.build());jObject.add("src", fromCls.build()); return jObject;})
+
+}
+
+
+JsonObjectBuilder PropertyGraphExpression(JsonObjectBuilder jObject):{Token t; JsonObjectBuilder tempJB = Json.createObjectBuilder();}
+
+{
+ <SELECT> t = <ALPHANUM>
+{jObject.add("SELECT", tempJB.build()); return jObject;}
+}
+
+
+JsonObjectBuilder CommonWhereClause(JsonObjectBuilder jObject, String src):{Token t; JsonObjectBuilder tempJB = Json.createObjectBuilder();}{
+  <WHERE> tempJB = GetConditionExpression(tempJB, src)
+
+{jObject.add("where",tempJB.build()); return jObject;}
+}
+
+String FromClause(JsonObjectBuilder jObject):{Token t; JsonObjectBuilder tempJB = Json.createObjectBuilder();}{
+<FROM> ( LOOKAHEAD(2)
+
+t = <ALPHANUM>{jObject.add("src",tempJB.build());}
+| t = <FIELDNAME>{jObject.add("src", tempJB.build());}
+
+
+)
+
+{jObject.add("from ",tempJB.build()); return t.image;}
+}
+
+
+
+
+
+
 
 
 
  JsonObjectBuilder GetConditionExpression(JsonObjectBuilder l, String src) : {Token t; List x; List y; Token o1; Token operand; Token o2; JsonArrayBuilder m  =Json.createArrayBuilder();  JsonObjectBuilder j1 = Json.createObjectBuilder(); JsonArrayBuilder p  =Json.createArrayBuilder(); JsonObjectBuilder k  =Json.createObjectBuilder();}
 {
 
-       (( LOOKAHEAD(3)(function(j1) {k.add("firstfunction",j1.build());})
+    (( LOOKAHEAD(3)(function(j1) {k.add("firstfunction",j1.build());})
        |(o1 = <FIELDNAME>  {  JsonObjectBuilder tempVar = Json.createObjectBuilder(); variableType(tempVar, src, o1.image, decision ); k.add("firstoperand",tempVar.build());})
        |( o1=<ALPHANUM>{ k.add("firstoperand",o1.image);})|( o1=<DIGITS>{ k.add("firstoperand",o1.image);})) ( LOOKAHEAD(1) ( operand = <OPERATOR>{k.add("operator", operand.image);}) | (<NOT> <IN>) )
         ( LOOKAHEAD(3)(function(j1) {k.add("secondfunction",j1.build());})|(o2 = <ALPHANUM>{k.add("secondoperand",o2.image);})|(o2 = <FIELDNAME>{k.add("secondoperand",o2.image);})|( o2=<DIGITS>{ k.add("secondoperand", o2.image);})
@@ -483,13 +596,9 @@ t = <ANNOTATE>
 
 
 
-      {l.add("WHERE",m.build());}
+      {l.add("COND",m.build());}
 {return l;}
 }
-
-
-
-
 
 
 
