@@ -17,14 +17,16 @@ public class ConnectSolr {
 
     private static HttpSolrClient solr;
 
-    private static void addDocuments( String name ,String filtersPath, String objectsPath) throws IOException,
+    public ConnectSolr(String url) {
+        solr = solrConnection(url);
+    }
+
+    public void addDocuments(String[] filters, String[] objects) throws IOException,
             SolrServerException{
-        if(name == null || filtersPath == null || objectsPath == null) {
+        if(filters == null || objects == null) {
             System.err.println("Missing document filters, objects, or name");
             System.exit(1);
         }
-        String[] filters = filtersPath.split(",");
-        String[] objects = objectsPath.split(",");
         if(filters.length != objects.length) {
             System.err.println("Not enough filters and/or objects to make pairs");
             System.exit(1);
@@ -32,16 +34,20 @@ public class ConnectSolr {
         else {
             SolrInputDocument doc = new SolrInputDocument();
             for(int i = 0; i < filters.length; i++) {
-                doc.addField(filters[i], objects[i]);
+                String filter = filters[i];
+                String object = "null";
+                if(objects[i] != null) {
+                    object = objects[i];
+                }
+                doc.addField(filter, object);
             }
-            doc.addField("name", name);
             solr.add(doc);
         }
         solr.commit();
-        System.out.println("Successful Commit of Document : " + name);
+        System.out.println("Successful Commit of Document");
     }
 
-    private static void doQuery( String requestPath, String queryPath, String fieldsPath,
+    public void doQuery( String requestPath, String queryPath, String fieldsPath,
                                          String filter, Gson gson ) {
 
         SolrQuery query = new SolrQuery();
@@ -82,7 +88,10 @@ public class ConnectSolr {
             System.err.println("IOException: Unable to parse responses");
             System.exit(1);
         }
+    }
 
+    public HttpSolrClient solrConnection(String urlPath) {
+        return new HttpSolrClient.Builder(urlPath).build();
     }
 
     public static void main(String[] args) {
@@ -148,12 +157,14 @@ public class ConnectSolr {
             System.exit(1);
         }
 
-        solr = new HttpSolrClient.Builder(urlPath).build();
+        ConnectSolr connection = new ConnectSolr(urlPath);
 
         /* check if adding documents or searching documents */
         if(documentsFlag) {
             try {
-                addDocuments(namedocumentPath, filtersdocumentPath, objectsdocumentPath);
+                String[] filtersDoc = filtersdocumentPath.split(",");
+                String[] objectsDoc= objectsdocumentPath.split(",");
+                connection.addDocuments(filtersDoc, objectsDoc);
             }
             catch(SolrServerException e) {
                 System.err.println("SolrServerException: Unable to connect to Solr Server");
@@ -171,7 +182,7 @@ public class ConnectSolr {
             if(filtersPath != null) {
                 String[] filtersArr = filtersPath.split(",");
                 for(String filter : filtersArr) {
-                    doQuery(requestPath, queryPath, fieldsPath, filter, gson);
+                    connection.doQuery(requestPath, queryPath, fieldsPath, filter, gson);
                 }
             }
         }
