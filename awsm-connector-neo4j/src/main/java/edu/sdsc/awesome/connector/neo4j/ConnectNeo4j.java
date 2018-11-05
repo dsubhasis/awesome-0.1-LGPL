@@ -15,12 +15,10 @@ import static org.neo4j.driver.v1.Values.parameters;
 public class ConnectNeo4j {
 
     private Driver driver;
-    private String query;
     /* sets up bolt connector and login */
-    private ConnectNeo4j(String bolt, String user, String password, String query) {
+    public ConnectNeo4j(String bolt, String user, String password) {
         try {
             driver = GraphDatabase.driver(bolt, AuthTokens.basic(user, password));
-            this.query = query;
         } catch(Exception e) {
             System.err.println("Server Connection Failed");
             System.exit(1);
@@ -28,19 +26,18 @@ public class ConnectNeo4j {
     }
 
     /* closes driver after use */
-    private void close() {
+    public void close() {
         driver.close();
     }
 
     /* parses command */
-    private void parseCommand( final String query ) {
+    public void parseCommand( final String query ) {
         try(Session session = driver.session()) {
             String result = session.writeTransaction(new TransactionWork<String>() {
                 @Override
                 public String execute(Transaction tx) {
                     StatementResult result = tx.run(query);
                     tx.success();
-                    System.out.println(result.keys().toString());
                     return "Success";
                 }
             });
@@ -79,7 +76,7 @@ public class ConnectNeo4j {
         String queryPath = "";
 
         try {
-           cmd = parser.parse(options, args);
+            cmd = parser.parse(options, args);
             boltPath = cmd.getOptionValue("bolt");
             usernamePath = cmd.getOptionValue("username");
             passwordPath = cmd.getOptionValue("password");
@@ -91,7 +88,7 @@ public class ConnectNeo4j {
         }
 
         /* Create Client and Run Command */
-        ConnectNeo4j command = new ConnectNeo4j(boltPath, usernamePath, passwordPath, queryPath);
+        ConnectNeo4j command = new ConnectNeo4j(boltPath, usernamePath, passwordPath);
         command.parseCommand( queryPath );
         command.close();
 
