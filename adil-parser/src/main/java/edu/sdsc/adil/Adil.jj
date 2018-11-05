@@ -22,11 +22,14 @@ import java.util.List;
 
 
 
+import edu.sdsc.awesome.adil.parser.ParserTable.VariableTable;
+
 
 import static edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.ImportLibraryDBCheck;
 import static edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.handleCypherQuery;
 import static edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.handleSQLPPQuery;
 import static edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.*;
+import edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil;
 
 
 public class Adil/*@bgen(jjtree)*/implements AdilTreeConstants/*@egen*/ {/*@bgen(jjtree)*/
@@ -41,6 +44,7 @@ private JsonObjectBuilder error = Json.createObjectBuilder();
 private JsonObjectBuilder decision = Json.createObjectBuilder();
 private JsonObjectBuilder schema = Json.createObjectBuilder();
 private JsonObjectBuilder type = Json.createObjectBuilder();
+private VariableTable varTable = new VariableTable();
 
 
 public static void main(String[] args) {
@@ -76,8 +80,8 @@ TOKEN : {
   | <SEMICOLON : ";">
   | <COLON : ":" >
   | < EQAL : "=" >
-  | < #GREATER : ">">
-  | < #LESS : "<" >
+  | < GREATER : ">">
+  | < LESS : "<" >
   | <FBRACKETSTART : "(">
   | <FBRACKETEND : ")">
   | <DOT : ".">
@@ -86,6 +90,11 @@ TOKEN : {
   | <EndSQBracket   : "]" >
   | < AT : "@">
   | <OPERATOR : (<GREATER>|<LESS>|(<EQAL><EQAL>)) >
+  |< MINUS : "-" >
+
+
+
+
 
 
 }
@@ -124,6 +133,10 @@ TOKEN [IGNORE_CASE]: {
 | <WITNESS : "witness" >
 | <PROJECT : "project" >
 | <AWSM : "awsm">
+|<NODE : "node">
+|<NODES : "nodes">
+|<PATH : "path">
+|<SELECT : "select" >
 
 
 
@@ -148,7 +161,12 @@ TOKEN :
 
  |<FIELDNAME : (<ALPHANUM>(<DOT><ALPHANUM>)*)>
 
- |< QUOTED_IDENTIFIER: "\"" (~["\n","\r","\""])+ "\"" | ("`" (~["\n","\r","`"])+ "`") | ( "[" ~["0"-"9","]"] (~["\n","\r","]"])* "]" ) >
+ |< QUOTED_IDENTIFIER : "\"" (~["\n","\r","\""])+ "\"" | ("`" (~["\n","\r","`"])+ "`") >
+ |<GraphElementType : <COLON><ALPHANUM>>
+ |<INPATH : (<MINUS><GREATER>) >
+ |<OUTPATH : (<LESS><MINUS>) >
+
+
 
 
 
@@ -331,10 +349,10 @@ JsonObjectBuilder CreateAnalysis(JsonObjectBuilder jObject) : {/*@bgen(jjtree) C
   try {
 /*@egen*/
   <ANALYSIS> k = <ALPHANUM> <AS> <FBRACKETSTART> ({JsonObjectBuilder tempJB = Json.createObjectBuilder();}
-                                           tempJB =  DeclareAnalysis(tempJB){array.add(tempJB.build());})
+                                           tempJB =  DeclareAnalysis(tempJB)<SEMICOLON>{array.add(tempJB.build());})
 
 
-  ( {JsonObjectBuilder tempJC = Json.createObjectBuilder();} <COMMA> tempJC =  DeclareAnalysis(tempJC) {array.add(tempJC.build());})*   <FBRACKETEND>
+  ( {JsonObjectBuilder tempJC = Json.createObjectBuilder();}  tempJC =  DeclareAnalysis(tempJC) <SEMICOLON>{array.add(tempJC.build());})*   <FBRACKETEND>
   (<EXECUTE> <EVERY> t = <ALPHANUM>  {scheduleFlag = true;} {jObject.add("SCHEDULED", t.image);} )?
 
 
@@ -438,12 +456,18 @@ JsonObjectBuilder AnalysisStatement(JsonObjectBuilder jObject) : {/*@bgen(jjtree
      try {
 /*@egen*/
 
-     (LOOKAHEAD(1)(UserDefinedFunction(tempJB)) |(AwsmDefinedFunction(tempJB))) (<STORE> )? (t = <FIELDNAME>)?/*@bgen(jjtree)*/
+     (LOOKAHEAD(1)(tempJB = UserDefinedFunction(tempJB)  {jObject.add("ufn", tempJB.build());})
+     |(tempJB = AwsmDefinedFunction(tempJB) {jObject.add("nfn", tempJB.build());}))
+
+
+        (<STORE> {jObject.add("Store",true);} )? (t = <FIELDNAME>{jObject.add("type",t.image);})?/*@bgen(jjtree)*/
  {
    jjtree.closeNodeScope(jjtn000, true);
    jjtc000 = false;
  }
 /*@egen*/
+
+
 
 
  {return jObject;}/*@bgen(jjtree)*/
@@ -469,6 +493,37 @@ JsonObjectBuilder AnalysisStatement(JsonObjectBuilder jObject) : {/*@bgen(jjtree
 /*@egen*/
 }
 
+JsonObjectBuilder FunctionParam(JsonObjectBuilder jObject) : {/*@bgen(jjtree) FunctionParam */
+                                                              ASTFunctionParam jjtn000 = new ASTFunctionParam(JJTFUNCTIONPARAM);
+                                                              boolean jjtc000 = true;
+                                                              jjtree.openNodeScope(jjtn000);
+/*@egen*/Token t; Token t2;Token t3; JsonArrayBuilder array  =Json.createArrayBuilder();JsonObjectBuilder tempJB = Json.createObjectBuilder(); }
+{/*@bgen(jjtree) FunctionParam */
+      try {
+/*@egen*/
+      (t = <ALPHANUM> | t = <FIELDNAME> | t = <DIGITS>) (<EQAL> (LOOKAHEAD(2) t2 = <ALPHANUM> | t2 = <FIELDNAME> | t2 = <DIGITS>){
+
+      tempJB.add("name", t.image);tempJB.add("value", t2.image); array.add(tempJB.build());})?
+
+      (<COMMA>  (t = <ALPHANUM> | t = <FIELDNAME>| t = <DIGITS>) (<EQAL> (LOOKAHEAD(2) t2 = <ALPHANUM> | t2 = <FIELDNAME> | t2 = <DIGITS>))  { JsonObjectBuilder tempJC = Json.createObjectBuilder();
+      tempJB.add("name", t.image);tempJB.add("value", t2.image); array.add(tempJB.build());}
+      )?/*@bgen(jjtree)*/
+     {
+       jjtree.closeNodeScope(jjtn000, true);
+       jjtc000 = false;
+     }
+/*@egen*/
+
+     {jObject.add("param",array.build());return jObject;}/*@bgen(jjtree)*/
+      } finally {
+        if (jjtc000) {
+          jjtree.closeNodeScope(jjtn000, true);
+        }
+      }
+/*@egen*/
+
+}
+
 JsonObjectBuilder AwsmDefinedFunction(JsonObjectBuilder jObject)                    : {/*@bgen(jjtree) JsonObjectBuilder */
                                                                                        ASTJsonObjectBuilder jjtn000 = new ASTJsonObjectBuilder(JJTJSONOBJECTBUILDER);
                                                                                        boolean jjtc000 = true;
@@ -478,7 +533,24 @@ JsonObjectBuilder AwsmDefinedFunction(JsonObjectBuilder jObject)                
   try {
 /*@egen*/
 
-  <AWSM><COLON><ALPHANUM><FBRACKETSTART>AwesomeSafeFunction(tempJB)<FBRACKETEND>/*@bgen(jjtree)*/
+  (<AWSM><COLON>t =<ALPHANUM><FBRACKETSTART>
+   (LOOKAHEAD(1) AwesomeSafeFunction(tempJB){jObject.add("input","cypher"); jObject.add("stmt", tempJB.build());}
+  //|(AwsmDefinedFunction(tempJB){jObject.add("input","nested"); jObject.add("stmt", tempJB.build());})
+  | (FunctionParam(tempJB){jObject.add("input","function"); jObject.add("stmt", tempJB.build());})
+ )
+  {jObject.add("internal", true); jObject.add("name", t.image);}
+
+
+
+
+
+  <FBRACKETEND>)|GraphSelect(tempJB){jObject.add("cypher-g", tempJB.build());;}
+
+  {
+  ParserUtil pt = new ParserUtil();
+  pt.handleawsmfunction(jObject,  varTable);
+
+   }/*@bgen(jjtree)*/
     {
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
@@ -549,54 +621,22 @@ JsonObjectBuilder UserDefinedFunction(JsonObjectBuilder jObject) : {/*@bgen(jjtr
 /* awesome safe functions are read functions and awesome specific update functions
 *
 */
-
-
-JsonObjectBuilder AwesomeSafeFunction(JsonObjectBuilder jObject)                    : {/*@bgen(jjtree) JsonObjectBuilder */
-                                                                                       ASTJsonObjectBuilder jjtn000 = new ASTJsonObjectBuilder(JJTJSONOBJECTBUILDER);
-                                                                                       boolean jjtc000 = true;
-                                                                                       jjtree.openNodeScope(jjtn000);
+JsonObjectBuilder AwesomeSafeFunction(JsonObjectBuilder jObject)  : {/*@bgen(jjtree) AwesomeSafeFunction */
+                                                                     ASTAwesomeSafeFunction jjtn000 = new ASTAwesomeSafeFunction(JJTAWESOMESAFEFUNCTION);
+                                                                     boolean jjtc000 = true;
+                                                                     jjtree.openNodeScope(jjtn000);
 /*@egen*/Token t0; Token t1; Token t2; JsonObjectBuilder tempJB = Json.createObjectBuilder();}
-{/*@bgen(jjtree) JsonObjectBuilder */
-   try {
-/*@egen*/
-   LOOKAHEAD(6)
-    AnnotateWithStoreOperation(tempJB)/*@bgen(jjtree)*/
-                                       {
-                                         jjtree.closeNodeScope(jjtn000, true);
-                                         jjtc000 = false;
-                                       }
-/*@egen*/ {jObject.add("annotation", tempJB.build());}
-   |( ExecuteSQLPP(tempJB)/*@bgen(jjtree)*/
-                           {
-                             jjtree.closeNodeScope(jjtn000, true);
-                             jjtc000 = false;
-                           }
-/*@egen*/ {jObject.add("SQLPP", tempJB.build());})
-   |(executeCypher(tempJB)/*@bgen(jjtree)*/
-                           {
-                             jjtree.closeNodeScope(jjtn000, true);
-                             jjtc000 = false;
-                           }
-/*@egen*/ {jObject.add("graph", tempJB.build());} )
-   |(CreateView(tempJB)/*@bgen(jjtree)*/
-                        {
-                          jjtree.closeNodeScope(jjtn000, true);
-                          jjtc000 = false;
-                        }
-/*@egen*/ {jObject.add("view", tempJB.build());})
-   |(FilterOperation(tempJB)/*@bgen(jjtree)*/
-                             {
-                               jjtree.closeNodeScope(jjtn000, true);
-                               jjtc000 = false;
-                             }
-/*@egen*/ {jObject.add("filter", tempJB.build());})
-   |(ProjectFunction(tempJB)/*@bgen(jjtree)*/
-                            {
-                              jjtree.closeNodeScope(jjtn000, true);
-                              jjtc000 = false;
-                            }
-/*@egen*/{jObject.add("PROJECT", tempJB.build());})
-   |(ReportAnalysis(tempJB) {jObject.add("report", tempJB.build());} )/*@bgen(jjtree)*/
+{/*@bgen(jjtree) AwesomeSafeFunction */
+  try {
+/*@egen*/ 
+  (LOOKAHEAD(6)
+    AnnotateWithStoreOperation(tempJB) {jObject.add("annotation", tempJB.build());}
+   |( ExecuteSQLPP(tempJB) {jObject.add("SQLPP", tempJB.build());})
+   |(executeCypher(tempJB) {jObject.add("graph", tempJB.build());} )
+   |(CreateView(tempJB) {jObject.add("view", tempJB.build());})
+   |(FilterOperation(tempJB) {jObject.add("filter", tempJB.build());})
+   |(ProjectFunction(tempJB){jObject.add("PROJECT", tempJB.build());})
+   |(ReportAnalysis(tempJB) {jObject.add("report", tempJB.build());} ))/*@bgen(jjtree)*/
     {
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
@@ -604,26 +644,28 @@ JsonObjectBuilder AwesomeSafeFunction(JsonObjectBuilder jObject)                
 /*@egen*/
 
 
+
+
     {return jObject; }/*@bgen(jjtree)*/
-   } catch (Throwable jjte000) {
-     if (jjtc000) {
-       jjtree.clearNodeScope(jjtn000);
-       jjtc000 = false;
-     } else {
-       jjtree.popNode();
-     }
-     if (jjte000 instanceof RuntimeException) {
-       throw (RuntimeException)jjte000;
-     }
-     if (jjte000 instanceof ParseException) {
-       throw (ParseException)jjte000;
-     }
-     throw (Error)jjte000;
-   } finally {
-     if (jjtc000) {
-       jjtree.closeNodeScope(jjtn000, true);
-     }
-   }
+  } catch (Throwable jjte000) {
+    if (jjtc000) {
+      jjtree.clearNodeScope(jjtn000);
+      jjtc000 = false;
+    } else {
+      jjtree.popNode();
+    }
+    if (jjte000 instanceof RuntimeException) {
+      throw (RuntimeException)jjte000;
+    }
+    if (jjte000 instanceof ParseException) {
+      throw (ParseException)jjte000;
+    }
+    throw (Error)jjte000;
+  } finally {
+    if (jjtc000) {
+      jjtree.closeNodeScope(jjtn000, true);
+    }
+  }
 /*@egen*/
 }
 
@@ -872,9 +914,9 @@ JsonObjectBuilder executeCypher(JsonObjectBuilder jObject) : {/*@bgen(jjtree) ex
    <AS>partitionVar=<ALPHANUM> )?
 
 
-   {tempJB = handleCypherQuery(t.image, tempJB, partitionJB, partitionFlag);}
-   {jObject.add("Plan" ,tempJB.build());
-   jObject.add("query", t.image);
+   //{tempJB = handleCypherQuery(t.image, tempJB, partitionJB, partitionFlag);}
+   //{jObject.add("Plan" ,tempJB.build());
+   {jObject.add("query", t.image);
    jObject.add("source", source.image);
 
    }/*@bgen(jjtree)*/
@@ -982,7 +1024,10 @@ JsonObjectBuilder AnnotateWithStoreOperation(JsonObjectBuilder jObject) : {/*@bg
                                                                            ASTAnnotateWithStoreOperation jjtn000 = new ASTAnnotateWithStoreOperation(JJTANNOTATEWITHSTOREOPERATION);
                                                                            boolean jjtc000 = true;
                                                                            jjtree.openNodeScope(jjtn000);
-/*@egen*/boolean withnessflag=false;  JsonObjectBuilder annotateInfo = Json.createObjectBuilder(); List l1 = new ArrayList(); Token v; Token s;  Token t; List x; Token y; List l = new ArrayList(); List m = new ArrayList(); List z; JsonObjectBuilder varmap = Json.createObjectBuilder(); JsonArrayBuilder dict  =Json.createArrayBuilder();  JsonArrayBuilder fields  =Json.createArrayBuilder(); JsonObjectBuilder exp = Json.createObjectBuilder(); JsonObjectBuilder annotate = Json.createObjectBuilder();}
+/*@egen*/boolean withnessflag=false;  JsonObjectBuilder annotateInfo = Json.createObjectBuilder();
+List l1 = new ArrayList(); Token v; Token s;  Token t; List x; Token y; List l = new ArrayList();
+List m = new ArrayList(); List z; JsonObjectBuilder varmap = Json.createObjectBuilder(); JsonArrayBuilder dict  =Json.createArrayBuilder();
+JsonArrayBuilder fields  =Json.createArrayBuilder(); JsonObjectBuilder exp = Json.createObjectBuilder(); JsonObjectBuilder annotate = Json.createObjectBuilder();}
 {/*@bgen(jjtree) AnnotateWithStoreOperation */
 try {
 /*@egen*/
@@ -990,7 +1035,7 @@ try {
 t = <ANNOTATE>
  <FBRACKETSTART> x = GetField(l)<FBRACKETEND>
                 <IN> y = <ALPHANUM> <WITH> z = GetDictionary(m)
-                (( <WHERE> exp = GetConditionExpression(exp, y.image))*
+                (( CommonWhereClause(exp, y.image))*
                  (<WITNESS>( <AS> <PROJECT><FBRACKETSTART> l1 = GetField(l1)<FBRACKETEND>) ? {withnessflag=true;} ) (<STORE> <TYPE> s = <ALPHANUM>)?)
 
 //{annotate = edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.getAnnotateJSONPLAN(annotate, z, exp.build(), x, y.image, s.image, variableTable, decision, schema, type );}
@@ -1038,6 +1083,180 @@ t = <ANNOTATE>
 
 }
 
+JsonObjectBuilder Cypher(JsonObjectBuilder jObject):{/*@bgen(jjtree) Cypher */
+                                                     ASTCypher jjtn000 = new ASTCypher(JJTCYPHER);
+                                                     boolean jjtc000 = true;
+                                                     jjtree.openNodeScope(jjtn000);
+/*@egen*/Token a,b; JsonObjectBuilder tempJB = Json.createObjectBuilder(); Token q;JsonObjectBuilder tempAB = Json.createObjectBuilder(); JsonArrayBuilder path  =Json.createArrayBuilder();}
+{/*@bgen(jjtree) Cypher */
+try {
+/*@egen*/
+
+((a = <ALPHANUM> b = <GraphElementType>)|((<FBRACKETSTART> a = <ALPHANUM> b = <GraphElementType> <FBRACKETEND>))
+                 {JsonObjectBuilder tempa = Json.createObjectBuilder(); tempa.add("name", a.image);JsonObjectBuilder tempb = Json.createObjectBuilder(); tempb.add("type", b.image); tempAB.add("0", tempa.build()) ; tempAB.add("1", tempb.build()) ;})
+({JsonObjectBuilder tempJC = Json.createObjectBuilder();Token c, d, e, f, g, h;}((<INPATH>{tempAB.add( a.image, "in" );})
+|(<OUTPATH>{tempAB.add( a.image, "out" );})
+   { path.add(tempJC.build());})<StartSQBracket>c = <ALPHANUM>d = <GraphElementType> <EndSQBracket>
+      {JsonObjectBuilder tempc = Json.createObjectBuilder(); tempc.add("name", c.image+d.image);path.add(tempc.build());JsonObjectBuilder tempd = Json.createObjectBuilder(); tempd.add("type", d.image);path.add(tempd.build());  }
+
+(<INPATH>{{tempJC.add( c.image, "in" );}}
+|<OUTPATH>{tempJC.add( c.image, "out" );}{path.add(tempJC.build());})e = <ALPHANUM> f = <GraphElementType>{JsonObjectBuilder tempe = Json.createObjectBuilder(); tempe.add("name", e.image+f.image);path.add(tempe.build()); JsonObjectBuilder tempf = Json.createObjectBuilder(); tempf.add("type", f.image); path.add(tempf.build()) ;}
+|(<FBRACKETSTART> g = <ALPHANUM> h = <GraphElementType> <FBRACKETEND> ) {JsonObjectBuilder tempg = Json.createObjectBuilder(); tempg.add("name", g.image+h.image);path.add(tempg.build()); JsonObjectBuilder temph = Json.createObjectBuilder(); temph.add("type", h.image); path.add(temph.build()) ;}
+{tempAB.add("nest",path.build());})+
+
+{jObject.add("var", tempAB.build());}/*@bgen(jjtree)*/
+{
+  jjtree.closeNodeScope(jjtn000, true);
+  jjtc000 = false;
+}
+/*@egen*/
+{return jObject;}/*@bgen(jjtree)*/
+} finally {
+  if (jjtc000) {
+    jjtree.closeNodeScope(jjtn000, true);
+  }
+}
+/*@egen*/
+
+}
+
+
+JsonObjectBuilder GraphSelect(JsonObjectBuilder jObject):{/*@bgen(jjtree) GraphSelect */
+                                                          ASTGraphSelect jjtn000 = new ASTGraphSelect(JJTGRAPHSELECT);
+                                                          boolean jjtc000 = true;
+                                                          jjtree.openNodeScope(jjtn000);
+/*@egen*/String t; JsonObjectBuilder cypher = Json.createObjectBuilder();JsonObjectBuilder fromCls = Json.createObjectBuilder();JsonArrayBuilder variable  =Json.createArrayBuilder();}
+
+{/*@bgen(jjtree) GraphSelect */
+try {
+/*@egen*/
+<SELECT> <NODES> <FBRACKETSTART> Cypher(cypher) <FBRACKETEND> t = FromClause(fromCls) ({JsonObjectBuilder whereC = Json.createObjectBuilder();}CommonWhereClause(whereC, t ){jObject.add("where",whereC.build());})?/*@bgen(jjtree)*/
+{
+  jjtree.closeNodeScope(jjtn000, true);
+  jjtc000 = false;
+}
+/*@egen*/
+{jObject.add("cypher", cypher.build());jObject.add("src", fromCls.build()); return jObject;}/*@bgen(jjtree)*/
+} catch (Throwable jjte000) {
+  if (jjtc000) {
+    jjtree.clearNodeScope(jjtn000);
+    jjtc000 = false;
+  } else {
+    jjtree.popNode();
+  }
+  if (jjte000 instanceof RuntimeException) {
+    throw (RuntimeException)jjte000;
+  }
+  if (jjte000 instanceof ParseException) {
+    throw (ParseException)jjte000;
+  }
+  throw (Error)jjte000;
+} finally {
+  if (jjtc000) {
+    jjtree.closeNodeScope(jjtn000, true);
+  }
+}
+/*@egen*/
+
+}
+
+
+JsonObjectBuilder PropertyGraphExpression(JsonObjectBuilder jObject):{/*@bgen(jjtree) PropertyGraphExpression */
+                                                                      ASTPropertyGraphExpression jjtn000 = new ASTPropertyGraphExpression(JJTPROPERTYGRAPHEXPRESSION);
+                                                                      boolean jjtc000 = true;
+                                                                      jjtree.openNodeScope(jjtn000);
+/*@egen*/Token t; JsonObjectBuilder tempJB = Json.createObjectBuilder();}
+
+{/*@bgen(jjtree) PropertyGraphExpression */
+ try {
+/*@egen*/
+ <SELECT> t = <ALPHANUM>/*@bgen(jjtree)*/
+{
+  jjtree.closeNodeScope(jjtn000, true);
+  jjtc000 = false;
+}
+/*@egen*/
+{jObject.add("SELECT", tempJB.build()); return jObject;}/*@bgen(jjtree)*/
+ } finally {
+   if (jjtc000) {
+     jjtree.closeNodeScope(jjtn000, true);
+   }
+ }
+/*@egen*/
+}
+
+
+JsonObjectBuilder CommonWhereClause(JsonObjectBuilder jObject, String src):{/*@bgen(jjtree) CommonWhereClause */
+                                                                            ASTCommonWhereClause jjtn000 = new ASTCommonWhereClause(JJTCOMMONWHERECLAUSE);
+                                                                            boolean jjtc000 = true;
+                                                                            jjtree.openNodeScope(jjtn000);
+/*@egen*/Token t; JsonObjectBuilder tempJB = Json.createObjectBuilder();}{/*@bgen(jjtree) CommonWhereClause */
+  try {
+/*@egen*/
+  <WHERE> tempJB = GetConditionExpression(tempJB, src)/*@bgen(jjtree)*/
+{
+  jjtree.closeNodeScope(jjtn000, true);
+  jjtc000 = false;
+}
+/*@egen*/
+
+{jObject.add("where",tempJB.build()); return jObject;}/*@bgen(jjtree)*/
+  } catch (Throwable jjte000) {
+    if (jjtc000) {
+      jjtree.clearNodeScope(jjtn000);
+      jjtc000 = false;
+    } else {
+      jjtree.popNode();
+    }
+    if (jjte000 instanceof RuntimeException) {
+      throw (RuntimeException)jjte000;
+    }
+    if (jjte000 instanceof ParseException) {
+      throw (ParseException)jjte000;
+    }
+    throw (Error)jjte000;
+  } finally {
+    if (jjtc000) {
+      jjtree.closeNodeScope(jjtn000, true);
+    }
+  }
+/*@egen*/
+}
+
+String FromClause(JsonObjectBuilder jObject):{/*@bgen(jjtree) FromClause */
+                                              ASTFromClause jjtn000 = new ASTFromClause(JJTFROMCLAUSE);
+                                              boolean jjtc000 = true;
+                                              jjtree.openNodeScope(jjtn000);
+/*@egen*/Token t; JsonObjectBuilder tempJB = Json.createObjectBuilder();}{/*@bgen(jjtree) FromClause */
+try {
+/*@egen*/
+<FROM> ( LOOKAHEAD(2)
+
+t = <ALPHANUM>{jObject.add("src",tempJB.build());}
+| t = <FIELDNAME>{jObject.add("src", tempJB.build());}
+
+
+)/*@bgen(jjtree)*/
+{
+  jjtree.closeNodeScope(jjtn000, true);
+  jjtc000 = false;
+}
+/*@egen*/
+
+{jObject.add("from ",tempJB.build()); System.out.println(t.image);return t.image;}/*@bgen(jjtree)*/
+} finally {
+  if (jjtc000) {
+    jjtree.closeNodeScope(jjtn000, true);
+  }
+}
+/*@egen*/
+}
+
+
+
+
+
+
 
 
 
@@ -1047,10 +1266,10 @@ t = <ANNOTATE>
                                                                               jjtree.openNodeScope(jjtn000);
 /*@egen*/Token t; List x; List y; Token o1; Token operand; Token o2; JsonArrayBuilder m  =Json.createArrayBuilder();  JsonObjectBuilder j1 = Json.createObjectBuilder(); JsonArrayBuilder p  =Json.createArrayBuilder(); JsonObjectBuilder k  =Json.createObjectBuilder();}
 {/*@bgen(jjtree) GetConditionExpression */
-       try {
+    try {
 /*@egen*/
 
-       (( LOOKAHEAD(3)(function(j1) {k.add("firstfunction",j1.build());})
+    (( LOOKAHEAD(3)(function(j1) {k.add("firstfunction",j1.build());})
        |(o1 = <FIELDNAME>  {  JsonObjectBuilder tempVar = Json.createObjectBuilder(); variableType(tempVar, src, o1.image, decision ); k.add("firstoperand",tempVar.build());})
        |( o1=<ALPHANUM>{ k.add("firstoperand",o1.image);})|( o1=<DIGITS>{ k.add("firstoperand",o1.image);})) ( LOOKAHEAD(1) ( operand = <OPERATOR>{k.add("operator", operand.image);}) | (<NOT> <IN>) )
         ( LOOKAHEAD(3)(function(j1) {k.add("secondfunction",j1.build());})|(o2 = <ALPHANUM>{k.add("secondoperand",o2.image);})|(o2 = <FIELDNAME>{k.add("secondoperand",o2.image);})|( o2=<DIGITS>{ k.add("secondoperand", o2.image);})
@@ -1065,38 +1284,34 @@ t = <ANNOTATE>
 
 
 
-      {l.add("WHERE",m.build());}/*@bgen(jjtree)*/
+      {l.add("COND",m.build());}/*@bgen(jjtree)*/
 {
   jjtree.closeNodeScope(jjtn000, true);
   jjtc000 = false;
 }
 /*@egen*/
 {return l;}/*@bgen(jjtree)*/
-       } catch (Throwable jjte000) {
-         if (jjtc000) {
-           jjtree.clearNodeScope(jjtn000);
-           jjtc000 = false;
-         } else {
-           jjtree.popNode();
-         }
-         if (jjte000 instanceof RuntimeException) {
-           throw (RuntimeException)jjte000;
-         }
-         if (jjte000 instanceof ParseException) {
-           throw (ParseException)jjte000;
-         }
-         throw (Error)jjte000;
-       } finally {
-         if (jjtc000) {
-           jjtree.closeNodeScope(jjtn000, true);
-         }
-       }
+    } catch (Throwable jjte000) {
+      if (jjtc000) {
+        jjtree.clearNodeScope(jjtn000);
+        jjtc000 = false;
+      } else {
+        jjtree.popNode();
+      }
+      if (jjte000 instanceof RuntimeException) {
+        throw (RuntimeException)jjte000;
+      }
+      if (jjte000 instanceof ParseException) {
+        throw (ParseException)jjte000;
+      }
+      throw (Error)jjte000;
+    } finally {
+      if (jjtc000) {
+        jjtree.closeNodeScope(jjtn000, true);
+      }
+    }
 /*@egen*/
 }
-
-
-
-
 
 
 

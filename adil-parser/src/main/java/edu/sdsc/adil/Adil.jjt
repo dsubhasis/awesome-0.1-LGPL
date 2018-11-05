@@ -157,8 +157,8 @@ TOKEN :
 
  |<FIELDNAME : (<ALPHANUM>(<DOT><ALPHANUM>)*)>
 
- |< QUOTED_IDENTIFIER: "\"" (~["\n","\r","\""])+ "\"" | ("`" (~["\n","\r","`"])+ "`") | ( "[" ~["0"-"9","]"] (~["\n","\r","]"])* "]" ) >
- |<GraphElementType : (<COLON><ALPHANUM>)>
+ |< QUOTED_IDENTIFIER : "\"" (~["\n","\r","\""])+ "\"" | ("`" (~["\n","\r","`"])+ "`") >
+ |<GraphElementType : <COLON><ALPHANUM>>
  |<INPATH : (<MINUS><GREATER>) >
  |<OUTPATH : (<LESS><MINUS>) >
 
@@ -303,20 +303,24 @@ JsonObjectBuilder FunctionParam(JsonObjectBuilder jObject) : {Token t; Token t2;
 JsonObjectBuilder AwsmDefinedFunction(JsonObjectBuilder jObject) #JsonObjectBuilder : {Token t; Token t2; JsonObjectBuilder tempJB = Json.createObjectBuilder();}
 {
 
-  <AWSM><COLON>t =<ALPHANUM><FBRACKETSTART>
-   (LOOKAHEAD(2) AwesomeSafeFunction(tempJB){jObject.add("input","cypher"); jObject.add("stmt", tempJB.build());}
-  |(AwsmDefinedFunction(tempJB){jObject.add("input","nested"); jObject.add("stmt", tempJB.build());})
+  (<AWSM><COLON>t =<ALPHANUM><FBRACKETSTART>
+   (LOOKAHEAD(1) AwesomeSafeFunction(tempJB){jObject.add("input","cypher"); jObject.add("stmt", tempJB.build());}
+  //|(AwsmDefinedFunction(tempJB){jObject.add("input","nested"); jObject.add("stmt", tempJB.build());})
   | (FunctionParam(tempJB){jObject.add("input","function"); jObject.add("stmt", tempJB.build());})
-
-
-  )
-
+ )
   {jObject.add("internal", true); jObject.add("name", t.image);}
 
 
-  <FBRACKETEND>
 
-  {ParserUtil pt = new ParserUtil(); pt.handleawsmfunction(jObject,  varTable);}
+
+
+  <FBRACKETEND>)|GraphSelect(tempJB){jObject.add("cypher-g", tempJB.build());;}
+
+  {
+  ParserUtil pt = new ParserUtil();
+  pt.handleawsmfunction(jObject,  varTable);
+
+   }
 
     {System.out.println("xxxxxx");return jObject; }
 }
@@ -333,7 +337,7 @@ JsonObjectBuilder UserDefinedFunction(JsonObjectBuilder jObject) : {Token t0; To
 */
 JsonObjectBuilder AwesomeSafeFunction(JsonObjectBuilder jObject)  : {Token t0; Token t1; Token t2; JsonObjectBuilder tempJB = Json.createObjectBuilder();}
 { 
-   (LOOKAHEAD(6)
+  (LOOKAHEAD(6)
     AnnotateWithStoreOperation(tempJB) {jObject.add("annotation", tempJB.build());}
    |( ExecuteSQLPP(tempJB) {jObject.add("SQLPP", tempJB.build());})
    |(executeCypher(tempJB) {jObject.add("graph", tempJB.build());} )
@@ -341,6 +345,8 @@ JsonObjectBuilder AwesomeSafeFunction(JsonObjectBuilder jObject)  : {Token t0; T
    |(FilterOperation(tempJB) {jObject.add("filter", tempJB.build());})
    |(ProjectFunction(tempJB){jObject.add("PROJECT", tempJB.build());})
    |(ReportAnalysis(tempJB) {jObject.add("report", tempJB.build());} ))
+
+
 
 
     {return jObject; }
@@ -517,7 +523,7 @@ t = <ANNOTATE>
 JsonObjectBuilder Cypher(JsonObjectBuilder jObject):{Token a,b; JsonObjectBuilder tempJB = Json.createObjectBuilder(); Token q;JsonObjectBuilder tempAB = Json.createObjectBuilder(); JsonArrayBuilder path  =Json.createArrayBuilder();}
 {
 
-((a = <ALPHANUM>b = <GraphElementType>)|((<FBRACKETSTART> a = <ALPHANUM> b = <GraphElementType> <FBRACKETEND>))
+((a = <ALPHANUM> b = <GraphElementType>)|((<FBRACKETSTART> a = <ALPHANUM> b = <GraphElementType> <FBRACKETEND>))
                  {JsonObjectBuilder tempa = Json.createObjectBuilder(); tempa.add("name", a.image);JsonObjectBuilder tempb = Json.createObjectBuilder(); tempb.add("type", b.image); tempAB.add("0", tempa.build()) ; tempAB.add("1", tempb.build()) ;})
 ({JsonObjectBuilder tempJC = Json.createObjectBuilder();Token c, d, e, f, g, h;}((<INPATH>{tempAB.add( a.image, "in" );})
 |(<OUTPATH>{tempAB.add( a.image, "out" );})
@@ -539,7 +545,7 @@ JsonObjectBuilder GraphSelect(JsonObjectBuilder jObject):{String t; JsonObjectBu
 
 {
 <SELECT> <NODES> <FBRACKETSTART> Cypher(cypher) <FBRACKETEND> t = FromClause(fromCls) ({JsonObjectBuilder whereC = Json.createObjectBuilder();}CommonWhereClause(whereC, t ){jObject.add("where",whereC.build());})?
-({jObject.add("cypher", cypher.build());jObject.add("src", fromCls.build()); return jObject;})
+{jObject.add("cypher", cypher.build());jObject.add("src", fromCls.build()); return jObject;}
 
 }
 
@@ -567,7 +573,7 @@ t = <ALPHANUM>{jObject.add("src",tempJB.build());}
 
 )
 
-{jObject.add("from ",tempJB.build()); return t.image;}
+{jObject.add("from ",tempJB.build()); System.out.println(t.image);return t.image;}
 }
 
 

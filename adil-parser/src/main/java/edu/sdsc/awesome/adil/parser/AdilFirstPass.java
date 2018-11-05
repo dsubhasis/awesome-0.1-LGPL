@@ -234,7 +234,7 @@ public class AdilFirstPass {
 
         JsonObject temp = js.build();
 
-       // System.out.println(temp.toString());
+       System.out.println(temp.toString());
 
         JsonObjectBuilder finalObject = Json.createObjectBuilder();
         finalObject.add("FirstPass", temp);

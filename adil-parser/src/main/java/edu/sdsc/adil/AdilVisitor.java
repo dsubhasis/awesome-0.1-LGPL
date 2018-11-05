@@ -11,8 +11,10 @@ public interface AdilVisitor
   public Object visit(ASTCreateAnalysis node, Object data);
   public Object visit(ASTDeclareAnalysis node, Object data);
   public Object visit(ASTAnalysisStatement node, Object data);
+  public Object visit(ASTFunctionParam node, Object data);
   public Object visit(ASTJsonObjectBuilder node, Object data);
   public Object visit(ASTUserDefinedFunction node, Object data);
+  public Object visit(ASTAwesomeSafeFunction node, Object data);
   public Object visit(ASTCreateView node, Object data);
   public Object visit(ASTProjectFunction node, Object data);
   public Object visit(ASTReportAnalysis node, Object data);
@@ -22,6 +24,11 @@ public interface AdilVisitor
   public Object visit(ASTquetedStatement node, Object data);
   public Object visit(ASTFilterOperation node, Object data);
   public Object visit(ASTAnnotateWithStoreOperation node, Object data);
+  public Object visit(ASTCypher node, Object data);
+  public Object visit(ASTGraphSelect node, Object data);
+  public Object visit(ASTPropertyGraphExpression node, Object data);
+  public Object visit(ASTCommonWhereClause node, Object data);
+  public Object visit(ASTFromClause node, Object data);
   public Object visit(ASTGetConditionExpression node, Object data);
   public Object visit(ASTGetField node, Object data);
   public Object visit(ASTGetDictionary node, Object data);
@@ -34,4 +41,4 @@ public interface AdilVisitor
   public Object visit(ASTOperand node, Object data);
   public Object visit(ASTaction node, Object data);
 }
-/* JavaCC - OriginalChecksum=6f635a57c60f4698ddf7e2fe19e9004d (do not edit this line) */
+/* JavaCC - OriginalChecksum=452b419ecd74772b519381ee64de3fd1 (do not edit this line) */

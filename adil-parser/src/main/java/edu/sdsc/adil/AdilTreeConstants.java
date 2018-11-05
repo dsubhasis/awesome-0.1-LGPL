@@ -10,28 +10,35 @@ public interface AdilTreeConstants
   public int JJTCREATEANALYSIS = 4;
   public int JJTDECLAREANALYSIS = 5;
   public int JJTANALYSISSTATEMENT = 6;
-  public int JJTJSONOBJECTBUILDER = 7;
-  public int JJTUSERDEFINEDFUNCTION = 8;
-  public int JJTCREATEVIEW = 9;
-  public int JJTPROJECTFUNCTION = 10;
-  public int JJTREPORTANALYSIS = 11;
-  public int JJTFUNCTIONANALYSIS = 12;
-  public int JJTEXECUTESQLPP = 13;
-  public int JJTEXECUTECYPHER = 14;
-  public int JJTQUETEDSTATEMENT = 15;
-  public int JJTFILTEROPERATION = 16;
-  public int JJTANNOTATEWITHSTOREOPERATION = 17;
-  public int JJTGETCONDITIONEXPRESSION = 18;
-  public int JJTGETFIELD = 19;
-  public int JJTGETDICTIONARY = 20;
-  public int JJTCREATEDATASOURCE = 21;
-  public int JJTCONNECTDATASRC = 22;
-  public int JJTCREATENVIRONMENT = 23;
-  public int JJTFUNCTION = 24;
-  public int JJTUSEENVIRONMENT = 25;
-  public int JJTOPERATOR = 26;
-  public int JJTOPERAND = 27;
-  public int JJTACTION = 28;
+  public int JJTFUNCTIONPARAM = 7;
+  public int JJTJSONOBJECTBUILDER = 8;
+  public int JJTUSERDEFINEDFUNCTION = 9;
+  public int JJTAWESOMESAFEFUNCTION = 10;
+  public int JJTCREATEVIEW = 11;
+  public int JJTPROJECTFUNCTION = 12;
+  public int JJTREPORTANALYSIS = 13;
+  public int JJTFUNCTIONANALYSIS = 14;
+  public int JJTEXECUTESQLPP = 15;
+  public int JJTEXECUTECYPHER = 16;
+  public int JJTQUETEDSTATEMENT = 17;
+  public int JJTFILTEROPERATION = 18;
+  public int JJTANNOTATEWITHSTOREOPERATION = 19;
+  public int JJTCYPHER = 20;
+  public int JJTGRAPHSELECT = 21;
+  public int JJTPROPERTYGRAPHEXPRESSION = 22;
+  public int JJTCOMMONWHERECLAUSE = 23;
+  public int JJTFROMCLAUSE = 24;
+  public int JJTGETCONDITIONEXPRESSION = 25;
+  public int JJTGETFIELD = 26;
+  public int JJTGETDICTIONARY = 27;
+  public int JJTCREATEDATASOURCE = 28;
+  public int JJTCONNECTDATASRC = 29;
+  public int JJTCREATENVIRONMENT = 30;
+  public int JJTFUNCTION = 31;
+  public int JJTUSEENVIRONMENT = 32;
+  public int JJTOPERATOR = 33;
+  public int JJTOPERAND = 34;
+  public int JJTACTION = 35;
 
 
   public String[] jjtNodeName = {
@@ -42,8 +49,10 @@ public interface AdilTreeConstants
     "CreateAnalysis",
     "DeclareAnalysis",
     "AnalysisStatement",
+    "FunctionParam",
     "JsonObjectBuilder",
     "UserDefinedFunction",
+    "AwesomeSafeFunction",
     "CreateView",
     "ProjectFunction",
     "ReportAnalysis",
@@ -53,6 +62,11 @@ public interface AdilTreeConstants
     "quetedStatement",
     "FilterOperation",
     "AnnotateWithStoreOperation",
+    "Cypher",
+    "GraphSelect",
+    "PropertyGraphExpression",
+    "CommonWhereClause",
+    "FromClause",
     "GetConditionExpression",
     "GetField",
     "GetDictionary",
@@ -66,4 +80,4 @@ public interface AdilTreeConstants
     "action",
   };
 }
-/* JavaCC - OriginalChecksum=1663ec1eb02a3d7995ff847f12e329c8 (do not edit this line) */
+/* JavaCC - OriginalChecksum=c0401155735767bc7a3b8d937db42a67 (do not edit this line) */

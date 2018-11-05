@@ -43,97 +43,113 @@ public interface AdilConstants {
   /** RegularExpression Id. */
   int OPERATOR = 21;
   /** RegularExpression Id. */
-  int CREATE = 22;
+  int MINUS = 22;
   /** RegularExpression Id. */
-  int DELETE = 23;
+  int CREATE = 23;
   /** RegularExpression Id. */
-  int ALTER = 24;
+  int DELETE = 24;
   /** RegularExpression Id. */
-  int LOAD = 25;
+  int ALTER = 25;
   /** RegularExpression Id. */
-  int IMPORT = 26;
+  int LOAD = 26;
   /** RegularExpression Id. */
-  int DATASOURCE = 27;
+  int IMPORT = 27;
   /** RegularExpression Id. */
-  int WITH = 28;
+  int DATASOURCE = 28;
   /** RegularExpression Id. */
-  int WHERE = 29;
+  int WITH = 29;
   /** RegularExpression Id. */
-  int AND = 30;
+  int WHERE = 30;
   /** RegularExpression Id. */
-  int STORE = 31;
+  int AND = 31;
   /** RegularExpression Id. */
-  int TYPE = 32;
+  int STORE = 32;
   /** RegularExpression Id. */
-  int PARTITION = 33;
+  int TYPE = 33;
   /** RegularExpression Id. */
-  int BY = 34;
+  int PARTITION = 34;
   /** RegularExpression Id. */
-  int AS = 35;
+  int BY = 35;
   /** RegularExpression Id. */
-  int TEMPORALRELATION = 36;
+  int AS = 36;
   /** RegularExpression Id. */
-  int TEMPORALGRAPH = 37;
+  int TEMPORALRELATION = 37;
   /** RegularExpression Id. */
-  int ON = 38;
+  int TEMPORALGRAPH = 38;
   /** RegularExpression Id. */
-  int REPORT = 39;
+  int ON = 39;
   /** RegularExpression Id. */
-  int ANALYSIS = 40;
+  int REPORT = 40;
   /** RegularExpression Id. */
-  int EXECUTE = 41;
+  int ANALYSIS = 41;
   /** RegularExpression Id. */
-  int EVERY = 42;
+  int EXECUTE = 42;
   /** RegularExpression Id. */
-  int PROPERTYGRAPH = 43;
+  int EVERY = 43;
   /** RegularExpression Id. */
-  int VIEW = 44;
+  int PROPERTYGRAPH = 44;
   /** RegularExpression Id. */
-  int COLLECTION = 45;
+  int VIEW = 45;
   /** RegularExpression Id. */
-  int CONNECTION = 46;
+  int COLLECTION = 46;
   /** RegularExpression Id. */
-  int TO = 47;
+  int CONNECTION = 47;
   /** RegularExpression Id. */
-  int FROM = 48;
+  int TO = 48;
   /** RegularExpression Id. */
-  int LIBRARY = 49;
+  int FROM = 49;
   /** RegularExpression Id. */
-  int DICTIONARY = 50;
+  int LIBRARY = 50;
   /** RegularExpression Id. */
-  int ONTOLOGY = 51;
+  int DICTIONARY = 51;
   /** RegularExpression Id. */
-  int WITNESS = 52;
+  int ONTOLOGY = 52;
   /** RegularExpression Id. */
-  int PROJECT = 53;
+  int WITNESS = 53;
   /** RegularExpression Id. */
-  int AWSM = 54;
+  int PROJECT = 54;
   /** RegularExpression Id. */
-  int ENV = 55;
+  int AWSM = 55;
   /** RegularExpression Id. */
-  int IN = 56;
+  int NODE = 56;
   /** RegularExpression Id. */
-  int ANNOTATE = 57;
+  int NODES = 57;
   /** RegularExpression Id. */
-  int FILTER = 58;
+  int PATH = 58;
   /** RegularExpression Id. */
-  int EXECUTESQLPP = 59;
+  int SELECT = 59;
   /** RegularExpression Id. */
-  int CONSTRUCTGRAPH = 60;
+  int ENV = 60;
   /** RegularExpression Id. */
-  int CYPHERQUERY = 61;
+  int IN = 61;
   /** RegularExpression Id. */
-  int EXECUTECYPHER = 62;
+  int ANNOTATE = 62;
   /** RegularExpression Id. */
-  int DIGIT = 63;
+  int FILTER = 63;
   /** RegularExpression Id. */
-  int LETTER = 64;
+  int EXECUTESQLPP = 64;
   /** RegularExpression Id. */
-  int ALPHANUM = 65;
+  int CONSTRUCTGRAPH = 65;
   /** RegularExpression Id. */
-  int FIELDNAME = 66;
+  int CYPHERQUERY = 66;
   /** RegularExpression Id. */
-  int QUOTED_IDENTIFIER = 67;
+  int EXECUTECYPHER = 67;
+  /** RegularExpression Id. */
+  int DIGIT = 68;
+  /** RegularExpression Id. */
+  int LETTER = 69;
+  /** RegularExpression Id. */
+  int ALPHANUM = 70;
+  /** RegularExpression Id. */
+  int FIELDNAME = 71;
+  /** RegularExpression Id. */
+  int QUOTED_IDENTIFIER = 72;
+  /** RegularExpression Id. */
+  int GraphElementType = 73;
+  /** RegularExpression Id. */
+  int INPATH = 74;
+  /** RegularExpression Id. */
+  int OUTPATH = 75;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -162,6 +178,7 @@ public interface AdilConstants {
     "\"]\"",
     "\"@\"",
     "<OPERATOR>",
+    "\"-\"",
     "\"create\"",
     "\"delete\"",
     "\"alter\"",
@@ -195,6 +212,10 @@ public interface AdilConstants {
     "\"witness\"",
     "\"project\"",
     "\"awsm\"",
+    "\"node\"",
+    "\"nodes\"",
+    "\"path\"",
+    "\"select\"",
     "\"env\"",
     "\"in\"",
     "\"annotate\"",
@@ -208,6 +229,9 @@ public interface AdilConstants {
     "<ALPHANUM>",
     "<FIELDNAME>",
     "<QUOTED_IDENTIFIER>",
+    "<GraphElementType>",
+    "<INPATH>",
+    "<OUTPATH>",
   };
 
 }

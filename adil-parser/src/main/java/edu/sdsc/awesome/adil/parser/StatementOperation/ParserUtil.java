@@ -2,14 +2,15 @@ package edu.sdsc.awesome.adil.parser.StatementOperation;
 
 import edu.sdsc.Cypher.Cypher;
 import edu.sdsc.SQLPP.SQLPP;
+import edu.sdsc.awesome.adil.parser.ParserTable.VariableTable;
 
 
 import javax.json.*;
 import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ParserUtil {
@@ -196,8 +197,8 @@ public class ParserUtil {
 
         String name = "*";
 
-        String query = "Select "+name+" from "+table+" where "+fieldName+" = "+value;
-        //System.out.println(query);
+        String query = "Select "+name+" from "+table+" where "+fieldName+" = "+value+" ";
+        System.out.println(query);
         Connection con = ParserUtil.dbConnection();
         Statement st = con.createStatement();
         ResultSet rs = st.executeQuery(query);
@@ -573,6 +574,82 @@ public class ParserUtil {
         js.add("PLAN", p.build());
         js.add("EXECUTABLE", name);
         return js;
+    }
+
+
+    public JsonObjectBuilder handleawsmfunction(JsonObjectBuilder jobject, VariableTable vt) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+
+        JsonObjectBuilder p = Json.createObjectBuilder();
+        JsonObject stmt = jobject.build();
+        Map property = new HashMap();
+
+
+        //Get the type
+
+        System.out.println(stmt.toString());
+
+        String type = stmt.getString("input");
+        String className = null;
+        try {
+            ResultSet rs = getResult("name","classTable","\""+type+"\"");
+            while(rs.next())
+            {
+                className = rs.getString("class");
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        this.runClassLib(property, className);
+
+
+
+        return p;
+
+
+
+    }
+
+    public void runClassLib(Map property, String ClassName ) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+
+
+        Class myClass = Class.forName(ClassName);
+        Constructor<?> constructor = myClass.getConstructor(Map.class,  String.class);
+
+        Object  object = constructor.newInstance(property, ClassName);
+
+
+        
+
+
+
+
+
+
+
+
+    }
+
+    public void runClassLib(JsonObject property, String ClassName ) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+
+
+        Class myClass = Class.forName(ClassName);
+        Constructor<?> constructor = myClass.getConstructor(JsonObject.class,  String.class);
+
+        Object  object = constructor.newInstance(property, ClassName);
+
+
+
+
+
+
+
+
+
+
+
     }
 
 
