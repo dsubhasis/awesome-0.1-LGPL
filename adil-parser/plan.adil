@@ -1,5 +1,8 @@
-create analysis a1 as (
-p[][] := awsm:query(EXECUTECYPHER("match( x) merge ")@xx
+create analysis burstanalysis as (
+
+
+v2[] := Select nodes( xx:tt -> [ xx:node] ->bb:user ) from you ;
+
 
 
 );
