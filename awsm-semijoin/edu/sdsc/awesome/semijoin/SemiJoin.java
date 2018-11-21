@@ -29,9 +29,10 @@ public class SemiJoin {
 		this.client = this.getSolrClient(solrBaseUrl);
 	}
 	
-	public void search(String searchQuery, String field, String collection, String joinQuery) {
+	public void search(String host, String username, String password, String 
+			solrQuery, String field, String collection, String joinQuery) {
 		final Map<String, String> queryParamMap = new HashMap<String, String>();
-		queryParamMap.put("q", searchQuery);
+		queryParamMap.put("q", solrQuery);
 		queryParamMap.put("fl", field);
 		QueryResponse response;
 		try {
@@ -41,7 +42,7 @@ public class SemiJoin {
 			for(SolrDocument document : documents) {
 				reSet.add("'" + document.get(field) + "'");
 			}
-			Connection conn = this.getConn("10.128.36.22:5432","postgres", "XJrJgb8g");
+			Connection conn = this.getConn(host, username, password);
 			Statement st = conn.createStatement();
 			ResultSet rs = st.executeQuery(joinQuery + "(" + String.join(",", reSet)
 			+ ")");
@@ -87,7 +88,8 @@ public class SemiJoin {
 	
 	public static void main(String[] args) {
 		SemiJoin sj = new SemiJoin("http://10.128.36.16:8983/solr");
-		sj.search("segmentedtext:��ͨ��", "filename", "courtcaseraw", 
+		sj.search("10.128.36.22:5432", args[0], args[1], "segmentedtext:南通市",
+				"filename", "courtcaseraw", 
 				"SELECT parties FROM parsed_data WHERE filename in ");
 	}
 }
