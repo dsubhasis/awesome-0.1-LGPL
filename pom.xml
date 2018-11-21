@@ -97,6 +97,7 @@
         <module>awsm-tdm-compute</module>
         <module>awsm-connector-rserver</module>
         <module>awsm-neo4j-client</module>
-  </modules>
+        <module>awsm-semijoin</module>
+    </modules>
 
 </project>
