@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Properties;
 
@@ -38,14 +39,11 @@ public class SemiJoin {
 	
 	/**
 	 * Execute Solr query first, then perform a semi-join with Postgres.
-	 * @param host
-	 * @param username
-	 * @param password
-	 * @param solrQuery
-	 * @param field
-	 * @param collection
-	 * @param joinQuery
-	 * @param limit
+	 * @param solrQuery - a standard solr query
+	 * @param field - field for result set (the field for semi-join)
+	 * @param collection - solr collection
+	 * @param joinQuery - a postgres query joining using keys
+	 * @param limit - batch size for
 	 */
 	public void solrToPg(String solrQuery, String field, String collection, 
 			String joinQuery, int limit) {
@@ -58,6 +56,7 @@ public class SemiJoin {
 			response = client.query(collection, new MapSolrParams(queryParamMap));
 			final SolrDocumentList documents = response.getResults();
 			ArrayList<String> reSet = new ArrayList<>();
+			//TODO: consider divide solr result into segments and/or write to a file
 			for(SolrDocument document : documents) {
 				reSet.add("'" + document.get(field) + "'");
 			}
@@ -76,8 +75,37 @@ public class SemiJoin {
 		}
 	}
 	
-	public void solrToPg(String pgQuery, String field) {
-		
+	public void pgToSolr(String pgQuery, String field, String collection, 
+			String joinQuery, String fl, int limit) {
+		Connection conn = this.getConn(this.pgHost, this.username, this.password);
+		Statement st;
+		try {
+			st = conn.createStatement();
+			st.setFetchSize(limit);
+			ResultSet rs = st.executeQuery(pgQuery);
+			LinkedList<String> keys = new LinkedList<>();
+			while(rs.next()) {
+				keys.add(rs.getString(1));
+			}
+			final Map<String, String> queryParamMap = new HashMap<String, String>();
+			StringBuilder sb = new StringBuilder();
+			sb.append(field);
+			//TODO: handle large results
+			for(String key : keys) {
+				sb.append(key + ' ');
+			}
+			queryParamMap.put("q", sb.toString());
+			queryParamMap.put("fl", fl);
+			SolrClient client = getSolrClient(this.solrBaseUrl);
+			QueryResponse response = client.query(collection, 
+					new MapSolrParams(queryParamMap));
+			final SolrDocumentList documents = response.getResults();
+			for(SolrDocument doc : documents) {
+				System.out.println(doc.get(fl));
+			}
+		} catch (SQLException | SolrServerException | IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private SolrClient getSolrClient(String baseUrl) {
@@ -113,7 +141,10 @@ public class SemiJoin {
 	public static void main(String[] args) {
 		SemiJoin sj = new SemiJoin("http://10.128.36.16:8983/solr", 
 				"10.128.36.22:5432", args[0], args[1]);
-		sj.solrToPg("segmentedtext:南通市", "filename", "courtcaseraw", 
-				"SELECT parties FROM parsed_data WHERE filename in ", 1000);
+		//sj.solrToPg("segmentedtext:南通市", "filename", "courtcaseraw", 
+				//"SELECT parties FROM parsed_data WHERE filename in ", 1000);
+		sj.pgToSolr("SELECT filename FROM parsed_data WHERE type = '民事裁定书' "
+				+ "LIMIT 5", "filename", "courtcaseraw", "filename:",
+				"segmentedtext", 1000);
 	}
 }
