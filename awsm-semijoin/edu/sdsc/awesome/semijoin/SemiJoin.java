@@ -23,27 +23,47 @@ public class SemiJoin {
 	static final String DRIVER = "org.postgresql.Driver";
   static final String PREFIX = "jdbc:postgresql://";
   
-	private SolrClient client = null;
+	private String solrBaseUrl = null;
+	private String pgHost = null;
+	private String username = null; //Postgres username
+	private String password = null; //Postgres password
 	
-	public SemiJoin(String solrBaseUrl) {
-		this.client = this.getSolrClient(solrBaseUrl);
+	public SemiJoin(String solrBaseUrl, String pgHost, String username, 
+			String password) {
+		this.solrBaseUrl = solrBaseUrl;
+		this.pgHost = pgHost;
+		this.username = username;
+		this.password = password;
 	}
 	
-	public void search(String host, String username, String password, String 
-			solrQuery, String field, String collection, String joinQuery) {
+	/**
+	 * Execute Solr query first, then perform a semi-join with Postgres.
+	 * @param host
+	 * @param username
+	 * @param password
+	 * @param solrQuery
+	 * @param field
+	 * @param collection
+	 * @param joinQuery
+	 * @param limit
+	 */
+	public void solrToPg(String solrQuery, String field, String collection, 
+			String joinQuery, int limit) {
 		final Map<String, String> queryParamMap = new HashMap<String, String>();
 		queryParamMap.put("q", solrQuery);
 		queryParamMap.put("fl", field);
 		QueryResponse response;
 		try {
+			SolrClient client = getSolrClient(this.solrBaseUrl);
 			response = client.query(collection, new MapSolrParams(queryParamMap));
 			final SolrDocumentList documents = response.getResults();
 			ArrayList<String> reSet = new ArrayList<>();
 			for(SolrDocument document : documents) {
 				reSet.add("'" + document.get(field) + "'");
 			}
-			Connection conn = this.getConn(host, username, password);
+			Connection conn = this.getConn(this.pgHost, this.username, this.password);
 			Statement st = conn.createStatement();
+			st.setFetchSize(limit);
 			ResultSet rs = st.executeQuery(joinQuery + "(" + String.join(",", reSet)
 			+ ")");
 			while (rs.next()) {
@@ -54,6 +74,10 @@ public class SemiJoin {
 		} catch (SolrServerException | IOException | SQLException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void solrToPg(String pgQuery, String field) {
+		
 	}
 
 	private SolrClient getSolrClient(String baseUrl) {
@@ -87,9 +111,9 @@ public class SemiJoin {
   }
 	
 	public static void main(String[] args) {
-		SemiJoin sj = new SemiJoin("http://10.128.36.16:8983/solr");
-		sj.search("10.128.36.22:5432", args[0], args[1], "segmentedtext:南通市",
-				"filename", "courtcaseraw", 
-				"SELECT parties FROM parsed_data WHERE filename in ");
+		SemiJoin sj = new SemiJoin("http://10.128.36.16:8983/solr", 
+				"10.128.36.22:5432", args[0], args[1]);
+		sj.solrToPg("segmentedtext:南通市", "filename", "courtcaseraw", 
+				"SELECT parties FROM parsed_data WHERE filename in ", 1000);
 	}
 }
