@@ -76,5 +76,11 @@
       <version>1.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
+      <dependency>
+          <groupId>com.github.jsqlparser</groupId>
+          <artifactId>jsqlparser</artifactId>
+          <version>1.4-SNAPSHOT</version>
+          <scope>compile</scope>
+      </dependency>
   </dependencies>
 </project>

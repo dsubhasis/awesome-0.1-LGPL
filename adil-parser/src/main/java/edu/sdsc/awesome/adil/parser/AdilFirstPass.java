@@ -8,6 +8,10 @@ import edu.sdsc.SQLPP.SQLPP;
 import edu.sdsc.adil.Adil;
 import edu.sdsc.adil.ParseException;
 
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.util.deparser.StatementDeParser;
 import org.apache.commons.cli.*;
 
 
@@ -84,6 +88,7 @@ public class AdilFirstPass {
         AdilFirstPass as = new AdilFirstPass();
 
         Options options = new Options();
+        Statement stmt;
 
 
         Option input = new Option("i", "input", true, "input file path");
@@ -91,6 +96,16 @@ public class AdilFirstPass {
         input.setRequired(true);
 
         options.addOption(input);
+
+        try {
+
+
+            stmt = CCJSqlParserUtil.parse("Select * from test ");
+
+            System.out.println(stmt);
+        } catch (JSQLParserException e) {
+            e.printStackTrace();
+        }
 
 
         CommandLineParser parser = new DefaultParser();
