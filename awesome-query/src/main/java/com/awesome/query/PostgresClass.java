@@ -2,10 +2,13 @@ package com.awesome.query;
 
 import java.util.Map;
 
-public class PosgresClass  {
+public class PostgresClass {
 
     private Map propertyMap;
     private Map connectionMap;
+
+
+
 
 
 
