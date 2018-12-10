@@ -1,8 +1,9 @@
 package edu.sdsc.awesome.data.common.util;
 
 import edu.sdsc.awesome.common.connector.BaseStoreConnector;
-import org.eclipse.collections.impl.bimap.mutable.HashBiMap;
 
+
+import java.util.HashMap;
 import java.util.Map;
 
 public class ConnectionMap {
@@ -11,28 +12,30 @@ public class ConnectionMap {
   private String ip;
   private String driverClass;
   private Map InputMap;
-  private Map OutputMap;
+  private Map outputMap;
   private String testClassName;
 
-  public void createConnetion(Map InputMap){
+  public Map createConnetion(Map InputMap){
 
     BaseStoreConnector baseConnector = new BaseStoreConnector();
     boolean status = false;
-    Map connetionMap = new HashBiMap();
+
     Integer type = (Integer) InputMap.get("type");
 
    switch (type) {
      case 1:
      {
-        status = baseConnector.PostgresConnector(InputMap, connetionMap);
+        status = baseConnector.PostgresConnector(InputMap,  outputMap);
 
      }
      case 2 :
      {
-       status = baseConnector.solrConnector(InputMap, connetionMap);
+       status = baseConnector.solrConnector(InputMap, outputMap);
      }
 
    }
+
+   return outputMap;
   }
 
 

@@ -28,7 +28,6 @@ public class BaseStoreConnector {
 
         }
 
-
         outPutMap.put("errorFlag", errorFlag);
 
 
