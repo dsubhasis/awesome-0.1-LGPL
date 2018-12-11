@@ -5,16 +5,23 @@ import edu.sdsc.awesome.connector.postgres.JDBCConnection;
 import edu.sdsc.awesome.data.common.util.ConnectionMap;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Map;
 
 public class PostgresClassImpl  {
 
     private Map InputMap;
-    private Map outputMap;
-    private Map query;
+
+    public PostgresClassImpl(Map inputMap) {
+        InputMap = inputMap;
+    }
 
 
-    public void query(String query){
+
+
+    public Map query(String query){
+
+        Map outputMap = new HashMap();
 
         BaseStoreConnector bs = new BaseStoreConnector();
         bs.PostgresConnector(InputMap, outputMap);
@@ -34,7 +41,7 @@ public class PostgresClassImpl  {
         }
 
 
-
+return outputMap;
 
     }
 
