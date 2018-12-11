@@ -11,7 +11,7 @@ public class ConnectionMap {
   private String className;
   private String ip;
   private String driverClass;
-  private Map InputMap;
+
   private Map outputMap;
   private String testClassName;
 
