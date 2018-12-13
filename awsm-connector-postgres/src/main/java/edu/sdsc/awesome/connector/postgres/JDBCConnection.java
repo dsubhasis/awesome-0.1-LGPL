@@ -1,9 +1,14 @@
 package edu.sdsc.awesome.connector.postgres;
 
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParserManager;
+import net.sf.jsqlparser.statement.select.*;
+import net.sf.jsqlparser.util.TablesNamesFinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.json.*;
+import java.io.StringReader;
 import java.sql.*;
 import java.util.*;
 
@@ -28,6 +33,64 @@ public class JDBCConnection {
             logger.debug("Check JDBC connection : " + e.getSQLState() + e.getMessage());
         }
     }
+
+    public void pqSQLQueryAnalysis(String query) throws JSQLParserException {
+
+        String exQuery = "EXPLAIN ANALYZE "+query;
+        ResultSet rs = null;
+
+        CCJSqlParserManager pm = new CCJSqlParserManager();
+        net.sf.jsqlparser.statement.Statement statement = pm.parse(new StringReader(query));
+
+        if (statement instanceof Select) {
+            Select selectStatement = (Select) statement;
+            TablesNamesFinder tablesNamesFinder = new TablesNamesFinder();
+            SelectExpressionItem selectItem = new SelectExpressionItem();
+            PlainSelect s = (PlainSelect) ((Select) statement).getSelectBody();
+
+
+
+
+
+
+            List tableList = tablesNamesFinder.getTableList(selectStatement);
+
+        }
+
+        try {
+            rs = databaseQuery(exQuery);
+
+            analysisCost(rs);
+
+        } catch (InterruptedException e) {
+            logger.debug(e.getLocalizedMessage() + "Connection Problem Chack the network " + query);
+        }
+
+
+
+
+
+    }
+
+    public void analysisCost(ResultSet rs){
+
+        String value;
+        List queryOutPut = new ArrayList();
+
+        while(true) {
+            try {
+                if (rs.next()) {
+                    value = rs.getString("Query Plan");
+                    queryOutPut.add(value);
+                }
+                ;
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
     public Map pgSQLQuery(String query) throws SQLException {
         ResultSet rs = null;
         try {
@@ -184,6 +247,11 @@ public class JDBCConnection {
             for (String col : colName) {
 
                 Integer type = elementType.get(col);
+
+                if(type == -5){
+                    rowValue.put(col,rs.getInt(col));
+                }
+
 
                 if(type == -7)
                 {
