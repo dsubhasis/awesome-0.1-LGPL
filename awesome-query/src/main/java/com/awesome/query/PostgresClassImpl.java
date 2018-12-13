@@ -22,25 +22,22 @@ public class PostgresClassImpl  {
     public Map query(String query){
 
         Map outputMap = new HashMap();
-
+        Map result ;
         BaseStoreConnector bs = new BaseStoreConnector();
         bs.PostgresConnector(InputMap, outputMap);
-
+        bs.PostgresPlanGenerator(query);
         boolean flag = (boolean) outputMap.get("errorFlag");
         if(!flag){
-
             JDBCConnection jdb = (JDBCConnection) outputMap.get("connection");
 
+
             try {
-                jdb.pgSQLQuery(query);
+                result = jdb.pgSQLQuery(query);
+                outputMap.put("result", result);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-
-
         }
-
-
 return outputMap;
 
     }
