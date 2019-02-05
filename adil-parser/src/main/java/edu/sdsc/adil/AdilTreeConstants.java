@@ -18,7 +18,7 @@ public interface AdilTreeConstants
   public int JJTPROJECTFUNCTION = 12;
   public int JJTREPORTANALYSIS = 13;
   public int JJTFUNCTIONANALYSIS = 14;
-  public int JJTEXECUTESQLPP = 15;
+  public int JJTEXECUTESQL = 15;
   public int JJTEXECUTECYPHER = 16;
   public int JJTQUETEDSTATEMENT = 17;
   public int JJTFILTEROPERATION = 18;
@@ -57,7 +57,7 @@ public interface AdilTreeConstants
     "ProjectFunction",
     "ReportAnalysis",
     "FunctionAnalysis",
-    "ExecuteSQLPP",
+    "ExecuteSQL",
     "executeCypher",
     "quetedStatement",
     "FilterOperation",
@@ -80,4 +80,4 @@ public interface AdilTreeConstants
     "action",
   };
 }
-/* JavaCC - OriginalChecksum=c0401155735767bc7a3b8d937db42a67 (do not edit this line) */
+/* JavaCC - OriginalChecksum=72647210e68a0bf762277318112c21bd (do not edit this line) */

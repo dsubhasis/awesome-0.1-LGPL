@@ -19,7 +19,7 @@ import edu.sdsc.awesome.adil.parser.ParserTable.VariableTable;
 
 import static edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.ImportLibraryDBCheck;
 import static edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.handleCypherQuery;
-import static edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.handleSQLPPQuery;
+import static edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.handleSQLQuery;
 import static edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.*;
 import edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil;
 
@@ -367,14 +367,14 @@ public static void main(String[] args) {
       }
       jj_consume_token(COLON);
       jj_consume_token(EQAL);
-      tempJB = AnalysisStatement(tempJB);
-  jObject.add("plan", tempJB);
-  jObject.add("AnalysisVariable", t.image);
-  type.add(t.image, "analysisVariable" );
-  decision.add(t.image, false );
-   jjtree.closeNodeScope(jjtn000, true);
-   jjtc000 = false;
-  {if (true) return jObject;}
+      tempJB = AwesomeSafeFunction(tempJB);
+ jObject.add("plan", tempJB);
+ jObject.add("AnalysisVariable", t.image);
+ type.add(t.image, "analysisVariable" );
+ decision.add(t.image, false );
+  jjtree.closeNodeScope(jjtn000, true);
+  jjtc000 = false;
+ {if (true) return jObject;}
     } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -436,9 +436,9 @@ public static void main(String[] args) {
         jj_la1[11] = jj_gen;
         ;
       }
-   jjtree.closeNodeScope(jjtn000, true);
-   jjtc000 = false;
-  {if (true) return jObject;}
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+   {if (true) return jObject;}
     } catch (Throwable jjte000) {
        if (jjtc000) {
          jjtree.clearNodeScope(jjtn000);
@@ -578,8 +578,8 @@ public static void main(String[] args) {
         case PROJECT:
         case ANNOTATE:
         case FILTER:
-        case EXECUTESQLPP:
         case EXECUTECYPHER:
+        case EXECUTESQL:
           AwesomeSafeFunction(tempJB);
                                              jObject.add("input","cypher"); jObject.add("stmt", tempJB.build());
           break;
@@ -599,7 +599,7 @@ public static void main(String[] args) {
         break;
       case SELECT:
         GraphSelect(tempJB);
-                                     jObject.add("cypher-g", tempJB.build());;
+                                    jObject.add("cypher-g", tempJB.build());;
   ParserUtil pt = new ParserUtil();
   pt.handleawsmfunction(jObject,  varTable);
       jjtree.closeNodeScope(jjtn000, true);
@@ -682,9 +682,9 @@ public static void main(String[] args) {
                                         jObject.add("annotation", tempJB.build());
       } else {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case EXECUTESQLPP:
-          ExecuteSQLPP(tempJB);
-                            jObject.add("SQLPP", tempJB.build());
+        case EXECUTESQL:
+          ExecuteSQL(tempJB);
+                          jObject.add("SQLPP", tempJB.build());
           break;
         case EXECUTECYPHER:
           executeCypher(tempJB);
@@ -930,17 +930,17 @@ public static void main(String[] args) {
     throw new Error("Missing return statement in function");
   }
 
-  final public JsonObjectBuilder ExecuteSQLPP(JsonObjectBuilder jObject) throws ParseException {
-                                                             /*@bgen(jjtree) ExecuteSQLPP */
-                                                             ASTExecuteSQLPP jjtn000 = new ASTExecuteSQLPP(JJTEXECUTESQLPP);
-                                                             boolean jjtc000 = true;
-                                                             jjtree.openNodeScope(jjtn000);Token t; Token var; JsonObjectBuilder tempJB = Json.createObjectBuilder();
+  final public JsonObjectBuilder ExecuteSQL(JsonObjectBuilder jObject) throws ParseException {
+                                                           /*@bgen(jjtree) ExecuteSQL */
+                                                           ASTExecuteSQL jjtn000 = new ASTExecuteSQL(JJTEXECUTESQL);
+                                                           boolean jjtc000 = true;
+                                                           jjtree.openNodeScope(jjtn000);Token t; Token var; JsonObjectBuilder tempJB = Json.createObjectBuilder();
     try {
-      jj_consume_token(EXECUTESQLPP);
+      jj_consume_token(EXECUTESQL);
       jj_consume_token(FBRACKETSTART);
       t = quetedStatement();
       jj_consume_token(FBRACKETEND);
-   tempJB = handleSQLPPQuery(t.image, tempJB);
+   tempJB = handleSQLQuery(t.image, tempJB);
    jObject.add("execute", tempJB);
     jjtn000.setImage(t.image);
      jjtree.closeNodeScope(jjtn000, true);
@@ -2071,8 +2071,19 @@ JsonObjectBuilder functionObject = Json.createObjectBuilder(); JsonObjectBuilder
     finally { jj_save(12, xla); }
   }
 
+  private boolean jj_3R_26() {
+    if (jj_scan_token(COMMA)) return true;
+    if (jj_scan_token(FIELDNAME)) return true;
+    return false;
+  }
+
   private boolean jj_3R_24() {
     if (jj_scan_token(ANALYSIS)) return true;
+    return false;
+  }
+
+  private boolean jj_3_6() {
+    if (jj_3R_14()) return true;
     return false;
   }
 
@@ -2081,22 +2092,29 @@ JsonObjectBuilder functionObject = Json.createObjectBuilder(); JsonObjectBuilder
     return false;
   }
 
+  private boolean jj_3_7() {
+    if (jj_scan_token(ALPHANUM)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_13() {
+    if (jj_scan_token(DATASOURCE)) return true;
+    if (jj_scan_token(ALPHANUM)) return true;
+    if (jj_scan_token(TYPE)) return true;
+    return false;
+  }
+
   private boolean jj_3_3() {
     if (jj_3R_13()) return true;
     return false;
   }
 
-  private boolean jj_3_5() {
-    if (jj_scan_token(ALPHANUM)) return true;
+  private boolean jj_3R_23() {
+    if (jj_scan_token(ENV)) return true;
     return false;
   }
 
-  private boolean jj_3R_25() {
-    if (jj_scan_token(CONNECTION)) return true;
-    return false;
-  }
-
-  private boolean jj_3_9() {
+  private boolean jj_3_11() {
     if (jj_3R_15()) return true;
     return false;
   }
@@ -2106,13 +2124,13 @@ JsonObjectBuilder functionObject = Json.createObjectBuilder(); JsonObjectBuilder
     return false;
   }
 
-  private boolean jj_3_13() {
-    if (jj_3R_15()) return true;
-    return false;
-  }
-
-  private boolean jj_3_8() {
-    if (jj_3R_15()) return true;
+  private boolean jj_3R_19() {
+    if (jj_scan_token(FIELDNAME)) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_26()) { jj_scanpos = xsp; break; }
+    }
     return false;
   }
 
@@ -2133,6 +2151,51 @@ JsonObjectBuilder functionObject = Json.createObjectBuilder(); JsonObjectBuilder
     return false;
   }
 
+  private boolean jj_3_10() {
+    if (jj_3R_15()) return true;
+    return false;
+  }
+
+  private boolean jj_3_5() {
+    if (jj_scan_token(ALPHANUM)) return true;
+    return false;
+  }
+
+  private boolean jj_3_2() {
+    if (jj_scan_token(LIBRARY)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_25() {
+    if (jj_scan_token(CONNECTION)) return true;
+    return false;
+  }
+
+  private boolean jj_3_9() {
+    if (jj_3R_15()) return true;
+    return false;
+  }
+
+  private boolean jj_3_13() {
+    if (jj_3R_15()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_17() {
+    if (jj_3R_24()) return true;
+    return false;
+  }
+
+  private boolean jj_3_8() {
+    if (jj_3R_15()) return true;
+    return false;
+  }
+
+  private boolean jj_3_4() {
+    if (jj_scan_token(ALPHANUM)) return true;
+    return false;
+  }
+
   private boolean jj_3R_22() {
     if (jj_scan_token(DIGITS)) return true;
     return false;
@@ -2145,16 +2208,6 @@ JsonObjectBuilder functionObject = Json.createObjectBuilder(); JsonObjectBuilder
 
   private boolean jj_3R_20() {
     if (jj_scan_token(FIELDNAME)) return true;
-    return false;
-  }
-
-  private boolean jj_3_4() {
-    if (jj_scan_token(ALPHANUM)) return true;
-    return false;
-  }
-
-  private boolean jj_3_2() {
-    if (jj_scan_token(LIBRARY)) return true;
     return false;
   }
 
@@ -2173,12 +2226,17 @@ JsonObjectBuilder functionObject = Json.createObjectBuilder(); JsonObjectBuilder
     return false;
   }
 
+  private boolean jj_3_1() {
+    if (jj_3R_12()) return true;
+    return false;
+  }
+
   private boolean jj_3R_15() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_scan_token(70)) {
+    if (jj_scan_token(71)) {
     jj_scanpos = xsp;
-    if (jj_scan_token(71)) return true;
+    if (jj_scan_token(72)) return true;
     }
     if (jj_scan_token(FBRACKETSTART)) return true;
     xsp = jj_scanpos;
@@ -2192,64 +2250,6 @@ JsonObjectBuilder functionObject = Json.createObjectBuilder(); JsonObjectBuilder
     }
     }
     }
-    return false;
-  }
-
-  private boolean jj_3R_26() {
-    if (jj_scan_token(COMMA)) return true;
-    if (jj_scan_token(FIELDNAME)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_17() {
-    if (jj_3R_24()) return true;
-    return false;
-  }
-
-  private boolean jj_3_6() {
-    if (jj_3R_14()) return true;
-    return false;
-  }
-
-  private boolean jj_3_7() {
-    if (jj_scan_token(ALPHANUM)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_13() {
-    if (jj_scan_token(DATASOURCE)) return true;
-    if (jj_scan_token(ALPHANUM)) return true;
-    if (jj_scan_token(TYPE)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_23() {
-    if (jj_scan_token(ENV)) return true;
-    return false;
-  }
-
-  private boolean jj_3_11() {
-    if (jj_3R_15()) return true;
-    return false;
-  }
-
-  private boolean jj_3_1() {
-    if (jj_3R_12()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_19() {
-    if (jj_scan_token(FIELDNAME)) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_26()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3_10() {
-    if (jj_3R_15()) return true;
     return false;
   }
 
@@ -2280,7 +2280,7 @@ JsonObjectBuilder functionObject = Json.createObjectBuilder(); JsonObjectBuilder
       jj_la1_1 = new int[] {0x0,0x0,0x180000,0x0,0x10008200,0x0,0x400,0x0,0x0,0x8800000,0x1,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xc0400100,0x8800000,0x80400100,0x0,0x60,0x10,0x1,0x0,0x4,0x0,0x0,0x10,0x1,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
    private static void jj_la1_init_2() {
-      jj_la1_2 = new int[] {0x40,0x40,0x0,0x0,0x0,0x40,0x0,0x0,0x0,0x80,0x0,0x80,0xc0,0x80,0x0,0xc0,0x80,0x0,0xc9,0x0,0x9,0x0,0x0,0x0,0x0,0xc0,0x0,0xc0,0x0,0x0,0x0,0x40,0xc00,0xc00,0xc00,0xc00,0x0,0x80,0xc0,0x0,0xc0,0x0,0xc0,0x0,0xc0,0x0,0x0,0x0,0x40,0xc0,0xc0,0x0,0xc0,0x0,};
+      jj_la1_2 = new int[] {0x80,0x80,0x0,0x0,0x0,0x80,0x0,0x0,0x0,0x100,0x0,0x100,0x180,0x100,0x0,0x180,0x100,0x0,0x198,0x0,0x18,0x0,0x0,0x0,0x0,0x180,0x0,0x180,0x0,0x0,0x0,0x80,0x1800,0x1800,0x1800,0x1800,0x0,0x100,0x180,0x0,0x180,0x0,0x180,0x0,0x180,0x0,0x0,0x0,0x80,0x180,0x180,0x0,0x180,0x0,};
    }
   final private JJCalls[] jj_2_rtns = new JJCalls[13];
   private boolean jj_rescan = false;
@@ -2472,7 +2472,7 @@ JsonObjectBuilder functionObject = Json.createObjectBuilder(); JsonObjectBuilder
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[76];
+    boolean[] la1tokens = new boolean[77];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -2492,7 +2492,7 @@ JsonObjectBuilder functionObject = Json.createObjectBuilder(); JsonObjectBuilder
         }
       }
     }
-    for (int i = 0; i < 76; i++) {
+    for (int i = 0; i < 77; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

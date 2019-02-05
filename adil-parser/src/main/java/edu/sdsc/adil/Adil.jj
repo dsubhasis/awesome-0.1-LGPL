@@ -27,7 +27,7 @@ import edu.sdsc.awesome.adil.parser.ParserTable.VariableTable;
 
 import static edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.ImportLibraryDBCheck;
 import static edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.handleCypherQuery;
-import static edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.handleSQLPPQuery;
+import static edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.handleSQLQuery;
 import static edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.*;
 import edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil;
 
@@ -151,26 +151,18 @@ TOKEN [IGNORE_CASE]: {
 | <CONSTRUCTGRAPH : "constructgraph" >
 |<CYPHERQUERY : "cypherquery" >
 | <EXECUTECYPHER : "executecypher">
-
+| <EXECUTESQL :"executesql">
 }
 TOKEN :
 {
    < #DIGIT    : ["0"-"9"] >
  | < #LETTER   : ["a"-"z","A"-"Z"] >
  | < ALPHANUM : (<LETTER>|<DIGIT>)+>
-
  |<FIELDNAME : (<ALPHANUM>(<DOT><ALPHANUM>)*)>
-
  |< QUOTED_IDENTIFIER : "\"" (~["\n","\r","\""])+ "\"" | ("`" (~["\n","\r","`"])+ "`") >
  |<GraphElementType : <COLON><ALPHANUM>>
  |<INPATH : (<MINUS><GREATER>) >
  |<OUTPATH : (<LESS><MINUS>) >
-
-
-
-
-
-
 }
 
 JsonObjectBuilder ADILStatement(JsonObjectBuilder jObject)  :
@@ -403,23 +395,17 @@ JsonObjectBuilder DeclareAnalysis(JsonObjectBuilder jObject) : {/*@bgen(jjtree) 
 
   t = <ALPHANUM>(<StartSQBracket><EndSQBracket>{variableArray = true; tempJB.add("Type", "array"); int n = 1;}
 
- (<StartSQBracket><EndSQBracket>{n++;})* {tempJB.add("ArraySize", n);})?<COLON><EQAL> tempJB  = AnalysisStatement(tempJB)
-
-
- {jObject.add("plan", tempJB);}
- {jObject.add("AnalysisVariable", t.image);}
-
- {type.add(t.image, "analysisVariable" );}
- {decision.add(t.image, false );}/*@bgen(jjtree)*/
- {
-   jjtree.closeNodeScope(jjtn000, true);
-   jjtc000 = false;
- }
+ (<StartSQBracket><EndSQBracket>{n++;})* {tempJB.add("ArraySize", n);})?<COLON><EQAL> tempJB  = AwesomeSafeFunction(tempJB)
+{jObject.add("plan", tempJB);}
+{jObject.add("AnalysisVariable", t.image);}
+{type.add(t.image, "analysisVariable" );}
+{decision.add(t.image, false );}/*@bgen(jjtree)*/
+{
+  jjtree.closeNodeScope(jjtn000, true);
+  jjtc000 = false;
+}
 /*@egen*/
-
-
-
- {return jObject; }/*@bgen(jjtree)*/
+{return jObject; }/*@bgen(jjtree)*/
   } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -444,9 +430,6 @@ JsonObjectBuilder DeclareAnalysis(JsonObjectBuilder jObject) : {/*@bgen(jjtree) 
 
 }
 
-
-
-
 JsonObjectBuilder AnalysisStatement(JsonObjectBuilder jObject) : {/*@bgen(jjtree) AnalysisStatement */
                                                                   ASTAnalysisStatement jjtn000 = new ASTAnalysisStatement(JJTANALYSISSTATEMENT);
                                                                   boolean jjtc000 = true;
@@ -461,16 +444,13 @@ JsonObjectBuilder AnalysisStatement(JsonObjectBuilder jObject) : {/*@bgen(jjtree
 
 
         (<STORE> {jObject.add("Store",true);} )? (t = <FIELDNAME>{jObject.add("type",t.image);})?/*@bgen(jjtree)*/
- {
-   jjtree.closeNodeScope(jjtn000, true);
-   jjtc000 = false;
- }
+  {
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+  }
 /*@egen*/
 
-
-
-
- {return jObject;}/*@bgen(jjtree)*/
+  {return jObject;}/*@bgen(jjtree)*/
      } catch (Throwable jjte000) {
        if (jjtc000) {
          jjtree.clearNodeScope(jjtn000);
@@ -540,11 +520,7 @@ JsonObjectBuilder AwsmDefinedFunction(JsonObjectBuilder jObject)                
  )
   {jObject.add("internal", true); jObject.add("name", t.image);}
 
-
-
-
-
-  <FBRACKETEND>)|GraphSelect(tempJB){jObject.add("cypher-g", tempJB.build());;}
+ <FBRACKETEND>)|GraphSelect(tempJB){jObject.add("cypher-g", tempJB.build());;}
 
   {
   ParserUtil pt = new ParserUtil();
@@ -631,7 +607,7 @@ JsonObjectBuilder AwesomeSafeFunction(JsonObjectBuilder jObject)  : {/*@bgen(jjt
 /*@egen*/ 
   (LOOKAHEAD(6)
     AnnotateWithStoreOperation(tempJB) {jObject.add("annotation", tempJB.build());}
-   |( ExecuteSQLPP(tempJB) {jObject.add("SQLPP", tempJB.build());})
+   |( ExecuteSQL(tempJB) {jObject.add("SQLPP", tempJB.build());})
    |(executeCypher(tempJB) {jObject.add("graph", tempJB.build());} )
    |(CreateView(tempJB) {jObject.add("view", tempJB.build());})
    |(FilterOperation(tempJB) {jObject.add("filter", tempJB.build());})
@@ -680,7 +656,6 @@ JsonObjectBuilder CreateView(JsonObjectBuilder jObject) : {/*@bgen(jjtree) Creat
   <CREATE> <VIEW> <FBRACKETSTART>
  <COLLECTION> <COLON> <EQAL> tempJB = AnalysisStatement(tempJB)<COMMA> <VIEW> <COLON><EQAL> tempJC = AnalysisStatement(tempJC)
  <FBRACKETEND>
-
 
  {jObject.add("COLLECTION", tempJB.build());}
  {jObject.add("VIEW", tempJC.build());}
@@ -835,17 +810,17 @@ JsonObjectBuilder FunctionAnalysis(JsonObjectBuilder jObject) : {/*@bgen(jjtree)
 /*@egen*/
 }
 
-JsonObjectBuilder ExecuteSQLPP(JsonObjectBuilder jObject) : {/*@bgen(jjtree) ExecuteSQLPP */
-                                                             ASTExecuteSQLPP jjtn000 = new ASTExecuteSQLPP(JJTEXECUTESQLPP);
-                                                             boolean jjtc000 = true;
-                                                             jjtree.openNodeScope(jjtn000);
+JsonObjectBuilder ExecuteSQL(JsonObjectBuilder jObject) : {/*@bgen(jjtree) ExecuteSQL */
+                                                           ASTExecuteSQL jjtn000 = new ASTExecuteSQL(JJTEXECUTESQL);
+                                                           boolean jjtc000 = true;
+                                                           jjtree.openNodeScope(jjtn000);
 /*@egen*/Token t; Token var; JsonObjectBuilder tempJB = Json.createObjectBuilder(); }
-{/*@bgen(jjtree) ExecuteSQLPP */
+{/*@bgen(jjtree) ExecuteSQL */
    try {
 /*@egen*/
-   <EXECUTESQLPP> <FBRACKETSTART> t =quetedStatement()<FBRACKETEND>
+   <EXECUTESQL> <FBRACKETSTART> t =quetedStatement()<FBRACKETEND>
 
-  {tempJB = handleSQLPPQuery(t.image, tempJB);}
+  {tempJB = handleSQLQuery(t.image, tempJB);}
 
   {jObject.add("execute", tempJB);}
 

@@ -135,21 +135,23 @@ public interface AdilConstants {
   /** RegularExpression Id. */
   int EXECUTECYPHER = 67;
   /** RegularExpression Id. */
-  int DIGIT = 68;
+  int EXECUTESQL = 68;
   /** RegularExpression Id. */
-  int LETTER = 69;
+  int DIGIT = 69;
   /** RegularExpression Id. */
-  int ALPHANUM = 70;
+  int LETTER = 70;
   /** RegularExpression Id. */
-  int FIELDNAME = 71;
+  int ALPHANUM = 71;
   /** RegularExpression Id. */
-  int QUOTED_IDENTIFIER = 72;
+  int FIELDNAME = 72;
   /** RegularExpression Id. */
-  int GraphElementType = 73;
+  int QUOTED_IDENTIFIER = 73;
   /** RegularExpression Id. */
-  int INPATH = 74;
+  int GraphElementType = 74;
   /** RegularExpression Id. */
-  int OUTPATH = 75;
+  int INPATH = 75;
+  /** RegularExpression Id. */
+  int OUTPATH = 76;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -224,6 +226,7 @@ public interface AdilConstants {
     "\"constructgraph\"",
     "\"cypherquery\"",
     "\"executecypher\"",
+    "\"executesql\"",
     "<DIGIT>",
     "<LETTER>",
     "<ALPHANUM>",

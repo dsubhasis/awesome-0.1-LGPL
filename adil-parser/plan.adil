@@ -1,8 +1,6 @@
 create analysis burstanalysis as (
 
-
-v2[] := Select nodes( xx:tt -> [ xx:node] ->bb:user ) from you ;
-
-
+x := executesql("With x1 as (SELECT Distinct x from text )
+Select * from x2");
 
 );

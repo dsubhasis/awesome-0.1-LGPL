@@ -3,6 +3,14 @@ package edu.sdsc.awesome.adil.parser.StatementOperation;
 import edu.sdsc.Cypher.Cypher;
 import edu.sdsc.SQLPP.SQLPP;
 import edu.sdsc.awesome.adil.parser.ParserTable.VariableTable;
+import edu.sdsc.awesome.connector.postgres.PGSQLSchme;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.util.TablesNamesFinder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import scala.reflect.internal.Trees;
 
 
 import javax.json.*;
@@ -14,6 +22,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ParserUtil {
+
+    final Logger logger = LoggerFactory.getLogger(ParserUtil.class);
 
     static boolean validateTuple(String s, String fieldName, String tableName) throws SQLException {
 
@@ -256,7 +266,7 @@ public class ParserUtil {
 
 
         try {
-            input = new FileInputStream("/home/sudasgupta/Documents/temp/awesome-stack/adil-parser/config.properties");;
+            input = new FileInputStream("/home/sudasgupta/Documents/edu.sdsc.awesome.connector.postgres.temp/awesome-stack/adil-parser/config.properties");;
             try {
                 prop.load(input);
             } catch (IOException e) {
@@ -554,21 +564,62 @@ public class ParserUtil {
     }
 
 
-    public static JsonObjectBuilder handleSQLPPQuery(String name, JsonObjectBuilder js){
-
-
+    public static JsonObjectBuilder handleSQLQuery(String name, JsonObjectBuilder js) throws edu.sdsc.SQLPP.ParseException {
         JsonObjectBuilder p = Json.createObjectBuilder();
+        SQLProcessor sql = new SQLProcessor();
+        net.sf.jsqlparser.statement.Statement stmt;
+
+       String lname = name.replaceFirst("\"", "");
+        name = lname.substring(0, name.length() - 2);
         Reader sr = new StringReader(name);
         SQLPP sqp = new SQLPP(sr);
+
         try {
 
-            p = sqp.Expression(p);
 
-            //System.out.println(js.build().toString());
+            System.out.println(name);
 
-        } catch (edu.sdsc.SQLPP.ParseException e) {
+            stmt = CCJSqlParserUtil.parse(name);
+
+            if (stmt instanceof Select){
+                Select selectStmt = (Select) stmt;
+                TablesNamesFinder tablesNamesFinder = new TablesNamesFinder();
+                List<String> tableList = tablesNamesFinder.getTableList(selectStmt);
+                /*
+                Validate tables with the databases
+                 */
+
+                //Check table
+                Map tableDetails = new HashMap();
+                PGSQLSchme pgq = new PGSQLSchme();
+                try {
+                    pgq.checkTableName(tableList);
+                } catch (SQLException e) {
+
+                }
+
+
+                if(selectStmt.getWithItemsList().size()>0)
+                {
+                   sql.SelectStatement(selectStmt);
+
+                }
+
+                System.out.println("x");
+
+
+
+
+
+            }
+
+
+            System.out.println(stmt);
+        } catch (JSQLParserException e) {
             e.printStackTrace();
         }
+
+        //System.out.println(js.build().toString());
 
 
         js.add("PLAN", p.build());

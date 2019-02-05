@@ -19,7 +19,7 @@ public interface AdilVisitor
   public Object visit(ASTProjectFunction node, Object data);
   public Object visit(ASTReportAnalysis node, Object data);
   public Object visit(ASTFunctionAnalysis node, Object data);
-  public Object visit(ASTExecuteSQLPP node, Object data);
+  public Object visit(ASTExecuteSQL node, Object data);
   public Object visit(ASTexecuteCypher node, Object data);
   public Object visit(ASTquetedStatement node, Object data);
   public Object visit(ASTFilterOperation node, Object data);
@@ -41,4 +41,4 @@ public interface AdilVisitor
   public Object visit(ASTOperand node, Object data);
   public Object visit(ASTaction node, Object data);
 }
-/* JavaCC - OriginalChecksum=452b419ecd74772b519381ee64de3fd1 (do not edit this line) */
+/* JavaCC - OriginalChecksum=c9df641d0ec5675be7247569994c01e3 (do not edit this line) */

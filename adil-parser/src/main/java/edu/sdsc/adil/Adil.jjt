@@ -26,7 +26,7 @@ import edu.sdsc.awesome.adil.parser.ParserTable.VariableTable;
 
 import static edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.ImportLibraryDBCheck;
 import static edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.handleCypherQuery;
-import static edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.handleSQLPPQuery;
+import static edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.handleSQLQuery;
 import static edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil.*;
 import edu.sdsc.awesome.adil.parser.StatementOperation.ParserUtil;
 
@@ -147,26 +147,18 @@ TOKEN [IGNORE_CASE]: {
 | <CONSTRUCTGRAPH : "constructgraph" >
 |<CYPHERQUERY : "cypherquery" >
 | <EXECUTECYPHER : "executecypher">
-
+| <EXECUTESQL :"executesql">
 }
 TOKEN :
 {
    < #DIGIT    : ["0"-"9"] >
  | < #LETTER   : ["a"-"z","A"-"Z"] >
  | < ALPHANUM : (<LETTER>|<DIGIT>)+>
-
  |<FIELDNAME : (<ALPHANUM>(<DOT><ALPHANUM>)*)>
-
  |< QUOTED_IDENTIFIER : "\"" (~["\n","\r","\""])+ "\"" | ("`" (~["\n","\r","`"])+ "`") >
  |<GraphElementType : <COLON><ALPHANUM>>
  |<INPATH : (<MINUS><GREATER>) >
  |<OUTPATH : (<LESS><MINUS>) >
-
-
-
-
-
-
 }
 
 JsonObjectBuilder ADILStatement(JsonObjectBuilder jObject)  :
@@ -252,24 +244,15 @@ JsonObjectBuilder DeclareAnalysis(JsonObjectBuilder jObject) : {Token t; JsonObj
 
   t = <ALPHANUM>(<StartSQBracket><EndSQBracket>{variableArray = true; tempJB.add("Type", "array"); int n = 1;}
 
- (<StartSQBracket><EndSQBracket>{n++;})* {tempJB.add("ArraySize", n);})?<COLON><EQAL> tempJB  = AnalysisStatement(tempJB)
-
-
- {jObject.add("plan", tempJB);}
- {jObject.add("AnalysisVariable", t.image);}
-
- {type.add(t.image, "analysisVariable" );}
- {decision.add(t.image, false );}
-
-
-
- {return jObject; }
+ (<StartSQBracket><EndSQBracket>{n++;})* {tempJB.add("ArraySize", n);})?<COLON><EQAL> tempJB  = AwesomeSafeFunction(tempJB)
+{jObject.add("plan", tempJB);}
+{jObject.add("AnalysisVariable", t.image);}
+{type.add(t.image, "analysisVariable" );}
+{decision.add(t.image, false );}
+{return jObject; }
 
 
 }
-
-
-
 
 JsonObjectBuilder AnalysisStatement(JsonObjectBuilder jObject) : {Token t; JsonObjectBuilder tempJB = Json.createObjectBuilder();}
 {
@@ -280,10 +263,7 @@ JsonObjectBuilder AnalysisStatement(JsonObjectBuilder jObject) : {Token t; JsonO
 
         (<STORE> {jObject.add("Store",true);} )? (t = <FIELDNAME>{jObject.add("type",t.image);})?
 
-
-
-
- {return jObject;}
+  {return jObject;}
 }
 
 JsonObjectBuilder FunctionParam(JsonObjectBuilder jObject) : {Token t; Token t2;Token t3; JsonArrayBuilder array  =Json.createArrayBuilder();JsonObjectBuilder tempJB = Json.createObjectBuilder(); }
@@ -310,11 +290,7 @@ JsonObjectBuilder AwsmDefinedFunction(JsonObjectBuilder jObject) #JsonObjectBuil
  )
   {jObject.add("internal", true); jObject.add("name", t.image);}
 
-
-
-
-
-  <FBRACKETEND>)|GraphSelect(tempJB){jObject.add("cypher-g", tempJB.build());;}
+ <FBRACKETEND>)|GraphSelect(tempJB){jObject.add("cypher-g", tempJB.build());;}
 
   {
   ParserUtil pt = new ParserUtil();
@@ -339,7 +315,7 @@ JsonObjectBuilder AwesomeSafeFunction(JsonObjectBuilder jObject)  : {Token t0; T
 { 
   (LOOKAHEAD(6)
     AnnotateWithStoreOperation(tempJB) {jObject.add("annotation", tempJB.build());}
-   |( ExecuteSQLPP(tempJB) {jObject.add("SQLPP", tempJB.build());})
+   |( ExecuteSQL(tempJB) {jObject.add("SQLPP", tempJB.build());})
    |(executeCypher(tempJB) {jObject.add("graph", tempJB.build());} )
    |(CreateView(tempJB) {jObject.add("view", tempJB.build());})
    |(FilterOperation(tempJB) {jObject.add("filter", tempJB.build());})
@@ -357,7 +333,6 @@ JsonObjectBuilder CreateView(JsonObjectBuilder jObject) : {boolean variableArray
   <CREATE> <VIEW> <FBRACKETSTART>
  <COLLECTION> <COLON> <EQAL> tempJB = AnalysisStatement(tempJB)<COMMA> <VIEW> <COLON><EQAL> tempJC = AnalysisStatement(tempJC)
  <FBRACKETEND>
-
 
  {jObject.add("COLLECTION", tempJB.build());}
  {jObject.add("VIEW", tempJC.build());}
@@ -413,11 +388,11 @@ JsonObjectBuilder FunctionAnalysis(JsonObjectBuilder jObject) : {JsonObjectBuild
 {return jObject;}
 }
 
-JsonObjectBuilder ExecuteSQLPP(JsonObjectBuilder jObject) : {Token t; Token var; JsonObjectBuilder tempJB = Json.createObjectBuilder(); }
+JsonObjectBuilder ExecuteSQL(JsonObjectBuilder jObject) : {Token t; Token var; JsonObjectBuilder tempJB = Json.createObjectBuilder(); }
 {
-   <EXECUTESQLPP> <FBRACKETSTART> t =quetedStatement()<FBRACKETEND>
+   <EXECUTESQL> <FBRACKETSTART> t =quetedStatement()<FBRACKETEND>
 
-  {tempJB = handleSQLPPQuery(t.image, tempJB);}
+  {tempJB = handleSQLQuery(t.image, tempJB);}
 
   {jObject.add("execute", tempJB);}
 
