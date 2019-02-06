@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -11,26 +12,58 @@ public class PGSQLSchme {
 
     final Logger logger = LoggerFactory.getLogger(PGSQLSchme.class);
 
+    private JDBCConnection jd;
+
+
 
 
     public void checkTableName(List<String> tableName) throws SQLException {
 
+        Map resultMapTable, resultMapIndex, resultMapType;
+        List tableList = new ArrayList();
 
-        JDBCConnection jd = new JDBCConnection(temp.pgurl, temp.pguser, temp.pgpassword);
+      for(String table  : tableName) {
+
+            String query = "select column_name, data_type, character_maximum_length from INFORMATION_SCHEMA.COLUMNS where table_name = \'"+table+"\'";
+
+            resultMapTable =  jd.pgSQLQuery(query);
+
+            PGSQLTable pgt = new PGSQLTable(table);
+
+            String query2 ="SELECT indexname, indexdef FROM pg_indexes \'"+table+"\'";
+            resultMapIndex = jd.pgSQLQuery(query2);
+
+            pgt.insert(resultMapTable, resultMapIndex);
+
+            pgt.insert(resultMapTable, jd.pgSQLQuery(query2));
 
 
-        for(String table  : tableName) {
+            tableList.add(pgt);
 
-            String query = "select column_name, data_type, character_maximum_length from INFORMATION_SCHEMA.COLUMNS where table_name ="+table;
+           // List tuple = resultMap.get('map')''
 
-            Map resultMap =  jd.pgSQLQuery(query);
+      }
+
+    }
+    public PGSQLSchme() {
+        jd = new JDBCConnection(temp.pgurl, temp.pguser, temp.pgpassword);
+    }
+    public boolean tableExist(String tableName) throws SQLException {
+        String query ="SELECT EXISTS (SELECT 1 from information_schema.tables where table_name  = \'"+tableName+"\');";
+        Map resultMap =  jd.pgSQLQuery(query);
+        List value = (List) resultMap.get("value");
+        Map unitValue = (Map) value.get(0);
+
+        boolean exists = (boolean) unitValue.get("exists");
 
 
-        }
 
 
 
+        return exists;
 
 
     }
+
+
 }

@@ -235,14 +235,7 @@ public class JDBCConnection {
     }
 
 
-    public boolean tableExist(String tableName){
 
-        String query ="SELECT EXISTS (SELECT 1 FROM   pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace n.nspname = "+tableName+");";
-
-        return true;
-
-
-    }
 
 
 
@@ -333,7 +326,7 @@ public class JDBCConnection {
 
                 if (counter == 4) {
                     flag = false;
-                    logger.debug("Permananely Stopped : Please recover manually " + query);
+                    logger.debug("Permanently Stopped : Please recover manually " + query);
                 } else {
 
                     Thread.sleep(4000);
