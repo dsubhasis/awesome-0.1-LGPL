@@ -17,7 +17,7 @@ public class PGSQLSchme {
 
 
 
-    public void checkTableName(List<String> tableName) throws SQLException {
+    public List checkTableName(List<String> tableName) throws SQLException {
 
         Map resultMapTable, resultMapIndex, resultMapType;
         List tableList = new ArrayList();
@@ -36,6 +36,8 @@ public class PGSQLSchme {
            // List tuple = resultMap.get('map')''
 
       }
+
+      return tableList;
 
     }
     public PGSQLSchme() {
