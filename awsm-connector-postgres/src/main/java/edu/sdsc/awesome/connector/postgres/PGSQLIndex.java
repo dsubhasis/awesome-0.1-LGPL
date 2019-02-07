@@ -5,8 +5,12 @@ import java.util.List;
 
 public class PGSQLIndex {
 
-    public List<String> getIndexedField() {
+    public String[] getIndexedField() {
         return indexedField;
+    }
+
+    public void setIndexedField(String[] indexedField) {
+        this.indexedField = indexedField;
     }
 
     public String getIndexType() {
@@ -37,7 +41,7 @@ public class PGSQLIndex {
         this.schemaName = schemaName;
     }
 
-    private List<String> indexedField;
+    private String[] indexedField;
     private String indexdef;
     private String name;
     private String schemaName;
@@ -46,11 +50,7 @@ public class PGSQLIndex {
 
 
 
-
-
-
-
-
-
-
+    public void setIndexType(String indexType) {
+        this.indexType = indexType;
+    }
 }

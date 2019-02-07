@@ -1,5 +1,7 @@
 package edu.sdsc.awesome.connector.postgres;
 
+import java.util.List;
+
 public class PGSQLTuple {
 
     private String column_name;
@@ -7,6 +9,7 @@ public class PGSQLTuple {
     private Integer charecter_maximum_length;
     private String date_type_precession;
     private String udt_name;
+    private String is_nullable;
 
 
     public String getColumn_name() {
@@ -49,12 +52,27 @@ public class PGSQLTuple {
         this.udt_name = udt_name;
     }
 
-    private void Setall(String column_name, String data_type, String date_type_precession, String udt_name){
+    public void Setall(String column_name,  String udt_name,  String is_nullable, Integer character_maximum_length, String data_type, String date_type_precession){
         this.column_name=column_name;
         this.data_type = data_type;
         this.date_type_precession = date_type_precession;
         this.udt_name = udt_name;
+        this.is_nullable = is_nullable;
+
+        this.charecter_maximum_length = character_maximum_length;
+
+
+
+
+
+
+
+
+
+        //column_name, data_type, udt_name,  is_nullable, character_maximum_length, data_type
 
 
     }
+
+
 }
