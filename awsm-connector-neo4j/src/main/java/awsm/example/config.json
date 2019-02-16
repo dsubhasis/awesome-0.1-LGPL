@@ -1,0 +1,15 @@
+{"dataProperty":{"startnode" : {
+  "type" : "tweet",
+  "property":{"date":"Created_at","tweetid":"id" }
+},
+  "endNode" : {
+    "type":"retweet",
+    "property":{"date":"created_at"}
+
+  },
+
+  "edge" :{"type":"retweeted",
+    "propety":{"date":"created_at"}
+  }
+
+}}

@@ -31,6 +31,8 @@ public class PGSQLTable {
         
     }
 
+
+
     public void indexTable(Map indexValue, PGSQLIndex pgindex){
 
         String indexdef = (String) indexValue.get("indexdef");
