@@ -1,25 +1,63 @@
-package edu.sdsc.awesome.adil.parser.adil.parser.sql;
+package edu.sdsc.awsm.datatype;
 
+
+import net.sf.jsqlparser.expression.Alias;
+import net.sf.jsqlparser.schema.Database;
 import net.sf.jsqlparser.statement.select.Select;
 
 import java.util.List;
 
-public class SelectElement {
+public class SelectElement extends AdilNode {
 
-    private List tableName;
+    private String tableName;
     private List tupleName;
     private List groupBy;
     private List orderby;
     private List join;
     private List distinct;
-    private WithElement withElement;
+    private List having;
+    private List withElement;
+    private Alias aliasName;
+    private String schemaName;
+    private Database databaseName;
 
+    public List getHaving() {
+        return having;
+    }
 
-    public List getTableName() {
+    public void setHaving(List having) {
+        this.having = having;
+    }
+
+    public Alias getAliasName() {
+        return aliasName;
+    }
+
+    public void setAliasName(Alias aliasName) {
+        this.aliasName = aliasName;
+    }
+
+    public String getSchemaName() {
+        return schemaName;
+    }
+
+    public void setSchemaName(String schemaName) {
+        this.schemaName = schemaName;
+    }
+
+    public Database getDatabaseName() {
+        return databaseName;
+    }
+
+    public void setDatabaseName(Database databaseName) {
+        this.databaseName = databaseName;
+    }
+
+    public String getTableName() {
         return tableName;
     }
 
-    public void setTableName(List tableName) {
+    public void setTableName(String tableName) {
         this.tableName = tableName;
     }
 
@@ -63,11 +101,11 @@ public class SelectElement {
         this.distinct = distinct;
     }
 
-    public WithElement getWithElement() {
+    public List getWithElement() {
         return withElement;
     }
 
-    public void setWithElement(WithElement withElement) {
+    public void setWithElement(List withElement) {
         this.withElement = withElement;
     }
 

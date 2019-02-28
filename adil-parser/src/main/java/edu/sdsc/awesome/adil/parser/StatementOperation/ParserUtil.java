@@ -1,17 +1,19 @@
 package edu.sdsc.awesome.adil.parser.StatementOperation;
 
+import com.awesome.query.CommonSlice.PGSQL.BasicSlice;
 import edu.sdsc.Cypher.Cypher;
 import edu.sdsc.SQLPP.SQLPP;
 import edu.sdsc.awesome.adil.parser.ParserTable.VariableTable;
 import edu.sdsc.awesome.connector.postgres.PGSQLSchme;
+import edu.sdsc.awsm.datatype.AdilNode;
 import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.util.TablesNamesFinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.reflect.internal.Trees;
-
 
 import javax.json.*;
 import java.io.*;
@@ -23,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ParserUtil {
 
-    final Logger logger = LoggerFactory.getLogger(ParserUtil.class);
+    static final Logger logvalue = LoggerFactory.getLogger(ParserUtil.class);
 
     static boolean validateTuple(String s, String fieldName, String tableName) throws SQLException {
 
@@ -31,36 +33,32 @@ public class ParserUtil {
         int count = 0;
 
         boolean flag = false;
-        String query = "Select count(*) from "+tableName+" where "+fieldName+ " = "+s;
+        String query = "Select count(*) from " + tableName + " where " + fieldName + " = " + s;
         Statement st = con.createStatement();
         ResultSet rs = st.executeQuery(query);
-        while(rs.next())
-        {
+        while (rs.next()) {
             count = rs.getInt("count");
-            if(count > 0) {
+            if (count > 0) {
                 flag = true;
             }
         }
         return flag;
     }
 
-    public static JsonArray checkAllDBelement( String match, String table, String fieldName ){
+    public static JsonArray checkAllDBelement(String match, String table, String fieldName) {
         JsonArrayBuilder variable = Json.createArrayBuilder();
         String name;
 
 
-
         try {
-            ResultSet rs = getResult(fieldName, table, "\""+match+"\"");
-            while(rs.next()) {
+            ResultSet rs = getResult(fieldName, table, "\"" + match + "\"");
+            while (rs.next()) {
                 JsonObjectBuilder temp = Json.createObjectBuilder();
 
                 name = rs.getString("name");
                 temp.add("name", name);
                 temp.add("source", rs.getString("name"));
                 variable.add(temp);
-
-
 
 
             }
@@ -75,15 +73,14 @@ public class ParserUtil {
 
     }
 
-    public static JsonObject fieldSchemaCheck(JsonObjectBuilder jObject, String field)
-    {
+    public static JsonObject fieldSchemaCheck(JsonObjectBuilder jObject, String field) {
         String type = null, path = null, model = null;
 
         String[] partofField = field.split("\\.");
         try {
-            ResultSet rs = getResult("name", "schematable", "\""+partofField[1]+"\"");
+            ResultSet rs = getResult("name", "schematable", "\"" + partofField[1] + "\"");
 
-            while(rs.next()) {
+            while (rs.next()) {
 
                 type = rs.getString("type");
                 path = rs.getString("path");
@@ -92,7 +89,7 @@ public class ParserUtil {
                 String[] pathComponent = path.split("\\.");
 
                 int size = pathComponent.length;
-                if(size > 0) {
+                if (size > 0) {
 
                     if ((pathComponent[size - 1]).equals("*")) {
                         model = "nested";
@@ -104,8 +101,7 @@ public class ParserUtil {
                         model = "flat";
 
                     }
-                }
-                else {
+                } else {
                     model = "flat";
 
                 }
@@ -127,8 +123,7 @@ public class ParserUtil {
     }
 
 
-
-    public static JsonObjectBuilder CheckDBStorage( JsonObjectBuilder dbObject, String match){
+    public static JsonObjectBuilder CheckDBStorage(JsonObjectBuilder dbObject, String match) {
 
 
         JsonArrayBuilder store = Json.createArrayBuilder();
@@ -136,19 +131,19 @@ public class ParserUtil {
         String name;
 
         try {
-            ResultSet rs = getResult("name", "storageType", "\""+match+"\"");
-            while(rs.next()) {
+            ResultSet rs = getResult("name", "storageType", "\"" + match + "\"");
+            while (rs.next()) {
                 name = rs.getString("type");
 
 
-                rs = getResult("name", "provider", "\""+name+"\"");
+                rs = getResult("name", "provider", "\"" + name + "\"");
                 while (rs.next()) {
                     String storename = rs.getString("type");
                     store.add(storename);
                 }
 
                 dbObject.add(name, store.build());
-                dbObject.add("source",match );
+                dbObject.add("source", match);
 
             }
 
@@ -160,30 +155,27 @@ public class ParserUtil {
         return dbObject;
     }
 
-    public static JsonObjectBuilder ImportLibraryDBCheck(JsonObjectBuilder retrunObject, String fromClause, JsonArray name)  {
+    public static JsonObjectBuilder ImportLibraryDBCheck(JsonObjectBuilder retrunObject, String fromClause, JsonArray name) {
 
         JsonArrayBuilder jproject = Json.createArrayBuilder();
 
-        for(int i =0 ; i < name.size(); i++) {
+        for (int i = 0; i < name.size(); i++) {
             try {
                 ResultSet rs = getResult("name", "libraryentry", name.get(i).toString());
 
 
+                while (rs.next()) {
 
-
-                while(rs.next())
-                {
-
-                    JsonObjectBuilder jObject =Json.createObjectBuilder();
-                    String lname =   rs.getString("name");
-                    String lpath =   rs.getString("path");
-                    Integer lsize =   rs.getInt("size");
-                    String lcomputeClass =   rs.getString("computeClass");
+                    JsonObjectBuilder jObject = Json.createObjectBuilder();
+                    String lname = rs.getString("name");
+                    String lpath = rs.getString("path");
+                    Integer lsize = rs.getInt("size");
+                    String lcomputeClass = rs.getString("computeClass");
 
                     jObject.add("name", lname);
                     jObject.add("VerifiedPath", lpath);
                     jObject.add("size", lsize);
-                    jObject.add("ComputeClass",lcomputeClass);
+                    jObject.add("ComputeClass", lcomputeClass);
                     jObject.add("count", 1);
 
                     jproject.add(jObject.build());
@@ -197,7 +189,7 @@ public class ParserUtil {
 
 
         }
-        retrunObject.add("info",jproject.build() );
+        retrunObject.add("info", jproject.build());
 
         return retrunObject;
     }
@@ -207,12 +199,11 @@ public class ParserUtil {
 
         String name = "*";
 
-        String query = "Select "+name+" from "+table+" where "+fieldName+" = "+value+" ";
+        String query = "Select " + name + " from " + table + " where " + fieldName + " = " + value + " ";
         System.out.println(query);
         Connection con = ParserUtil.dbConnection();
         Statement st = con.createStatement();
         ResultSet rs = st.executeQuery(query);
-
 
 
         return rs;
@@ -223,12 +214,11 @@ public class ParserUtil {
 
         String name = "colname";
 
-        String query = "Select "+name+" from "+table+" where "+fieldName+" = "+value;
+        String query = "Select " + name + " from " + table + " where " + fieldName + " = " + value;
         //System.out.println(query);
         Connection con = ParserUtil.dbConnection();
         Statement st = con.createStatement();
         ResultSet rs = st.executeQuery(query);
-
 
 
         return rs;
@@ -236,9 +226,7 @@ public class ParserUtil {
     }
 
 
-
-
-    static int insertTuple(String query){
+    static int insertTuple(String query) {
         Connection con = ParserUtil.dbConnection();
         int count = 0;
         boolean flag = false;
@@ -249,12 +237,11 @@ public class ParserUtil {
             st.execute(query);
             st.close();
         } catch (SQLException e) {
-            System.out.println(""+e.getMessage());
+            System.out.println("" + e.getMessage());
         }
 
         return 0;
     }
-
 
 
     static Connection dbConnection() {
@@ -266,7 +253,8 @@ public class ParserUtil {
 
 
         try {
-            input = new FileInputStream("/home/sudasgupta/Documents/edu.sdsc.awesome.connector.postgres.temp/awesome-stack/adil-parser/config.properties");;
+            input = new FileInputStream("/home/sudasgupta/Documents/edu.sdsc.awesome.connector.postgres.temp/awesome-stack/adil-parser/config.properties");
+            ;
             try {
                 prop.load(input);
             } catch (IOException e) {
@@ -278,11 +266,6 @@ public class ParserUtil {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-
-
-
-
-
         //String url = "jdbc:sqlite::memory";
         Connection con = null;
         try {
@@ -291,19 +274,15 @@ public class ParserUtil {
             System.out.println("Internal Database Connection error");
         }
         return con;
-
     }
 
     public static List getStoreCapabilty(String fieldName, String value) throws SQLException {
-
         List name = new ArrayList();
-
-        String query = "Select capability from StoreCapabilityTable where "+fieldName+ " = "+value;
+        String query = "Select capability from StoreCapabilityTable where " + fieldName + " = " + value;
         Connection con = ParserUtil.dbConnection();
         Statement st = con.createStatement();
         ResultSet rs = st.executeQuery(query);
-        while(rs.next())
-        {
+        while (rs.next()) {
             name.add(rs.getString("capabitity"));
         }
 
@@ -315,12 +294,11 @@ public class ParserUtil {
 
         String name = null;
 
-        String query = "Select name from OperatorCapabityTable where "+fieldName+ " = "+value;
+        String query = "Select name from OperatorCapabityTable where " + fieldName + " = " + value;
         Connection con = ParserUtil.dbConnection();
         Statement st = con.createStatement();
         ResultSet rs = st.executeQuery(query);
-        while(rs.next())
-        {
+        while (rs.next()) {
             name = rs.getString("name");
         }
 
@@ -328,14 +306,12 @@ public class ParserUtil {
 
     }
 
-    public static Integer generateUniqueID()
-    {
+    public static Integer generateUniqueID() {
         AtomicInteger counter = new AtomicInteger();
         return counter.intValue();
     }
 
-    public static JsonObjectBuilder variableType(JsonObjectBuilder type, String src, String variable, JsonObjectBuilder decesion)
-    {
+    public static JsonObjectBuilder variableType(JsonObjectBuilder type, String src, String variable, JsonObjectBuilder decesion) {
 
 
         String[] temp = variable.split("\\.");
@@ -350,25 +326,22 @@ public class ParserUtil {
         return type;
 
 
-
     }
 
-    public static JsonObject getProjectionObject(JsonObject jSlection, List<String> projection, String src, JsonObjectBuilder variable, JsonObjectBuilder decision, JsonObjectBuilder schema, JsonObjectBuilder type){
+    public static JsonObject getProjectionObject(JsonObject jSlection, List<String> projection, String src, JsonObjectBuilder variable, JsonObjectBuilder decision, JsonObjectBuilder schema, JsonObjectBuilder type) {
 
-        JsonObjectBuilder jwhere =Json.createObjectBuilder(jSlection);
+        JsonObjectBuilder jwhere = Json.createObjectBuilder(jSlection);
         JsonObjectBuilder jobject = Json.createObjectBuilder();
 
 
         JsonArrayBuilder jproject = Json.createArrayBuilder();
 
-        JsonObjectBuilder projectionVar =Json.createObjectBuilder();
+        JsonObjectBuilder projectionVar = Json.createObjectBuilder();
         jobject.add("SCHEMA", src);
         jobject.add("verified", false);
 
 
-
-        for(int i =0 ; i< projection.size(); i++){
-
+        for (int i = 0; i < projection.size(); i++) {
 
 
             String prjvar = projection.get(i);
@@ -376,7 +349,7 @@ public class ParserUtil {
             schema.add(src, false);
 
             projectionVar.add("tuple", prjvar);
-            if(temp.length> 1) {
+            if (temp.length > 1) {
                 projectionVar.add("Type", temp[0]);
                 String replacestring = prjvar.replace(temp[0], src);
                 projectionVar.add("field", replacestring);
@@ -391,8 +364,6 @@ public class ParserUtil {
             }
 
 
-
-
         }
 
 
@@ -401,23 +372,21 @@ public class ParserUtil {
         jobject.add("SELECT", jwhere.build());
 
 
-
         return jobject.build();
 
     }
 
-    public static JsonObjectBuilder functionCheck(JsonObjectBuilder fObject, String functionName)  {
+    public static JsonObjectBuilder functionCheck(JsonObjectBuilder fObject, String functionName) {
 
         ResultSet rs = null;
         JsonObjectBuilder jObject = Json.createObjectBuilder();
         try {
-            rs = getResult("name", "functionsignaturetable", "\""+functionName+"\"");
+            rs = getResult("name", "functionsignaturetable", "\"" + functionName + "\"");
 
             JsonArrayBuilder array = Json.createArrayBuilder();
 
 
-            while(rs.next())
-            {
+            while (rs.next()) {
 
                 String lname = rs.getString("name");
                 String loutput = rs.getString("output");
@@ -435,8 +404,7 @@ public class ParserUtil {
             }
 
 
-
-            jObject.add("info",array.build());
+            jObject.add("info", array.build());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -445,7 +413,7 @@ public class ParserUtil {
 
     }
 
-    public static JsonObjectBuilder getAnnotateJSONPLAN(JsonObjectBuilder jobject, List<String> dictionary,List<String> witness, JsonObject jSlection, List<String> projection, String src, JsonObjectBuilder variable, JsonObjectBuilder desision, JsonObjectBuilder schema, JsonObjectBuilder type) throws Exception{
+    public static JsonObjectBuilder getAnnotateJSONPLAN(JsonObjectBuilder jobject, List<String> dictionary, List<String> witness, JsonObject jSlection, List<String> projection, String src, JsonObjectBuilder variable, JsonObjectBuilder desision, JsonObjectBuilder schema, JsonObjectBuilder type) throws Exception {
 
         //JsonObjectBuilder jobject =Json.createObjectBuilder();
         JsonObject source = getProjectionObject(jSlection, projection, src, variable, desision, schema, type);
@@ -453,8 +421,7 @@ public class ParserUtil {
 
         JsonArrayBuilder jarray = Json.createArrayBuilder();
         JsonArrayBuilder jwitness = Json.createArrayBuilder();
-        for(int w = 0; w< witness.size(); w++)
-        {
+        for (int w = 0; w < witness.size(); w++) {
 
             JsonObjectBuilder witneestemp = Json.createObjectBuilder();
             witneestemp.add("source", src);
@@ -463,63 +430,43 @@ public class ParserUtil {
         }
 
         JsonObjectBuilder witnessProject = Json.createObjectBuilder();
-        if(witness.size()==0)
-        {
+        if (witness.size() == 0) {
             JsonObjectBuilder witneestemp = Json.createObjectBuilder();
             witneestemp.add("source", src);
-            witneestemp.add("name","*");
+            witneestemp.add("name", "*");
 
             jwitness.add(witneestemp.build());
         }
         witnessProject.add("PROJECT", jwitness.build());
         jobject.add("WITNESS", witnessProject.build());
-        if(dictionary.size()>1)
-        {
+        if (dictionary.size() > 1) {
             jobject.add("memoize", true);
-            jobject.add("MEMOSRC",source );
-            for(int i=0; i<dictionary.size();i++){
-                JsonObjectBuilder tempJobject =Json.createObjectBuilder();
-
-
-                ResultSet rs = getResult("name", "libraryentry", "\""+dictionary.get(i)+"\"");
-
-                while(rs.next())
-                {
-
-
-                    String lname =   rs.getString("name");
-                    String lpath =   rs.getString("path");
-                    Integer lsize =   rs.getInt("size");
-                    String lcomputeClass =   rs.getString("computeClass");
-
+            jobject.add("MEMOSRC", source);
+            for (int i = 0; i < dictionary.size(); i++) {
+                JsonObjectBuilder tempJobject = Json.createObjectBuilder();
+                ResultSet rs = getResult("name", "libraryentry", "\"" + dictionary.get(i) + "\"");
+                while (rs.next()) {
+                    String lname = rs.getString("name");
+                    String lpath = rs.getString("path");
+                    Integer lsize = rs.getInt("size");
+                    String lcomputeClass = rs.getString("computeClass");
                     dbcheck.add("name", lname);
                     dbcheck.add("VerifiedPath", lpath);
                     dbcheck.add("size", lsize);
-                    dbcheck.add("ComputeClass",lcomputeClass);
-
+                    dbcheck.add("ComputeClass", lcomputeClass);
                     dbcheck.add("ImportOptimized", false);
-
-                    tempJobject.add("info",dbcheck.build());
-
+                    tempJobject.add("info", dbcheck.build());
                 }
-
-
-
-                tempJobject.add("SOURCE","memoize");
+                tempJobject.add("SOURCE", "memoize");
 
                 jarray.add(tempJobject.build());
             }
             jobject.add("UNION", jarray.build());
 
 
-        }
-        else
-        {
+        } else {
             jobject.add("ANNOTATE", dictionary.get(0));
-            jobject.add("SOURCE",source);
-
-
-
+            jobject.add("SOURCE", source);
 
 
         }
@@ -530,8 +477,7 @@ public class ParserUtil {
 
     }
 
-    public static JsonObjectBuilder handleCypherQuery(String name, JsonObjectBuilder js, JsonObjectBuilder partition, boolean partitionflag){
-
+    public static JsonObjectBuilder handleCypherQuery(String name, JsonObjectBuilder js, JsonObjectBuilder partition, boolean partitionflag) {
 
 
         //Reader sr = new StringReader(" \" create CONSTRAINT ON (t:Tweet) ASSERT t.id IS UNIQUE ;  create CONSTRAINT ON (t:User) ASSERT u.id IS UNIQUE ; create (u:User { id: Collection.Tweet.User.id, name: Collection.Tweet.User.name})-[:created]->(n:Tweet { id: Collection.Tweet.TweetID, TweetDate: Collection.Tweet.TweetDate, Text: Collection.Tweet.Text } );  create (u:x {id: Collection.Tweet.User.id, name: Collection.Tweet.User.name}) ; match (n:Tweet) merge (n)-[:hasHashTag]->( h:HashTag  {tag: unnest(Collection.Tweet.Entities.HashTags)}); match (h1)  merge (h1)-[:cooccursWith]->(h2); \"");
@@ -554,8 +500,7 @@ public class ParserUtil {
         js.add("PLAN", p.build());
         js.add("Executable", name);
         js.add("PARTTION-STATUS", partitionflag);
-        if(partitionflag)
-        {
+        if (partitionflag) {
             js.add("partition", partition.build());
         }
 
@@ -568,48 +513,60 @@ public class ParserUtil {
         JsonObjectBuilder p = Json.createObjectBuilder();
         SQLProcessor sql = new SQLProcessor();
         net.sf.jsqlparser.statement.Statement stmt;
-
-       String lname = name.replaceFirst("\"", "");
+        String lname = name.replaceFirst("\"", "");
         name = lname.substring(0, name.length() - 2);
         Reader sr = new StringReader(name);
         SQLPP sqp = new SQLPP(sr);
-
         try {
-
-
             System.out.println(name);
 
             stmt = CCJSqlParserUtil.parse(name);
 
-            if (stmt instanceof Select){
+
+            if (stmt instanceof Select) {
+                PGSQLSchme pgql = new PGSQLSchme();
                 Select selectStmt = (Select) stmt;
+                String whereClause = "a=3 AND b=4 AND c=5 AND d>5 AND x<10";
+                Expression expr = CCJSqlParserUtil.parseCondExpression(whereClause);
+                PlainSelect ps = (PlainSelect) stmt;
+
                 TablesNamesFinder tablesNamesFinder = new TablesNamesFinder();
                 List<String> tableList = tablesNamesFinder.getTableList(selectStmt);
+
                 /*
                 Validate tables with the databases
                  */
 
+                boolean tableExist = true;
+                for (String tname : tableList) {
+
+                    try {
+                        if (!pgql.tableExist(tname)) {
+                            tableExist = false;
+                            logvalue.info("table not found");
+                            break;
+                        }
+
+                    } catch (SQLException e) {
+                        logvalue.info("Debug problem");
+                    }
+                }
                 //Check table
-                Map tableDetails = new HashMap();
-                PGSQLSchme pgq = new PGSQLSchme();
-                try {
-                    pgq.checkTableName(tableList);
-                } catch (SQLException e) {
+                List tableDetails;
+                AdilNode SelectElement;
+                if (tableExist) {
+
+                    try {
+                        tableDetails = pgql.TableStats(tableList);
+                        SelectElement = sql.SelectStatement(selectStmt);
+                        System.out.println("Statement parsed ");
+                        BasicSlice bs = new BasicSlice(tableDetails, SelectElement);
+
+                    } catch (SQLException e) {
+                    }
+
 
                 }
-
-
-                if(selectStmt.getWithItemsList().size()>0)
-                {
-                   sql.SelectStatement(selectStmt);
-
-                }
-
-                System.out.println("x");
-
-
-
-
 
             }
 
@@ -629,81 +586,33 @@ public class ParserUtil {
 
 
     public JsonObjectBuilder handleawsmfunction(JsonObjectBuilder jobject, VariableTable vt) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-
         JsonObjectBuilder p = Json.createObjectBuilder();
         JsonObject stmt = jobject.build();
         Map property = new HashMap();
-
-
         //Get the type
-
         System.out.println(stmt.toString());
-
         String type = stmt.getString("input");
         String className = null;
         try {
-            ResultSet rs = getResult("name","classTable","\""+type+"\"");
-            while(rs.next())
-            {
+            ResultSet rs = getResult("name", "classTable", "\"" + type + "\"");
+            while (rs.next()) {
                 className = rs.getString("class");
-
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         this.runClassLib(property, className);
-
-
-
         return p;
-
-
-
     }
 
-    public void runClassLib(Map property, String ClassName ) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-
-
+    public void runClassLib(Map property, String ClassName) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Class myClass = Class.forName(ClassName);
-        Constructor<?> constructor = myClass.getConstructor(Map.class,  String.class);
-
-        Object  object = constructor.newInstance(property, ClassName);
-
-
-        
-
-
-
-
-
-
-
-
+        Constructor<?> constructor = myClass.getConstructor(Map.class, String.class);
+        Object object = constructor.newInstance(property, ClassName);
     }
-
-    public void runClassLib(JsonObject property, String ClassName ) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-
-
+    public void runClassLib(JsonObject property, String ClassName) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Class myClass = Class.forName(ClassName);
-        Constructor<?> constructor = myClass.getConstructor(JsonObject.class,  String.class);
-
-        Object  object = constructor.newInstance(property, ClassName);
-
-
-
-
-
-
-
-
-
-
-
+        Constructor<?> constructor = myClass.getConstructor(JsonObject.class, String.class);
+        Object object = constructor.newInstance(property, ClassName);
     }
-
-
-
-
 }

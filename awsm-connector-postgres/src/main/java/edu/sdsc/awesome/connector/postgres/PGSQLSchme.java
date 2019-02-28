@@ -26,12 +26,15 @@ public class PGSQLSchme {
 
       for(String table  : tableName) {
 
-            String query = "select column_name, data_type, udt_name,  is_nullable, character_maximum_length, data_type"+" from INFORMATION_SCHEMA.COLUMNS where table_name = \'"+table+"\'";
+            String query = "select  pg_relation_size(\'"+table+"\') as size, column_name, data_type, udt_name,  is_nullable, character_maximum_length, data_type from INFORMATION_SCHEMA.COLUMNS where table_name = \'"+table+"\'";
             resultMapTable =  jd.pgSQLQuery(query);
             PGSQLTable pgt = new PGSQLTable(table);
             String query2 ="SELECT indexname, indexdef FROM pg_indexes where tablename =  \'"+table+"\'";
             resultMapIndex = jd.pgSQLQuery(query2);
             pgt.insert(resultMapTable, resultMapIndex);
+
+            //SELECT
+          //    pg_size_pretty (pg_relation_size('actor'));
 
 
 

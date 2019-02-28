@@ -214,7 +214,7 @@ public interface AdilConstants {
     "\"witness\"",
     "\"project\"",
     "\"awsm\"",
-    "\"node\"",
+    "\"AdilNode\"",
     "\"nodes\"",
     "\"path\"",
     "\"select\"",

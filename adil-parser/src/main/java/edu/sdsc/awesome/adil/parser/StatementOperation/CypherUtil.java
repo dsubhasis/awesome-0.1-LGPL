@@ -36,7 +36,7 @@ public class CypherUtil {
         JsonObjectBuilder temp = Json.createObjectBuilder();
         temp.add("name", node);
         temp.add("properties", jb.build());
-        temp.add("type", "node");
+        temp.add("type", "AdilNode");
 
      jObject.add(node, temp.build());
 

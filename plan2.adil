@@ -1,0 +1,33 @@
+create ENV SocialData;
+
+                                                                             IMPORT DICTIONARY senate, house, leadership, places FROM awesome.repositories.dictionary;
+
+                                                                             Import library coreNLP from awesome.libraries.textlib;
+
+
+
+
+
+CREATE DATASOURCE USPoliticalNews TYPE NEWS (lang, eng),(tokenizer, snlp),(FilePath, default);
+CREATE DATASOURCE USPoliticsTweets TYPE TWEET (credential, abcTweet),(streaming, true),(path, default);
+
+ CREATE CONNECTION FROM DATASOURCE USPoliticsTweets to defaulttweetschema EXECUTE every 30M;
+CREATE CONNECTION FROM DATASOURCE USPoliticalNews to defaultnewsschema EXECUTE every 24H;
+  create analysis a1 as (
+
+ annotatedTweets :=annotate( Tweet.text) in USPoliticsTweets with senate, house, leadership, places where wordcount(Tweet.text) > 10  WITNESS AS PROJECT(Tweet.text)  STORE TYPE DEFAULT,
+
+ annotatedNews := annotate( news.title , news.content ) IN USPoliticalNews WITH  senate, house, leadership, places  where news.catagory == politics AND news.name == NewYorkTimes  AND news.name == LATimes AND name == WAJOURNAL WITNESS AS PROJECT(news.title, news.content),
+ TrumpNews:= filter(annotatedNews where countentity( annotatedNews.witness.content, entity(DonaldTrump)) > 2),
+
+ BotTweets := EXECUTESQLPP( " WITH  hfQueries as (select m.id as TweetID e.text as hashtag m.user.name  AS name  from annotatedTweets.witness m  unnest m.entities.hashtag e )  select ht name htgroup count(h) from hfQueries h group by h.hashtag as ht  h.name as name group as htgroup limit 1500;"),
+ PROPERTYGRAPH  Conversations[] := CREATE VIEW(  COLLECTION :=  EXECUTESQLPP( " select * from annotatedTweets a where a.TweetID NOT IN (select x from BotTweets b Unnest b.htdoc  x where b.count < 100); "  ), VIEW := CONSTRUCTGRAPH( " create CONSTRAINT ON (t:Tweet) ASSERT t.id IS UNIQUE ;  create CONSTRAINT ON (t:User) ASSERT u.id IS UNIQUE ; create (u:User { id: Collection.Tweet.User.id, name: Collection.Tweet.User.name})-[:created]->(n:Tweet { id: Collection.Tweet.TweetID, TweetDate: Collection.Tweet.TweetDate, Text: Collection.Tweet.Text } );  create (u:x {id: Collection.Tweet.User.id, name: Collection.Tweet.User.name}) ; match (n:Tweet) merge (n)-[:hasHashTag]->( h:HashTag  {tag: unnest(Collection.Tweet.Entities.HashTags)}); match (h1)  merge (h1)-[:cooccursWith]->(h2); " ) PARTITION BY getDate(Collection.Tweet.createdate) AS TDATE ),
+ ConversationByGroups[][] :=  communitydetection(Conversations, kcore , 3),
+ TermDocumentMatrx := createtopicmodel(createtermdocumentmatrix(ConversationByGroups.Nodes.Text), 30)store as TemporalRelation ON ConversationByGroups.Tweet.createdate AS TIME,
+ TweetConversationTopics[][] := createtopicmodel(TermDocumentMatrix, 20) STORE AS TEMPORALGRAPH ON ConversationByGroups.Tweet.createdate AS TIME,
+ NewsConversationTopics := createtopicmodel(createtermdocumentmatrix( concat(TrumpNews.title, TrumpNews.content), 30)) STORE AS TEMPORALRELATION ON News2.reportDate AS DATE,
+ Xreport := REPORT ComputeDifference(TweetConversationTopics, NewsConversationTopics) AS JSON  STORE WEEKLY )execute every 12H;
+ );
+
+
+

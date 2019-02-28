@@ -288,7 +288,7 @@ JsonObjectBuilder createEntryStatement(JsonObjectBuilder jObject) : {/*@bgen(jjt
  (cypherNode = cypherNode(cypherNode) {cNode.add(cypherNode.build());} )(t = CypherEdge() {cEdge.add(t.image ); } cypherNode = cypherNode(cypherNode) {cNode.add(cypherNode.build());})?
 
 
- {jObject.add("node", cNode.build());}
+ {jObject.add("AdilNode", cNode.build());}
  {jObject.add("edge", cEdge.build());}/*@bgen(jjtree)*/
  {
    jjtree.closeNodeScope(jjtn000, true);

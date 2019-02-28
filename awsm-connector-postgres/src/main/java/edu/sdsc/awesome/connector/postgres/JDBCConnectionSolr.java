@@ -3,13 +3,14 @@ package edu.sdsc.awesome.connector.postgres;
 
 import edu.sdsc.awesome.connector.solr.ConnectSolr;
 import org.apache.commons.cli.*;
-
 import org.apache.solr.client.solrj.SolrServerException;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class JDBCConnectionSolr {
 

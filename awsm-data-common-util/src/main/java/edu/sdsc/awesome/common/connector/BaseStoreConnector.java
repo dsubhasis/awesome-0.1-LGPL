@@ -2,11 +2,8 @@ package edu.sdsc.awesome.common.connector;
 
 import edu.sdsc.awesome.connector.postgres.JDBCConnection;
 import net.sf.jsqlparser.JSQLParserException;
-import org.eclipse.collections.impl.bimap.mutable.HashBiMap;
 
-import java.sql.SQLException;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BaseStoreConnector {
 

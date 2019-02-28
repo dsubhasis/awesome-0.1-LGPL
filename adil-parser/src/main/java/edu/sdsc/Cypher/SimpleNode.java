@@ -56,7 +56,7 @@ class SimpleNode implements Node {
   public Object jjtGetValue() { return value; }
 
   /* You can override these two methods in subclasses of SimpleNode to
-     customize the way the node appears when the tree is dumped.  If
+     customize the way the AdilNode appears when the tree is dumped.  If
      your output uses more than one line you should override
      toString(String), otherwise overriding toString() is probably all
      you need to do. */
@@ -64,7 +64,7 @@ class SimpleNode implements Node {
   public String toString() { return CypherTreeConstants.jjtNodeName[id]+":"+image; }
   public String toString(String prefix) { return prefix + toString(); }
 
-  /* Override this method if you want to customize how the node dumps
+  /* Override this method if you want to customize how the AdilNode dumps
      out its children. */
 
   public void dump(String prefix) {

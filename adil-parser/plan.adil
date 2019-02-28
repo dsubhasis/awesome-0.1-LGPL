@@ -1,6 +1,6 @@
 create analysis burstanalysis as (
 
-x := executesql("With x1 as (SELECT Distinct x from text )
-Select * from x2");
+x := executesql("With x1 as (SELECT Distinct x from ted_main )
+Select * from x1, tmdb_5000_movies");
 
 );

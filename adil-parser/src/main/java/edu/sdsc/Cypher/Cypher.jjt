@@ -168,7 +168,7 @@ JsonObjectBuilder createEntryStatement(JsonObjectBuilder jObject) : {JsonObjectB
  (cypherNode = cypherNode(cypherNode) {cNode.add(cypherNode.build());} )(t = CypherEdge() {cEdge.add(t.image ); } cypherNode = cypherNode(cypherNode) {cNode.add(cypherNode.build());})?
 
 
- {jObject.add("node", cNode.build());}
+ {jObject.add(AAdilNodeode, cNode.build());}
  {jObject.add("edge", cEdge.build());}
  {return jObject;}
 

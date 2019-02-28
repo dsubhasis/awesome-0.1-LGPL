@@ -239,7 +239,7 @@ public class Cypher/*@bgen(jjtree)*/implements CypherTreeConstants, CypherConsta
         jj_la1[4] = jj_gen;
         ;
       }
-  jObject.add("node", cNode.build());
+  jObject.add("AdilNode", cNode.build());
   jObject.add("edge", cEdge.build());
    jjtree.closeNodeScope(jjtn000, true);
    jjtc000 = false;
