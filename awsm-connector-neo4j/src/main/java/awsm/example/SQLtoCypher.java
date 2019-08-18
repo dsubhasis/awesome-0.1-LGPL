@@ -1,6 +1,6 @@
 package awsm.example;
 
-import edu.sdsc.awesome.connector.postgres.JDBCConnection;
+
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -22,7 +22,7 @@ public class SQLtoCypher {
     public void SqlExec() throws SQLException, FileNotFoundException {
 
 
-        JDBCConnection jd = new JDBCConnection(pgurl, pguser, pgpassword);
+     /*   JDBCConnection jd = new JDBCConnection(pgurl, pguser, pgpassword);
         String query = "SELECT t.created_at as t1_datetime, id as startnodeid, in_reply_to_user_id_str as replyid, retweeted_id, userid from twitterstatus t1 LIMIT 10;";
 
         Map rs = jd.pgSQLQuery(query);
@@ -58,7 +58,8 @@ public class SQLtoCypher {
         SQLtoCypher stq = new SQLtoCypher();
         stq.SqlExec();
 
+    }*/
+
+
     }
-
-
 }

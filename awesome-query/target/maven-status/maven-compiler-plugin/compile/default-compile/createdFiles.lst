@@ -1,0 +1,8 @@
+com/awesome/query/JSONClass.class
+com/awesome/query/CommonSlice/PGSQL/SystemBasedSlice.class
+com/awesome/query/PostgresClass.class
+com/awesome/query/PostgresClassImpl.class
+com/awesome/query/PGSQLQueryRewrite.class
+com/awesome/query/CommonSlice/PGSQL/BasicSlice.class
+com/awesome/query/App.class
+com/awesome/query/RelationalClass.class

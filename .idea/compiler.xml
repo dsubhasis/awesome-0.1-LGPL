@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="awsm-connector-solr" />
+        <module name="awsm-tdm-compute" />
+        <module name="awesome-query" />
+        <module name="awsm-datatype" />
+        <module name="awsm-connector-rserver" />
+        <module name="awsm-connector-postgres" />
+        <module name="edu.sdsc.awesome" />
+        <module name="awsm-connector-asterixdb" />
+        <module name="adil-parser" />
+        <module name="awsm-data-common-util" />
+        <module name="awsm-neo4j-client" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="adil-web" target="1.6" />
+      <module name="awesome-WebService" target="1.8" />
+      <module name="awsm-connector-neo4j" target="7" />
+      <module name="awsm-web" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="awesome-WebService" options="-parameters" />
+      <module name="awsm-neo4j-client" options="-parameters" />
+      <module name="awsm-web" options="-parameters" />
+    </option>
+  </component>
+</project>

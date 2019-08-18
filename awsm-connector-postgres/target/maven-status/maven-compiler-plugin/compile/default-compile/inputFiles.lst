@@ -1,3 +1,8 @@
-/Users/subhasis/Documents/workspace/awesome-0.1/awsm-connector-postgres/src/main/java/edu/sdsc/awesome/connector/postgres/JDBCConnection.java
-/Users/subhasis/Documents/workspace/awesome-0.1/awsm-connector-postgres/src/main/java/edu/sdsc/awesome/connector/postgres/App.java
-/Users/subhasis/Documents/workspace/awesome-0.1/awsm-connector-postgres/src/main/java/edu/sdsc/awesome/connector/postgres/CommonUtil.java
+/home/subhasis/Documents/awesome-old/awsm-connector-postgres/src/main/java/edu/sdsc/awesome/connector/postgres/JDBCConnection.java
+/home/subhasis/Documents/awesome-old/awsm-connector-postgres/src/main/java/edu/sdsc/awesome/connector/postgres/PGSQLIndex.java
+/home/subhasis/Documents/awesome-old/awsm-connector-postgres/src/main/java/edu/sdsc/awesome/connector/postgres/PGSQLTable.java
+/home/subhasis/Documents/awesome-old/awsm-connector-postgres/src/main/java/edu/sdsc/awesome/connector/postgres/CommonUtil.java
+/home/subhasis/Documents/awesome-old/awsm-connector-postgres/src/main/java/edu/sdsc/awesome/connector/postgres/App.java
+/home/subhasis/Documents/awesome-old/awsm-connector-postgres/src/main/java/edu/sdsc/awesome/connector/postgres/PGSQLTuple.java
+/home/subhasis/Documents/awesome-old/awsm-connector-postgres/src/main/java/edu/sdsc/awesome/connector/postgres/temp.java
+/home/subhasis/Documents/awesome-old/awsm-connector-postgres/src/main/java/edu/sdsc/awesome/connector/postgres/PGSQLSchme.java

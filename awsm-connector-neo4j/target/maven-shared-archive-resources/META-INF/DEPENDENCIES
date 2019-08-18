@@ -1,0 +1,267 @@
+// ------------------------------------------------------------------
+// Transitive dependencies of this project determined from the
+// maven pom organized by organization.
+// ------------------------------------------------------------------
+
+awsm-connector-neo4j
+
+
+From: 'an unknown organization'
+  - Caffeine cache (https://github.com/ben-manes/caffeine) com.github.ben-manes.caffeine:caffeine:jar:2.3.3
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - ConcurrentLinkedHashMap (http://code.google.com/p/concurrentlinkedhashmap) com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru:jar:1.4.2
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - WMI4Java (https://github.com/profesorfalken/WMI4Java) com.profesorfalken:WMI4Java:jar:1.6.1
+    License: Apache License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - jPowerShell (https://github.com/profesorfalken/jPowerShell) com.profesorfalken:jPowerShell:jar:1.9
+    License: Apache License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - JLine (http://nexus.sonatype.org/oss-repository-hosting.html/jline) jline:jline:jar:2.12
+    License: The BSD License  (http://www.opensource.org/licenses/bsd-license.php)
+  - opencsv (http://opencsv.sf.net) net.sf.opencsv:opencsv:jar:2.3
+    License: Apache 2  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Bouncy Castle PKIX, CMS, EAC, TSP, PKCS, OCSP, CMP, and CRMF APIs (http://www.bouncycastle.org/java.html) org.bouncycastle:bcpkix-jdk15on:jar:1.59
+    License: Bouncy Castle Licence  (http://www.bouncycastle.org/licence.html)
+  - Bouncy Castle Provider (http://www.bouncycastle.org/java.html) org.bouncycastle:bcprov-jdk15on:jar:1.59
+    License: Bouncy Castle Licence  (http://www.bouncycastle.org/licence.html)
+  - jProcesses (https://github.com/profesorfalken/jProcesses) org.jprocesses:jProcesses:jar:1.6.4
+    License: Apache License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Neo4j - Browser (https://github.com/neo4j/neo4j) org.neo4j.client:neo4j-browser:jar:3.1.12
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j Java Driver (https://github.com/neo4j/neo4j-java-driver) org.neo4j.driver:neo4j-java-driver:jar:1.4.4
+    License: Apache License, Version 2  (http://www.apache.org/licenses/LICENSE-2.0)
+
+From: 'FasterXML' (http://fasterxml.com)
+  - Jackson (http://jackson.codehaus.org) org.codehaus.jackson:jackson-core-asl:jar:1.9.13
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - JAX-RS provider for JSON content type (http://jackson.codehaus.org) org.codehaus.jackson:jackson-jaxrs:jar:1.9.13
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)    License: GNU Lesser General Public License (LGPL), Version 2.1  (http://www.fsf.org/licensing/licenses/lgpl.txt)
+  - Data Mapper for Jackson (http://jackson.codehaus.org) org.codehaus.jackson:jackson-mapper-asl:jar:1.9.13
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+From: 'GlassFish Community' (https://glassfish.dev.java.net)
+  - Java Servlet API (http://servlet-spec.java.net) javax.servlet:javax.servlet-api:jar:3.1.0
+    License: CDDL + GPLv2 with classpath exception  (https://glassfish.dev.java.net/nonav/public/CDDL+GPL.html)
+
+From: 'Joe Walnes, Henri Tremblay, Leonardo Mesquita'
+  - Objenesis (http://objenesis.org) org.objenesis:objenesis:jar:2.6
+    License: Apache 2  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+From: 'LAMP/EPFL' (http://lamp.epfl.ch/)
+  - Scala Library (http://www.scala-lang.org/) org.scala-lang:scala-library:jar:2.11.12
+    License: BSD 3-Clause  (http://www.scala-lang.org/license.html)
+  - Scala Compiler (http://www.scala-lang.org/) org.scala-lang:scala-reflect:jar:2.11.12
+    License: BSD 3-Clause  (http://www.scala-lang.org/license.html)
+
+From: 'ObjectWeb' (http://www.objectweb.org/)
+  - ASM Core (http://asm.objectweb.org/asm/) org.ow2.asm:asm:jar:6.0
+    License: BSD  (http://asm.objectweb.org/license.html)
+  - ASM Analysis (http://asm.objectweb.org/asm-analysis/) org.ow2.asm:asm-analysis:jar:6.0
+    License: BSD  (http://asm.objectweb.org/license.html)
+  - ASM Tree (http://asm.objectweb.org/asm-tree/) org.ow2.asm:asm-tree:jar:6.0
+    License: BSD  (http://asm.objectweb.org/license.html)
+  - ASM Util (http://asm.objectweb.org/asm-util/) org.ow2.asm:asm-util:jar:6.0
+    License: BSD  (http://asm.objectweb.org/license.html)
+
+From: 'Oracle Corporation' (http://www.oracle.com/)
+  - jersey-client (https://jersey.java.net/jersey-client/) com.sun.jersey:jersey-client:jar:1.19.3
+    License: CDDL 1.1  (http://glassfish.java.net/public/CDDL+GPL_1_1.html)    License: GPL2 w/ CPE  (http://glassfish.java.net/public/CDDL+GPL_1_1.html)
+  - jersey-core (https://jersey.java.net/jersey-core/) com.sun.jersey:jersey-core:jar:1.19.3
+    License: CDDL 1.1  (http://glassfish.java.net/public/CDDL+GPL_1_1.html)    License: GPL2 w/ CPE  (http://glassfish.java.net/public/CDDL+GPL_1_1.html)
+  - jersey-server (https://jersey.java.net/jersey-server/) com.sun.jersey:jersey-server:jar:1.19.3
+    License: CDDL 1.1  (http://glassfish.java.net/public/CDDL+GPL_1_1.html)    License: GPL2 w/ CPE  (http://glassfish.java.net/public/CDDL+GPL_1_1.html)
+  - jersey-servlet (https://jersey.java.net/jersey-servlet/) com.sun.jersey:jersey-servlet:jar:1.19.3
+    License: CDDL 1.1  (http://glassfish.java.net/public/CDDL+GPL_1_1.html)    License: GPL2 w/ CPE  (http://glassfish.java.net/public/CDDL+GPL_1_1.html)
+  - jsr311-api (https://jsr311.dev.java.net) org.neo4j.3rdparty.javax.ws.rs:jsr311-api:jar:1.1.2.r612
+    License: CDDL 1.1  (https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html)    License: GPL2 w/ CPE  (https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html)
+
+From: 'org.parboiled' (http://parboiled.org)
+  - parboiled-core (http://parboiled.org) org.parboiled:parboiled-core:jar:1.1.7
+    License: Apache 2  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - parboiled-scala (http://parboiled.org) org.parboiled:parboiled-scala_2.11:jar:1.1.7
+    License: Apache 2  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+From: 'The Apache Software Foundation' (http://www.apache.org/)
+  - Apache Commons Configuration (http://commons.apache.org/configuration/) commons-configuration:commons-configuration:jar:1.10
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Commons Lang (http://commons.apache.org/lang/) commons-lang:commons-lang:jar:2.6
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Apache Commons Logging (http://commons.apache.org/proper/commons-logging/) commons-logging:commons-logging:jar:1.2
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Apache HttpClient (http://hc.apache.org/httpcomponents-client) org.apache.httpcomponents:httpclient:jar:4.5.2
+    License: Apache License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Apache HttpCore (http://hc.apache.org/httpcomponents-core-ga) org.apache.httpcomponents:httpcore:jar:4.4.5
+    License: Apache License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Lucene Common Analyzers (http://lucene.apache.org/lucene-parent/lucene-analyzers-common) org.apache.lucene:lucene-analyzers-common:jar:5.5.5
+    License: Apache 2  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Lucene Memory (http://lucene.apache.org/lucene-parent/lucene-backward-codecs) org.apache.lucene:lucene-backward-codecs:jar:5.5.0
+    License: Apache 2  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Lucene codecs (http://lucene.apache.org/lucene-parent/lucene-codecs) org.apache.lucene:lucene-codecs:jar:5.5.5
+    License: Apache 2  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Lucene Core (http://lucene.apache.org/lucene-parent/lucene-core) org.apache.lucene:lucene-core:jar:5.5.0
+    License: Apache 2  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Lucene QueryParsers (http://lucene.apache.org/lucene-parent/lucene-queryparser) org.apache.lucene:lucene-queryparser:jar:5.5.5
+    License: Apache 2  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+From: 'The Apache Software Foundation' (https://www.apache.org/)
+  - Apache Commons CLI (http://commons.apache.org/proper/commons-cli/) commons-cli:commons-cli:jar:1.4
+    License: Apache License, Version 2.0  (https://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Apache Commons Codec (http://commons.apache.org/proper/commons-codec/) commons-codec:commons-codec:jar:1.11
+    License: Apache License, Version 2.0  (https://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Apache Commons IO (http://commons.apache.org/proper/commons-io/) commons-io:commons-io:jar:2.6
+    License: Apache License, Version 2.0  (https://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Apache Commons Compress (http://commons.apache.org/proper/commons-compress/) org.apache.commons:commons-compress:jar:1.16.1
+    License: Apache License, Version 2.0  (https://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Apache Commons Lang (http://commons.apache.org/proper/commons-lang/) org.apache.commons:commons-lang3:jar:3.7
+    License: Apache License, Version 2.0  (https://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Apache Commons Text (http://commons.apache.org/proper/commons-text/) org.apache.commons:commons-text:jar:1.3
+    License: Apache License, Version 2.0  (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+From: 'The Mozilla Foundation' (http://www.mozilla.org)
+  - Mozilla Rhino (https://developer.mozilla.org/en/Rhino) org.mozilla:rhino:jar:1.7.9
+    License: Mozilla Public License, Version 2.0  (http://www.mozilla.org/MPL/2.0/index.txt)
+
+From: 'The Neo4j Graph Database Project' (http://neo4j.com/)
+  - Neo4j - Cypher Compiler 3.3 (http://components.neo4j.org/neo4j-cypher-compiler-3.3/3.3.5) org.neo4j:neo4j-cypher-compiler-3.3:jar:3.3.5
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Cypher Frontend 3.3 (http://components.neo4j.org/neo4j-cypher-frontend-3.3/3.3.5) org.neo4j:neo4j-cypher-frontend-3.3:jar:3.3.5
+    License: Apache License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0)
+  - Neo4j - Cypher Intermediate Representation 3.3 (http://components.neo4j.org/neo4j-cypher-ir-3.3/3.3.5) org.neo4j:neo4j-cypher-ir-3.3:jar:3.3.5
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Cypher logical plans 3.3 (http://components.neo4j.org/neo4j-cypher-logical-plans-3.3/3.3.5) org.neo4j:neo4j-cypher-logical-plans-3.3:jar:3.3.5
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+
+From: 'The Neo4j Graph Database Project' (http://neo4j.org/)
+  - Neo4j - Cypher Compiler 2.3 (http://components.neo4j.org/neo4j-cypher-compiler-2.3/2.3.12) org.neo4j:neo4j-cypher-compiler-2.3:jar:2.3.12
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Cypher Compiler 3.1 (http://components.neo4j.org/neo4j-cypher-compiler-3.1/3.1.8) org.neo4j:neo4j-cypher-compiler-3.1:jar:3.1.8
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Cypher Frontend 2.3 (http://components.neo4j.org/neo4j-cypher-frontend-2.3/2.3.12) org.neo4j:neo4j-cypher-frontend-2.3:jar:2.3.12
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Cypher Frontend 3.1 (http://components.neo4j.org/neo4j-cypher-frontend-3.1/3.1.8) org.neo4j:neo4j-cypher-frontend-3.1:jar:3.1.8
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Graph Matching (http://components.neo4j.org/neo4j-graph-matching/3.1.6) org.neo4j:neo4j-graph-matching:jar:3.1.6
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+
+From: 'The Neo4j Graph Database Project' (https://neo4j.com/)
+  - Neo4j - Community (http://components.neo4j.org/neo4j/3.4.0) org.neo4j:neo4j:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Bolt Protocol Version 1 (http://neo4j.com/neo4j-bolt/) org.neo4j:neo4j-bolt:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Code Generator (http://components.neo4j.org/neo4j-codegen/3.4.0) org.neo4j:neo4j-codegen:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Collections (http://components.neo4j.org/neo4j-collections/3.4.0) org.neo4j:neo4j-collections:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Command Line (http://neo4j.com/neo4j-command-line/) org.neo4j:neo4j-command-line:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Common (http://components.neo4j.org/neo4j-common/3.4.0) org.neo4j:neo4j-common:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Common (http://components.neo4j.org/neo4j-common/3.4.0) org.neo4j:neo4j-common:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Configuration (http://components.neo4j.org/neo4j-configuration/3.4.0) org.neo4j:neo4j-configuration:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Consistency Checker (http://components.neo4j.org/neo4j-consistency-check/3.4.0) org.neo4j:neo4j-consistency-check:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - CSV reading and parsing (http://components.neo4j.org/neo4j-csv/3.4.0) org.neo4j:neo4j-csv:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Cypher (http://components.neo4j.org/neo4j-cypher/3.4.0) org.neo4j:neo4j-cypher:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Cypher Expressions 3.4 (http://components.neo4j.org/neo4j-cypher-expression-3.4/3.4.0) org.neo4j:neo4j-cypher-expression-3.4:jar:3.4.0
+    License: Apache License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0)
+  - Neo4j - Cypher Interpreted Runtime (http://components.neo4j.org/neo4j-cypher-interpreted-runtime/3.4.0) org.neo4j:neo4j-cypher-interpreted-runtime:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Cypher Intermediate Representation 3.4 (http://components.neo4j.org/neo4j-cypher-ir-3.4/3.4.0) org.neo4j:neo4j-cypher-ir-3.4:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Cypher Logical Plans 3.4 (http://components.neo4j.org/neo4j-cypher-logical-plans-3.4/3.4.0) org.neo4j:neo4j-cypher-logical-plans-3.4:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Cypher Planner 3.4 (http://components.neo4j.org/neo4j-cypher-planner-3.4/3.4.0) org.neo4j:neo4j-cypher-planner-3.4:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Cypher Planner SPI 3.4 (http://components.neo4j.org/neo4j-cypher-planner-spi-3.4/3.4.0) org.neo4j:neo4j-cypher-planner-spi-3.4:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Cypher Runtime Utilities (http://components.neo4j.org/neo4j-cypher-runtime-util/3.4.0) org.neo4j:neo4j-cypher-runtime-util:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Cypher Util 3.4 (http://components.neo4j.org/neo4j-cypher-util-3.4/3.4.0) org.neo4j:neo4j-cypher-util-3.4:jar:3.4.0
+    License: Apache License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0)
+  - Neo4j - Database Management System (http://components.neo4j.org/neo4j-dbms/3.4.0/) org.neo4j:neo4j-dbms:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Graph Algorithms (http://components.neo4j.org/neo4j-graph-algo/3.4.0) org.neo4j:neo4j-graph-algo:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Graph Database API (http://components.neo4j.org/neo4j-graphdb-api/3.4.0) org.neo4j:neo4j-graphdb-api:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Import Command Line Tool (http://components.neo4j.org/neo4j-import-tool/3.4.0) org.neo4j:neo4j-import-tool:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Native index (http://components.neo4j.org/neo4j-index/3.4.0) org.neo4j:neo4j-index:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - IO (http://components.neo4j.org/neo4j-io/3.4.0) org.neo4j:neo4j-io:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - IO (http://components.neo4j.org/neo4j-io/3.4.0) org.neo4j:neo4j-io:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - JMX support (http://components.neo4j.org/neo4j-jmx/3.4.0) org.neo4j:neo4j-jmx:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Graph Database Kernel (http://components.neo4j.org/neo4j-kernel/3.4.0) org.neo4j:neo4j-kernel:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Graph Database Kernel (http://components.neo4j.org/neo4j-kernel/3.4.0) org.neo4j:neo4j-kernel:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Kernel API (http://components.neo4j.org/neo4j-kernel-api/3.4.0) org.neo4j:neo4j-kernel-api:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Logging (http://components.neo4j.org/neo4j-logging/3.4.0) org.neo4j:neo4j-logging:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Lucene Index (http://components.neo4j.org/neo4j-lucene-index/3.4.0) org.neo4j:neo4j-lucene-index:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Lucene Index Upgrade (http://neo4j.com/neo4j-lucene-upgrade/) org.neo4j:neo4j-lucene-upgrade:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Primitive Collections (http://components.neo4j.org/neo4j-primitive-collections/3.4.0) org.neo4j:neo4j-primitive-collections:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Procedure API (http://components.neo4j.org/neo4j-procedure-api/3.4.0) org.neo4j:neo4j-procedure-api:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Resource interface (http://components.neo4j.org/neo4j-resource/3.4.0) org.neo4j:neo4j-resource:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Security (http://components.neo4j.org/neo4j-security/3.4.0) org.neo4j:neo4j-security:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Generic shell (http://components.neo4j.org/neo4j-shell/3.4.0) org.neo4j:neo4j-shell:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Native Spatial Index (http://components.neo4j.org/neo4j-spatial-index/3.4.0) org.neo4j:neo4j-spatial-index:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - SSL (http://components.neo4j.org/neo4j-ssl/3.4.0) org.neo4j:neo4j-ssl:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Usage Data Collection (http://components.neo4j.org/neo4j-udc/3.4.0) org.neo4j:neo4j-udc:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Unsafe Access (http://components.neo4j.org/neo4j-unsafe/3.4.0) org.neo4j:neo4j-unsafe:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Value (http://components.neo4j.org/neo4j-values/3.4.0) org.neo4j:neo4j-values:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - openCypher Frontend (http://components.neo4j.org/openCypher-frontend-1/3.4.0) org.neo4j:openCypher-frontend-1:jar:3.4.0
+    License: Apache License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0)
+  - Neo4j - Server API (http://components.neo4j.org/server-api/3.4.0) org.neo4j:server-api:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Server (http://components.neo4j.org/neo4j-server/3.4.0) org.neo4j.app:neo4j-server:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Server (http://components.neo4j.org/neo4j-server/3.4.0) org.neo4j.app:neo4j-server:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+  - Neo4j - Test Harness (http://components.neo4j.org/neo4j-harness/3.4.0) org.neo4j.test:neo4j-harness:jar:3.4.0
+    License: GNU General Public License, Version 3  (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+
+From: 'The Netty Project' (http://netty.io/)
+  - Netty/All-in-One (http://netty.io/netty-all/) io.netty:netty-all:jar:4.1.24.Final
+    License: Apache License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0)
+
+From: 'Webtide' (https://webtide.com)
+  - Jetty :: Http Utility (http://www.eclipse.org/jetty) org.eclipse.jetty:jetty-http:jar:9.4.8.v20171121
+    License: Apache Software License - Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0)    License: Eclipse Public License - Version 1.0  (http://www.eclipse.org/org/documents/epl-v10.php)
+  - Jetty :: IO Utility (http://www.eclipse.org/jetty) org.eclipse.jetty:jetty-io:jar:9.4.8.v20171121
+    License: Apache Software License - Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0)    License: Eclipse Public License - Version 1.0  (http://www.eclipse.org/org/documents/epl-v10.php)
+  - Jetty :: Security (http://www.eclipse.org/jetty) org.eclipse.jetty:jetty-security:jar:9.4.8.v20171121
+    License: Apache Software License - Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0)    License: Eclipse Public License - Version 1.0  (http://www.eclipse.org/org/documents/epl-v10.php)
+  - Jetty :: Server Core (http://www.eclipse.org/jetty) org.eclipse.jetty:jetty-server:jar:9.4.8.v20171121
+    License: Apache Software License - Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0)    License: Eclipse Public License - Version 1.0  (http://www.eclipse.org/org/documents/epl-v10.php)
+  - Jetty :: Servlet Handling (http://www.eclipse.org/jetty) org.eclipse.jetty:jetty-servlet:jar:9.4.8.v20171121
+    License: Apache Software License - Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0)    License: Eclipse Public License - Version 1.0  (http://www.eclipse.org/org/documents/epl-v10.php)
+  - Jetty :: Utilities (http://www.eclipse.org/jetty) org.eclipse.jetty:jetty-util:jar:9.4.8.v20171121
+    License: Apache Software License - Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0)    License: Eclipse Public License - Version 1.0  (http://www.eclipse.org/org/documents/epl-v10.php)
+  - Jetty :: Webapp Application Support (http://www.eclipse.org/jetty) org.eclipse.jetty:jetty-webapp:jar:9.4.8.v20171121
+    License: Apache Software License - Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0)    License: Eclipse Public License - Version 1.0  (http://www.eclipse.org/org/documents/epl-v10.php)
+  - Jetty :: XML utilities (http://www.eclipse.org/jetty) org.eclipse.jetty:jetty-xml:jar:9.4.8.v20171121
+    License: Apache Software License - Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0)    License: Eclipse Public License - Version 1.0  (http://www.eclipse.org/org/documents/epl-v10.php)
+
+
+
+

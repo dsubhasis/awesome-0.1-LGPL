@@ -1,2 +1,3 @@
+edu/sdsc/awesome/connector/solr/ConnectSolr.class
 edu/sdsc/awesome/connector/solr/ConnectSolrStore.class
 edu/sdsc/awesome/connector/solr/App.class

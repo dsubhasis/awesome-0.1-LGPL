@@ -1,3 +1,8 @@
+edu/sdsc/awesome/connector/postgres/PGSQLIndex.class
+edu/sdsc/awesome/connector/postgres/PGSQLSchme.class
+edu/sdsc/awesome/connector/postgres/PGSQLTuple.class
 edu/sdsc/awesome/connector/postgres/CommonUtil.class
 edu/sdsc/awesome/connector/postgres/JDBCConnection.class
 edu/sdsc/awesome/connector/postgres/App.class
+edu/sdsc/awesome/connector/postgres/temp.class
+edu/sdsc/awesome/connector/postgres/PGSQLTable.class

@@ -57,19 +57,21 @@
 
         <module>awsm-connector-asterixdb</module>
         <module>awsm-connector-postgres</module>
-        <module>awsm-connector-neo4j</module>
+
         <module>awsm-connector-solr</module>
-        <module>awsm-web</module>
+
         <module>awsm-data-common-util</module>
-        <module>awsm-webService</module>
+
+
         <module>awsm-tdm-compute</module>
         <module>awsm-connector-rserver</module>
         <module>awsm-neo4j-client</module>
         <module>adil</module>
-        <module>adil-web</module>
+        <module>awesome-query</module>
+
         <module>adil-parser</module>
-        <module>Jsqlparser</module>
-      <module>awesome-query</module>
+
+
         <module>awsm-datatype</module>
     </modules>
 
