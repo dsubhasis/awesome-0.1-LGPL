@@ -7,38 +7,13 @@ public interface AdilVisitor
   public Object visit(ASTADILStatement node, Object data);
   public Object visit(ASTStatement node, Object data);
   public Object visit(ASTImportLibrary node, Object data);
-  public Object visit(ASTCreateStatement node, Object data);
   public Object visit(ASTCreateAnalysis node, Object data);
+  public Object visit(ASTAssignmentStatement node, Object data);
   public Object visit(ASTDeclareAnalysis node, Object data);
-  public Object visit(ASTAnalysisStatement node, Object data);
-  public Object visit(ASTFunctionParam node, Object data);
-  public Object visit(ASTJsonObjectBuilder node, Object data);
-  public Object visit(ASTUserDefinedFunction node, Object data);
-  public Object visit(ASTAwesomeSafeFunction node, Object data);
-  public Object visit(ASTCreateView node, Object data);
-  public Object visit(ASTProjectFunction node, Object data);
-  public Object visit(ASTReportAnalysis node, Object data);
-  public Object visit(ASTFunctionAnalysis node, Object data);
-  public Object visit(ASTExecuteSQL node, Object data);
-  public Object visit(ASTexecuteCypher node, Object data);
-  public Object visit(ASTquetedStatement node, Object data);
-  public Object visit(ASTFilterOperation node, Object data);
-  public Object visit(ASTAnnotateWithStoreOperation node, Object data);
-  public Object visit(ASTCypher node, Object data);
-  public Object visit(ASTGraphSelect node, Object data);
-  public Object visit(ASTPropertyGraphExpression node, Object data);
-  public Object visit(ASTCommonWhereClause node, Object data);
-  public Object visit(ASTFromClause node, Object data);
-  public Object visit(ASTGetConditionExpression node, Object data);
-  public Object visit(ASTGetField node, Object data);
-  public Object visit(ASTGetDictionary node, Object data);
-  public Object visit(ASTCreateDataSOURCE node, Object data);
-  public Object visit(ASTConnectDataSRC node, Object data);
-  public Object visit(ASTCreatEnvironment node, Object data);
-  public Object visit(ASTfunction node, Object data);
-  public Object visit(ASTUseEnvironment node, Object data);
-  public Object visit(ASTOperator node, Object data);
-  public Object visit(ASTOperand node, Object data);
-  public Object visit(ASTaction node, Object data);
+  public Object visit(ASTSelectStament node, Object data);
+  public Object visit(ASTAWSMFunction node, Object data);
+  public Object visit(ASTForAllExpression node, Object data);
+  public Object visit(ASTExpression node, Object data);
+  public Object visit(ASTGetFunction node, Object data);
 }
-/* JavaCC - OriginalChecksum=c9df641d0ec5675be7247569994c01e3 (do not edit this line) */
+/* JavaCC - OriginalChecksum=6dcf7492e0d4b5a7f41b8bd1e3a75e6d (do not edit this line) */

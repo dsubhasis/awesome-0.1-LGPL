@@ -1,6 +1,10 @@
-create analysis burstanalysis as (
 
-x := executesql("With x1 as (SELECT Distinct x from ted_main )
-Select * from x1, tmdb_5000_movies");
+create analysis burstanalysis as(
 
-);
+x[] := Select  x1 from db1, tmdb WHERE entity(a=x, f(b)) < 10 ORDER BY x1 ;
+y[] := TDMHistogram(x) Group by x;
+FORALL j : X {
+
+x[] := Select  x1 from db1, tmdb WHERE asr(a=x, f(j)) < 10 ORDER BY x1 ;
+};
+) EXECUTE EVERY Day;

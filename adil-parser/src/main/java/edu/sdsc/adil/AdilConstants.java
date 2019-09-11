@@ -11,147 +11,185 @@ public interface AdilConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int DIGITS = 6;
+  int WHITESPACE = 6;
   /** RegularExpression Id. */
-  int PLUS = 7;
+  int GREATERTHANEQUALS = 7;
   /** RegularExpression Id. */
-  int NOT = 8;
+  int MINORTHANEQUALS = 8;
   /** RegularExpression Id. */
-  int SEMICOLON = 9;
+  int NOTEQUALSSTANDARD = 9;
   /** RegularExpression Id. */
-  int COLON = 10;
+  int NOTEQUALSBANG = 10;
   /** RegularExpression Id. */
-  int EQAL = 11;
+  int CONCAT = 11;
   /** RegularExpression Id. */
-  int GREATER = 12;
+  int DIGITS = 12;
   /** RegularExpression Id. */
-  int LESS = 13;
+  int PLUS = 13;
   /** RegularExpression Id. */
-  int FBRACKETSTART = 14;
+  int NOT = 14;
   /** RegularExpression Id. */
-  int FBRACKETEND = 15;
+  int SEMICOLON = 15;
   /** RegularExpression Id. */
-  int DOT = 16;
+  int COLON = 16;
   /** RegularExpression Id. */
-  int COMMA = 17;
+  int EQAL = 17;
   /** RegularExpression Id. */
-  int StartSQBracket = 18;
+  int GREATER = 18;
   /** RegularExpression Id. */
-  int EndSQBracket = 19;
+  int LESS = 19;
   /** RegularExpression Id. */
-  int AT = 20;
+  int FBRACKETSTART = 20;
   /** RegularExpression Id. */
-  int OPERATOR = 21;
+  int FBRACKETEND = 21;
   /** RegularExpression Id. */
-  int MINUS = 22;
+  int DOT = 22;
   /** RegularExpression Id. */
-  int CREATE = 23;
+  int COMMA = 23;
   /** RegularExpression Id. */
-  int DELETE = 24;
+  int StartSQBracket = 24;
   /** RegularExpression Id. */
-  int ALTER = 25;
+  int EndSQBracket = 25;
   /** RegularExpression Id. */
-  int LOAD = 26;
+  int StartCurlyBracket = 26;
   /** RegularExpression Id. */
-  int IMPORT = 27;
+  int EndCurlyBracket = 27;
   /** RegularExpression Id. */
-  int DATASOURCE = 28;
+  int AT = 28;
   /** RegularExpression Id. */
-  int WITH = 29;
+  int OPERATOR = 29;
   /** RegularExpression Id. */
-  int WHERE = 30;
+  int MINUS = 30;
   /** RegularExpression Id. */
-  int AND = 31;
+  int CREATE = 31;
   /** RegularExpression Id. */
-  int STORE = 32;
+  int DELETE = 32;
   /** RegularExpression Id. */
-  int TYPE = 33;
+  int ALTER = 33;
   /** RegularExpression Id. */
-  int PARTITION = 34;
+  int LOAD = 34;
   /** RegularExpression Id. */
-  int BY = 35;
+  int IMPORT = 35;
   /** RegularExpression Id. */
-  int AS = 36;
+  int DATASOURCE = 36;
   /** RegularExpression Id. */
-  int TEMPORALRELATION = 37;
+  int WITH = 37;
   /** RegularExpression Id. */
-  int TEMPORALGRAPH = 38;
+  int WHERE = 38;
   /** RegularExpression Id. */
-  int ON = 39;
+  int AND = 39;
   /** RegularExpression Id. */
-  int REPORT = 40;
+  int OR = 40;
   /** RegularExpression Id. */
-  int ANALYSIS = 41;
+  int STORE = 41;
   /** RegularExpression Id. */
-  int EXECUTE = 42;
+  int TYPE = 42;
   /** RegularExpression Id. */
-  int EVERY = 43;
+  int PARTITION = 43;
   /** RegularExpression Id. */
-  int PROPERTYGRAPH = 44;
+  int BY = 44;
   /** RegularExpression Id. */
-  int VIEW = 45;
+  int AS = 45;
   /** RegularExpression Id. */
-  int COLLECTION = 46;
+  int TEMPORALRELATION = 46;
   /** RegularExpression Id. */
-  int CONNECTION = 47;
+  int TEMPORALGRAPH = 47;
   /** RegularExpression Id. */
-  int TO = 48;
+  int ON = 48;
   /** RegularExpression Id. */
-  int FROM = 49;
+  int REPORT = 49;
   /** RegularExpression Id. */
-  int LIBRARY = 50;
+  int ANALYSIS = 50;
   /** RegularExpression Id. */
-  int DICTIONARY = 51;
+  int EXECUTE = 51;
   /** RegularExpression Id. */
-  int ONTOLOGY = 52;
+  int EVERY = 52;
   /** RegularExpression Id. */
-  int WITNESS = 53;
+  int PROPERTYGRAPH = 53;
   /** RegularExpression Id. */
-  int PROJECT = 54;
+  int MATRIX = 54;
   /** RegularExpression Id. */
-  int AWSM = 55;
+  int INTEGER = 55;
   /** RegularExpression Id. */
-  int NODE = 56;
+  int STRING = 56;
   /** RegularExpression Id. */
-  int NODES = 57;
+  int TEXT = 57;
   /** RegularExpression Id. */
-  int PATH = 58;
+  int LONG = 58;
   /** RegularExpression Id. */
-  int SELECT = 59;
+  int DOUBLE = 59;
   /** RegularExpression Id. */
-  int ENV = 60;
+  int HISTOGRAM = 60;
   /** RegularExpression Id. */
-  int IN = 61;
+  int VIEW = 61;
   /** RegularExpression Id. */
-  int ANNOTATE = 62;
+  int COLLECTION = 62;
   /** RegularExpression Id. */
-  int FILTER = 63;
+  int CONNECTION = 63;
   /** RegularExpression Id. */
-  int EXECUTESQLPP = 64;
+  int TO = 64;
   /** RegularExpression Id. */
-  int CONSTRUCTGRAPH = 65;
+  int FROM = 65;
   /** RegularExpression Id. */
-  int CYPHERQUERY = 66;
+  int LIBRARY = 66;
   /** RegularExpression Id. */
-  int EXECUTECYPHER = 67;
+  int DICTIONARY = 67;
   /** RegularExpression Id. */
-  int EXECUTESQL = 68;
+  int ONTOLOGY = 68;
   /** RegularExpression Id. */
-  int DIGIT = 69;
+  int WITNESS = 69;
   /** RegularExpression Id. */
-  int LETTER = 70;
+  int PROJECT = 70;
   /** RegularExpression Id. */
-  int ALPHANUM = 71;
+  int AWSM = 71;
   /** RegularExpression Id. */
-  int FIELDNAME = 72;
+  int NODE = 72;
   /** RegularExpression Id. */
-  int QUOTED_IDENTIFIER = 73;
+  int NODES = 73;
   /** RegularExpression Id. */
-  int GraphElementType = 74;
+  int PATH = 74;
   /** RegularExpression Id. */
-  int INPATH = 75;
+  int SELECT = 75;
   /** RegularExpression Id. */
-  int OUTPATH = 76;
+  int ORDER = 76;
+  /** RegularExpression Id. */
+  int GROUP = 77;
+  /** RegularExpression Id. */
+  int ENV = 78;
+  /** RegularExpression Id. */
+  int IN = 79;
+  /** RegularExpression Id. */
+  int ANNOTATE = 80;
+  /** RegularExpression Id. */
+  int FILTER = 81;
+  /** RegularExpression Id. */
+  int EXECUTESQLPP = 82;
+  /** RegularExpression Id. */
+  int CONSTRUCTGRAPH = 83;
+  /** RegularExpression Id. */
+  int CYPHERQUERY = 84;
+  /** RegularExpression Id. */
+  int EXECUTECYPHER = 85;
+  /** RegularExpression Id. */
+  int EXECUTESQL = 86;
+  /** RegularExpression Id. */
+  int FORALL = 87;
+  /** RegularExpression Id. */
+  int DIGIT = 88;
+  /** RegularExpression Id. */
+  int LETTER = 89;
+  /** RegularExpression Id. */
+  int ALPHANUM = 90;
+  /** RegularExpression Id. */
+  int FIELDNAME = 91;
+  /** RegularExpression Id. */
+  int QUOTED_IDENTIFIER = 92;
+  /** RegularExpression Id. */
+  int GraphElementType = 93;
+  /** RegularExpression Id. */
+  int INPATH = 94;
+  /** RegularExpression Id. */
+  int OUTPATH = 95;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -164,6 +202,12 @@ public interface AdilConstants {
     "\"\\r\"",
     "<token of kind 4>",
     "<token of kind 5>",
+    "<WHITESPACE>",
+    "<GREATERTHANEQUALS>",
+    "<MINORTHANEQUALS>",
+    "<NOTEQUALSSTANDARD>",
+    "<NOTEQUALSBANG>",
+    "<CONCAT>",
     "<DIGITS>",
     "\"+\"",
     "\"!\"",
@@ -178,6 +222,8 @@ public interface AdilConstants {
     "\",\"",
     "\"[\"",
     "\"]\"",
+    "\"{\"",
+    "\"}\"",
     "\"@\"",
     "<OPERATOR>",
     "\"-\"",
@@ -190,6 +236,7 @@ public interface AdilConstants {
     "\"with\"",
     "\"where\"",
     "\"and\"",
+    "\"or\"",
     "\"store\"",
     "\"type\"",
     "\"partition\"",
@@ -203,6 +250,13 @@ public interface AdilConstants {
     "\"execute\"",
     "\"every\"",
     "\"propertygraph\"",
+    "\"matrix\"",
+    "\"integer\"",
+    "\"string\"",
+    "\"text\"",
+    "\"long\"",
+    "\"double\"",
+    "\"histogram\"",
     "\"view\"",
     "\"collection\"",
     "\"connection\"",
@@ -214,10 +268,12 @@ public interface AdilConstants {
     "\"witness\"",
     "\"project\"",
     "\"awsm\"",
-    "\"AdilNode\"",
+    "\"node\"",
     "\"nodes\"",
     "\"path\"",
     "\"select\"",
+    "\"order\"",
+    "\"group\"",
     "\"env\"",
     "\"in\"",
     "\"annotate\"",
@@ -227,6 +283,7 @@ public interface AdilConstants {
     "\"cypherquery\"",
     "\"executecypher\"",
     "\"executesql\"",
+    "\"forall\"",
     "<DIGIT>",
     "<LETTER>",
     "<ALPHANUM>",

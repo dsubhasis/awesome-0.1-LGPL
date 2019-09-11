@@ -1,17 +1,24 @@
+/*
+ * Copyright (c) 2019.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ *
+ */
+
 package edu.sdsc.awesome.adil.parser;
 
 
-import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
-import edu.sdsc.Cypher.Cypher;
-import edu.sdsc.Cypher.SimpleNode;
-import edu.sdsc.SQLPP.SQLPP;
+
 import edu.sdsc.adil.Adil;
 import edu.sdsc.adil.ParseException;
 
-import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.parser.CCJSqlParserUtil;
-import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.util.deparser.StatementDeParser;
+import edu.sdsc.awesome.adil.parser.ParserTable.Plan;
+import edu.sdsc.awesome.adil.parser.ParserTable.VariableTable;
 import org.apache.commons.cli.*;
 
 
@@ -70,7 +77,7 @@ public class AdilFirstPass {
         Adil p = new Adil(analysisScript);
         try {
             js = p.ADILStatement(js);
-            //System.out.println(js.build().toString());
+            System.out.println(js.build().toString());
 
 
         } catch (ParseException pe) {
@@ -97,15 +104,7 @@ public class AdilFirstPass {
 
         options.addOption(input);
 
-        try {
 
-
-            stmt = CCJSqlParserUtil.parse("Select * from test ");
-
-            System.out.println(stmt);
-        } catch (JSQLParserException e) {
-            e.printStackTrace();
-        }
 
 
         CommandLineParser parser = new DefaultParser();
@@ -241,6 +240,11 @@ public class AdilFirstPass {
         Adil p = new Adil(sr);
         try {
             js = p.ADILStatement(js);
+            VariableTable vtable = p.getVariableTable();
+            Plan naivePlan = new Plan();
+            naivePlan.initPlan(js.build(),vtable);
+
+
 
 
         } catch (ParseException pe) {

@@ -1,9 +1,20 @@
+/*
+ * Copyright (c) 2019.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ *
+ */
+
 package edu.sdsc.awesome.adil.parser.StatementOperation;
 
 import com.awesome.query.CommonSlice.PGSQL.BasicSlice;
 import edu.sdsc.Cypher.Cypher;
 import edu.sdsc.SQLPP.SQLPP;
-import edu.sdsc.awesome.adil.parser.ParserTable.VariableTable;
 import edu.sdsc.awesome.connector.postgres.PGSQLSchme;
 import edu.sdsc.awsm.datatype.AdilNode;
 import net.sf.jsqlparser.JSQLParserException;
@@ -162,39 +173,27 @@ public class ParserUtil {
         for (int i = 0; i < name.size(); i++) {
             try {
                 ResultSet rs = getResult("name", "libraryentry", name.get(i).toString());
-
-
                 while (rs.next()) {
-
                     JsonObjectBuilder jObject = Json.createObjectBuilder();
                     String lname = rs.getString("name");
                     String lpath = rs.getString("path");
                     Integer lsize = rs.getInt("size");
                     String lcomputeClass = rs.getString("computeClass");
-
+                    String type = rs.getString("type");
                     jObject.add("name", lname);
                     jObject.add("VerifiedPath", lpath);
                     jObject.add("size", lsize);
                     jObject.add("ComputeClass", lcomputeClass);
-                    jObject.add("count", 1);
-
+                    jObject.add("type", type);
                     jproject.add(jObject.build());
-
                 }
-
-
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-
-
         }
-        retrunObject.add("info", jproject.build());
-
+        retrunObject.add("LOAD", jproject.build());
         return retrunObject;
     }
-
-
     public static ResultSet getResult(String fieldName, String table, String value) throws SQLException {
 
         String name = "*";
@@ -253,7 +252,7 @@ public class ParserUtil {
 
 
         try {
-            input = new FileInputStream("/home/sudasgupta/Documents/edu.sdsc.awesome.connector.postgres.temp/awesome-stack/adil-parser/config.properties");
+            input = new FileInputStream("/home/subhasis/Documents/awesome-old/adil-parser/config.properties");
             ;
             try {
                 prop.load(input);
@@ -584,8 +583,35 @@ public class ParserUtil {
         return js;
     }
 
+public static JsonObject validateFunction(String name) throws SQLException {
 
-    public JsonObjectBuilder handleawsmfunction(JsonObjectBuilder jobject, VariableTable vt) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        JsonObjectBuilder object = Json.createObjectBuilder();
+
+        String query = "Select * from functionsignaturetable WHERE name = \""+name+"\"";
+        System.out.println(query);
+        Connection con = ParserUtil.dbConnection();
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery(query);
+    while (rs.next()) {
+        name = rs.getString("name");
+        String output = rs.getString("output");
+        String optclass = rs.getString("optclass");
+        String input = rs.getString("inputtype");
+        String vslicefld = rs.getString("vslicefld");
+
+        object.add("name", name);
+        object.add("output", output);
+        //object.add("optclass", optclass);
+        object.add("input", input);
+        //object.add("vslicefld", vslicefld);
+
+
+
+    }
+    return object.build();
+
+}
+    public JsonObjectBuilder handleawsmfunction(JsonObjectBuilder jobject) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         JsonObjectBuilder p = Json.createObjectBuilder();
         JsonObject stmt = jobject.build();
         Map property = new HashMap();

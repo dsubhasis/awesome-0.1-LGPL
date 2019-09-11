@@ -6,78 +6,28 @@ public interface AdilTreeConstants
   public int JJTADILSTATEMENT = 0;
   public int JJTSTATEMENT = 1;
   public int JJTIMPORTLIBRARY = 2;
-  public int JJTCREATESTATEMENT = 3;
-  public int JJTCREATEANALYSIS = 4;
+  public int JJTCREATEANALYSIS = 3;
+  public int JJTASSIGNMENTSTATEMENT = 4;
   public int JJTDECLAREANALYSIS = 5;
-  public int JJTANALYSISSTATEMENT = 6;
-  public int JJTFUNCTIONPARAM = 7;
-  public int JJTJSONOBJECTBUILDER = 8;
-  public int JJTUSERDEFINEDFUNCTION = 9;
-  public int JJTAWESOMESAFEFUNCTION = 10;
-  public int JJTCREATEVIEW = 11;
-  public int JJTPROJECTFUNCTION = 12;
-  public int JJTREPORTANALYSIS = 13;
-  public int JJTFUNCTIONANALYSIS = 14;
-  public int JJTEXECUTESQL = 15;
-  public int JJTEXECUTECYPHER = 16;
-  public int JJTQUETEDSTATEMENT = 17;
-  public int JJTFILTEROPERATION = 18;
-  public int JJTANNOTATEWITHSTOREOPERATION = 19;
-  public int JJTCYPHER = 20;
-  public int JJTGRAPHSELECT = 21;
-  public int JJTPROPERTYGRAPHEXPRESSION = 22;
-  public int JJTCOMMONWHERECLAUSE = 23;
-  public int JJTFROMCLAUSE = 24;
-  public int JJTGETCONDITIONEXPRESSION = 25;
-  public int JJTGETFIELD = 26;
-  public int JJTGETDICTIONARY = 27;
-  public int JJTCREATEDATASOURCE = 28;
-  public int JJTCONNECTDATASRC = 29;
-  public int JJTCREATENVIRONMENT = 30;
-  public int JJTFUNCTION = 31;
-  public int JJTUSEENVIRONMENT = 32;
-  public int JJTOPERATOR = 33;
-  public int JJTOPERAND = 34;
-  public int JJTACTION = 35;
+  public int JJTSELECTSTAMENT = 6;
+  public int JJTAWSMFUNCTION = 7;
+  public int JJTFORALLEXPRESSION = 8;
+  public int JJTEXPRESSION = 9;
+  public int JJTGETFUNCTION = 10;
 
 
   public String[] jjtNodeName = {
     "ADILStatement",
     "Statement",
     "ImportLibrary",
-    "CreateStatement",
     "CreateAnalysis",
+    "AssignmentStatement",
     "DeclareAnalysis",
-    "AnalysisStatement",
-    "FunctionParam",
-    "JsonObjectBuilder",
-    "UserDefinedFunction",
-    "AwesomeSafeFunction",
-    "CreateView",
-    "ProjectFunction",
-    "ReportAnalysis",
-    "FunctionAnalysis",
-    "ExecuteSQL",
-    "executeCypher",
-    "quetedStatement",
-    "FilterOperation",
-    "AnnotateWithStoreOperation",
-    "Cypher",
-    "GraphSelect",
-    "PropertyGraphExpression",
-    "CommonWhereClause",
-    "FromClause",
-    "GetConditionExpression",
-    "GetField",
-    "GetDictionary",
-    "CreateDataSOURCE",
-    "ConnectDataSRC",
-    "CreatEnvironment",
-    "function",
-    "UseEnvironment",
-    "Operator",
-    "Operand",
-    "action",
+    "SelectStament",
+    "AWSMFunction",
+    "ForAllExpression",
+    "Expression",
+    "GetFunction",
   };
 }
-/* JavaCC - OriginalChecksum=72647210e68a0bf762277318112c21bd (do not edit this line) */
+/* JavaCC - OriginalChecksum=5debfc11ce5866370f98647b5999003e (do not edit this line) */
