@@ -177,6 +177,7 @@ TOKEN [IGNORE_CASE]: {
 |<SELECT : "select" >
 |<ORDER : "order">
 |<GROUP : "group">
+|<USE : "use">
 }
 TOKEN [IGNORE_CASE]: {
 <ENV : "env" >
@@ -225,6 +226,8 @@ JsonObjectBuilder Statement(JsonObjectBuilder jObject)  : {Token t;}
  ( LOOKAHEAD(1) CreateAnalysis(jObject)| ImportLibrary(jObject) )
  {return jObject; }
 }
+
+// USE Database Syntax
 
 
 
@@ -286,17 +289,19 @@ JsonArrayBuilder order = Json.createArrayBuilder();
                   vtable.updateType(t.image, DataTypeEnum.Undecided.ordinal());
                   }
                   )*{vtable.addDimention(t.image, n);}
-                  <COLON><EQAL>(<FBRACKETSTART>(LOOKAHEAD(4)<PROPERTYGRAPH>{vtable.updateType(t.image, DataTypeEnum.PropertyGraph.ordinal());}
+                  <COLON><EQAL>(
+                                <FBRACKETSTART>(LOOKAHEAD(4)<PROPERTYGRAPH>{vtable.updateType(t.image, DataTypeEnum.PropertyGraph.ordinal());}
                                                            |<HISTOGRAM>{vtable.updateType(t.image, DataTypeEnum.Histogram.ordinal());}
                                                            |<LONG>{vtable.updateType(t.image, DataTypeEnum.Long.ordinal());}
                                                            |<STRING>{vtable.updateType(t.image, DataTypeEnum.String.ordinal());}
                                                            |<INTEGER>{vtable.updateType(t.image, DataTypeEnum.Integer.ordinal());}
                                                            |<TEXT>{vtable.updateType(t.image, DataTypeEnum.Text.ordinal());}
                                                 )
-                                   <FBRACKETEND>)?
+                                   <FBRACKETEND>
+                                )?
                     (SelectStament(tempJB)|AWSMFunction(tempJB))
                    (
-                        (<ORDER> <BY> or = <ALPHANUM>{ List ovar = new ArrayList(); order.add(or.image); ovar.add(or.image);}(<COMMA> <ORDER> <BY> or = <ALPHANUM> { order.add(or.image); ovar.add(or.image);})*
+                        (<ORDER> <BY> or = <ALPHANUM>{ List ovar = new ArrayList(); order.add(or.image); ovar.add(or.image);}(<COMMA>  or = <ALPHANUM> { order.add(or.image); ovar.add(or.image);})?
                         {
 
                         tempJB.add("ORDER",order.build());
@@ -306,8 +311,15 @@ JsonArrayBuilder order = Json.createArrayBuilder();
 
                     )?
                         (
-                            <GROUP> <BY> gr = <ALPHANUM>{ group.add(gr.image);}(<COMMA> <GROUP> <BY> gr = <ALPHANUM> { group.add(gr.image);})* {tempJB.add("GROUP",group.build());})?
-                            (<STORE> <AS> store = <ALPHANUM>{tempJB.add("STORE", true); tempJB.add("STORAGE", store.image);}
+                            <GROUP> <BY> gr = <ALPHANUM>{ group.add(gr.image);}(<COMMA> gr = <ALPHANUM> { group.add(gr.image);})* {tempJB.add("GROUP",group.build());}
+                        )?
+                        (
+                            <STORE> <AS> store = <ALPHANUM>{tempJB.add("STORE", true); tempJB.add("STORAGE", store.image);}
+                        )?
+                        (
+
+                        RetrunStatement(tempJB)
+
                         )?
 
                    )
@@ -318,6 +330,65 @@ JsonArrayBuilder order = Json.createArrayBuilder();
     }
 }
 
+JosonObject RetrunStatement(JsonObjectBuilder jobject) : {
+Token t;
+JsonObjectBuilder tempJB = Json.createObjectBuilder();
+
+}
+{
+<RETURN> <AS> <FBRACKETSTART>PropertyGraph() <FBRACKETEND>
+}
+
+JosonObject Graph(JsonObjectBuilder jobject) : {
+Token t;
+JsonArrayBuilder tempArray = Json.createArrayBuilder();
+JsonObjectBuilder tempJA = Json.createObjectBuilder();
+
+}
+{
+        GRAPHNODE(tempJA){tempArray.add(tempJA.build());}
+        (
+
+        {JsonObjectBuilder tempJB = Json.createObjectBuilder();}GRAPHEDGE(tempJB){tempArray.add(tempJB.build());}
+
+        {JsonObjectBuilder tempJC = Json.createObjectBuilder();}
+        GRAPHNODE(tempJC){tempArray.add(tempJC.build());}
+
+        )+
+        {jobject.add("cypher",tempArray.build());}
+}
+
+JosonObject GRAPHNODE(JsonArrayBuilder jobject) : {
+Token t; Token k;
+JsonObjectBuilder tempJB = Json.createObjectBuilder();
+}
+{
+(<FBRACKETSTART>
+            (t = <ALPHANUM>| t = <FIELDNAME>)<COLON> k = <ALPHANUM>
+<FBRACKETEND>)
+
+{tempJB.add("nodeName", t.image);
+tempJB.add("nodeType",s.image);
+jobject.add(tempJB.build());
+return jobject;
+}
+}
+
+JsonObject GRAPHEDGE(JsonArrayBuilder jobject):{Token t; Token k; Token s;}{
+
+{JsonObjectBuilder tempJB = Json.createObjectBuilder();
+
+}
+<MINUS><StartSQBracket>
+    t = <ALPHANUM><COLON> s = <ALPHANUM>
+<EndSQBracket><MINUS>
+{
+tempJB.add("edgeName", t.image);
+tempJB.add("edgeType",s.image);
+jobject.add(tempJB.build());
+return jobject;
+}
+}
 
 
 JsonObjectBuilder DeclareAnalysis(JsonObjectBuilder jObject) : {
@@ -477,6 +548,7 @@ JsonObjectBuilder Expression(JsonObjectBuilder l) :
     JsonObjectBuilder m  =Json.createObjectBuilder();
     JsonArrayBuilder l1 = Json.createArrayBuilder();
     JsonArrayBuilder k  =Json.createArrayBuilder();
+
 }
 {(o1 = <ALPHANUM>{m.add("op1", 0); k.add(o1.image);}
                                     (GetFunction(l1, o1.image))?{m.add("op1", 3); l.add(o1.image,l1.build());}) opn = <OPERATOR>{k.add(opn.image);}

@@ -1,10 +1,6 @@
 
 create analysis burstanalysis as(
 
-x[] := Select  x1 from db1, tmdb WHERE entity(a=x, f(b)) < 10 ORDER BY x1 ;
-y[] := TDMHistogram(x) Group by x;
-FORALL j : X {
+x[] := Select  x1 from db1, tmdb WHERE entity(a=x, wordcount(b)) < 10 ORDER BY x1 GROUP BY x1 ;
 
-x[] := Select  x1 from db1, tmdb WHERE asr(a=x, f(j)) < 10 ORDER BY x1 ;
-};
 ) EXECUTE EVERY Day;

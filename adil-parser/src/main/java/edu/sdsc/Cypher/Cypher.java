@@ -88,7 +88,7 @@ public class Cypher/*@bgen(jjtree)*/implements CypherTreeConstants, CypherConsta
     jjtree.closeNodeScope(jjtn000, true);
   }
     }
-    throw new Error("Missing return statement in function");
+    throw new Error("Missing return statement in Function");
   }
 
   final public JsonObjectBuilder Statement(JsonObjectBuilder jObject) throws ParseException {
@@ -134,7 +134,7 @@ public class Cypher/*@bgen(jjtree)*/implements CypherTreeConstants, CypherConsta
     jjtree.closeNodeScope(jjtn000, true);
   }
     }
-    throw new Error("Missing return statement in function");
+    throw new Error("Missing return statement in Function");
   }
 
   final public JsonObjectBuilder createStatement(JsonObjectBuilder jObject) throws ParseException {
@@ -179,7 +179,7 @@ public class Cypher/*@bgen(jjtree)*/implements CypherTreeConstants, CypherConsta
      jjtree.closeNodeScope(jjtn000, true);
    }
     }
-    throw new Error("Missing return statement in function");
+    throw new Error("Missing return statement in Function");
   }
 
   final public JsonObjectBuilder createConstantStatement(JsonObjectBuilder jObject) throws ParseException {
@@ -229,7 +229,7 @@ public class Cypher/*@bgen(jjtree)*/implements CypherTreeConstants, CypherConsta
     jjtree.closeNodeScope(jjtn000, true);
   }
     }
-    throw new Error("Missing return statement in function");
+    throw new Error("Missing return statement in Function");
   }
 
   final public JsonObjectBuilder createEntryStatement(JsonObjectBuilder jObject) throws ParseException {
@@ -275,7 +275,7 @@ public class Cypher/*@bgen(jjtree)*/implements CypherTreeConstants, CypherConsta
      jjtree.closeNodeScope(jjtn000, true);
    }
     }
-    throw new Error("Missing return statement in function");
+    throw new Error("Missing return statement in Function");
   }
 
   final public JsonObjectBuilder MatchStatement(JsonObjectBuilder jObject) throws ParseException {
@@ -323,7 +323,7 @@ public class Cypher/*@bgen(jjtree)*/implements CypherTreeConstants, CypherConsta
      jjtree.closeNodeScope(jjtn000, true);
    }
     }
-    throw new Error("Missing return statement in function");
+    throw new Error("Missing return statement in Function");
   }
 
   final public JsonObjectBuilder MergeStatement(JsonObjectBuilder mergeStmt) throws ParseException {
@@ -357,7 +357,7 @@ public class Cypher/*@bgen(jjtree)*/implements CypherTreeConstants, CypherConsta
     jjtree.closeNodeScope(jjtn000, true);
   }
     }
-    throw new Error("Missing return statement in function");
+    throw new Error("Missing return statement in Function");
   }
 
   final public JsonObjectBuilder cypherNode(JsonObjectBuilder jObject) throws ParseException {
@@ -453,7 +453,7 @@ public class Cypher/*@bgen(jjtree)*/implements CypherTreeConstants, CypherConsta
     jjtree.closeNodeScope(jjtn000, true);
   }
     }
-    throw new Error("Missing return statement in function");
+    throw new Error("Missing return statement in Function");
   }
 
   final public Token CypherEdge() throws ParseException {
@@ -477,7 +477,7 @@ public class Cypher/*@bgen(jjtree)*/implements CypherTreeConstants, CypherConsta
      jjtree.closeNodeScope(jjtn000, true);
    }
     }
-    throw new Error("Missing return statement in function");
+    throw new Error("Missing return statement in Function");
   }
 
   final public JsonObjectBuilder nodeProperty(JsonObjectBuilder jb) throws ParseException {
@@ -552,7 +552,7 @@ public class Cypher/*@bgen(jjtree)*/implements CypherTreeConstants, CypherConsta
     jjtree.closeNodeScope(jjtn000, true);
   }
     }
-    throw new Error("Missing return statement in function");
+    throw new Error("Missing return statement in Function");
   }
 
   /** Generated Token Manager. */

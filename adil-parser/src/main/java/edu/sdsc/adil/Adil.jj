@@ -181,6 +181,7 @@ TOKEN [IGNORE_CASE]: {
 |<SELECT : "select" >
 |<ORDER : "order">
 |<GROUP : "group">
+|<USE : "use">
 }
 TOKEN [IGNORE_CASE]: {
 <ENV : "env" >
@@ -291,6 +292,8 @@ JsonObjectBuilder Statement(JsonObjectBuilder jObject)  : {/*@bgen(jjtree) State
  }
 /*@egen*/
 }
+
+// USE Database Syntax
 
 
 
@@ -416,7 +419,7 @@ JsonArrayBuilder order = Json.createArrayBuilder();
                                    <FBRACKETEND>)?
                     (SelectStament(tempJB)|AWSMFunction(tempJB))
                    (
-                        (<ORDER> <BY> or = <ALPHANUM>{ List ovar = new ArrayList(); order.add(or.image); ovar.add(or.image);}(<COMMA> <ORDER> <BY> or = <ALPHANUM> { order.add(or.image); ovar.add(or.image);})*
+                        (<ORDER> <BY> or = <ALPHANUM>{ List ovar = new ArrayList(); order.add(or.image); ovar.add(or.image);}(<COMMA>  or = <ALPHANUM> { order.add(or.image); ovar.add(or.image);})?
                         {
 
                         tempJB.add("ORDER",order.build());
@@ -426,7 +429,7 @@ JsonArrayBuilder order = Json.createArrayBuilder();
 
                     )?
                         (
-                            <GROUP> <BY> gr = <ALPHANUM>{ group.add(gr.image);}(<COMMA> <GROUP> <BY> gr = <ALPHANUM> { group.add(gr.image);})* {tempJB.add("GROUP",group.build());})?
+                            <GROUP> <BY> gr = <ALPHANUM>{ group.add(gr.image);}(<COMMA> gr = <ALPHANUM> { group.add(gr.image);})* {tempJB.add("GROUP",group.build());})?
                             (<STORE> <AS> store = <ALPHANUM>{tempJB.add("STORE", true); tempJB.add("STORAGE", store.image);}
                         )?
 
@@ -736,6 +739,7 @@ JsonObjectBuilder Expression(JsonObjectBuilder l) :
     JsonObjectBuilder m  =Json.createObjectBuilder();
     JsonArrayBuilder l1 = Json.createArrayBuilder();
     JsonArrayBuilder k  =Json.createArrayBuilder();
+
 }
 {/*@bgen(jjtree) Expression */
  try {

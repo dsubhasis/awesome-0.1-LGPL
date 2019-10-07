@@ -166,6 +166,7 @@ public static void main(String[] args) {
     throw new Error("Missing return statement in function");
   }
 
+// USE Database Syntax
   final public JsonObjectBuilder ImportLibrary(JsonObjectBuilder jObject) throws ParseException {
                                                               /*@bgen(jjtree) ImportLibrary */
                                                               ASTImportLibrary jjtn000 = new ASTImportLibrary(JJTIMPORTLIBRARY);
@@ -399,21 +400,15 @@ JsonArrayBuilder order = Json.createArrayBuilder();
         jj_consume_token(BY);
         or = jj_consume_token(ALPHANUM);
                                                        List ovar = new ArrayList(); order.add(or.image); ovar.add(or.image);
-        label_5:
-        while (true) {
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-          case COMMA:
-            ;
-            break;
-          default:
-            jj_la1[11] = jj_gen;
-            break label_5;
-          }
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case COMMA:
           jj_consume_token(COMMA);
-          jj_consume_token(ORDER);
-          jj_consume_token(BY);
           or = jj_consume_token(ALPHANUM);
-                                                                                                                                                                     order.add(or.image); ovar.add(or.image);
+                                                                                                                                                         order.add(or.image); ovar.add(or.image);
+          break;
+        default:
+          jj_la1[11] = jj_gen;
+          ;
         }
                         tempJB.add("ORDER",order.build());
                         vtable.setOrder(ovar);
@@ -428,7 +423,7 @@ JsonArrayBuilder order = Json.createArrayBuilder();
         jj_consume_token(BY);
         gr = jj_consume_token(ALPHANUM);
                                                           group.add(gr.image);
-        label_6:
+        label_5:
         while (true) {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case COMMA:
@@ -436,15 +431,13 @@ JsonArrayBuilder order = Json.createArrayBuilder();
             break;
           default:
             jj_la1[13] = jj_gen;
-            break label_6;
+            break label_5;
           }
           jj_consume_token(COMMA);
-          jj_consume_token(GROUP);
-          jj_consume_token(BY);
           gr = jj_consume_token(ALPHANUM);
-                                                                                                                       group.add(gr.image);
+                                                                                                          group.add(gr.image);
         }
-                                                                                                                                                tempJB.add("GROUP",group.build());
+                                                                                                                                   tempJB.add("GROUP",group.build());
         break;
       default:
         jj_la1[14] = jj_gen;
@@ -534,7 +527,7 @@ int src = 1;
       jj_consume_token(SELECT);
       tuple = jj_consume_token(ALPHANUM);
                                       tempTuple.add(tuple.image); vtable.insertName(tuple.image); vtable.updateType(tuple.image, DataTypeEnum.Undecided.ordinal());
-      label_7:
+      label_6:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case COMMA:
@@ -542,7 +535,7 @@ int src = 1;
           break;
         default:
           jj_la1[17] = jj_gen;
-          break label_7;
+          break label_6;
         }
         jj_consume_token(COMMA);
         tuple = jj_consume_token(ALPHANUM);
@@ -701,7 +694,7 @@ jObject.add("SELECT", source);
         ;
       }
       jj_consume_token(StartCurlyBracket);
-      label_8:
+      label_7:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case FORALL:
@@ -710,7 +703,7 @@ jObject.add("SELECT", source);
           break;
         default:
           jj_la1[23] = jj_gen;
-          break label_8;
+          break label_7;
         }
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case ALPHANUM:
@@ -1037,40 +1030,25 @@ l.add(funcProp);
     finally { jj_save(3, xla); }
   }
 
-  private boolean jj_3R_14() {
-    if (jj_scan_token(DIGITS)) return true;
-    return false;
-  }
-
-  private boolean jj_3_3() {
-    if (jj_scan_token(ALPHANUM)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_9()) jj_scanpos = xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_10()) jj_scanpos = xsp;
-    return false;
-  }
-
   private boolean jj_3_4() {
     if (jj_scan_token(ALPHANUM)) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_11()) jj_scanpos = xsp;
+    if (jj_3R_10()) jj_scanpos = xsp;
     xsp = jj_scanpos;
-    if (jj_3R_12()) jj_scanpos = xsp;
+    if (jj_3R_11()) jj_scanpos = xsp;
     return false;
   }
 
-  private boolean jj_3R_13() {
+  private boolean jj_3R_12() {
     if (jj_scan_token(FBRACKETSTART)) return true;
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3_3()) {
     jj_scanpos = xsp;
-    if (jj_3R_14()) {
+    if (jj_3R_13()) {
     jj_scanpos = xsp;
-    if (jj_3R_15()) return true;
+    if (jj_3R_14()) return true;
     }
     }
     return false;
@@ -1086,30 +1064,45 @@ l.add(funcProp);
     return false;
   }
 
-  private boolean jj_3R_10() {
-    if (jj_scan_token(EQAL)) return true;
-    if (jj_scan_token(ALPHANUM)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_12() {
-    if (jj_scan_token(EQAL)) return true;
-    if (jj_scan_token(ALPHANUM)) return true;
-    return false;
-  }
-
   private boolean jj_3R_9() {
-    if (jj_3R_13()) return true;
+    if (jj_scan_token(EQAL)) return true;
+    if (jj_scan_token(ALPHANUM)) return true;
     return false;
   }
 
   private boolean jj_3R_11() {
-    if (jj_3R_13()) return true;
+    if (jj_scan_token(EQAL)) return true;
+    if (jj_scan_token(ALPHANUM)) return true;
     return false;
   }
 
-  private boolean jj_3R_15() {
+  private boolean jj_3R_8() {
+    if (jj_3R_12()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_10() {
+    if (jj_3R_12()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_14() {
     if (jj_scan_token(FIELDNAME)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_13() {
+    if (jj_scan_token(DIGITS)) return true;
+    return false;
+  }
+
+  private boolean jj_3_3() {
+    if (jj_scan_token(ALPHANUM)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_8()) jj_scanpos = xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_9()) jj_scanpos = xsp;
     return false;
   }
 
@@ -1128,10 +1121,12 @@ l.add(funcProp);
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static private int[] jj_la1_2;
+  static private int[] jj_la1_3;
   static {
       jj_la1_init_0();
       jj_la1_init_1();
       jj_la1_init_2();
+      jj_la1_init_3();
    }
    private static void jj_la1_init_0() {
       jj_la1_0 = new int[] {0x80000000,0x80000000,0x0,0x800000,0x0,0x0,0x0,0x1000000,0x0,0x100000,0x0,0x800000,0x0,0x800000,0x0,0x0,0x1000000,0x800000,0x800000,0x0,0x0,0x1000000,0x1000000,0x0,0x0,0x100000,0x1000,0x100000,0x100000,0x20000,0x100000,0x20000,0x1000,0x100000,0x20000,0x100000,0x20000,0x1000,0x800000,};
@@ -1140,7 +1135,10 @@ l.add(funcProp);
       jj_la1_1 = new int[] {0x8,0x8,0x0,0x0,0x0,0x0,0x80000,0x0,0x17800000,0x0,0x0,0x0,0x0,0x0,0x0,0x200,0x0,0x0,0x0,0x0,0x40,0x800,0x800,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
    private static void jj_la1_init_2() {
-      jj_la1_2 = new int[] {0x0,0x0,0x18,0x0,0x4800000,0x4800000,0x0,0x0,0x0,0x0,0x4000800,0x0,0x1000,0x0,0x2000,0x0,0x0,0x0,0x0,0x4000000,0x0,0x0,0x0,0x4800000,0x4800000,0x0,0x4000000,0x0,0x0,0x0,0x0,0x0,0x8000000,0x0,0x0,0x0,0x0,0x8000000,0x0,};
+      jj_la1_2 = new int[] {0x0,0x0,0x18,0x0,0x9000000,0x9000000,0x0,0x0,0x0,0x0,0x8000800,0x0,0x1000,0x0,0x2000,0x0,0x0,0x0,0x0,0x8000000,0x0,0x0,0x0,0x9000000,0x9000000,0x0,0x8000000,0x0,0x0,0x0,0x0,0x0,0x10000000,0x0,0x0,0x0,0x0,0x10000000,0x0,};
+   }
+   private static void jj_la1_init_3() {
+      jj_la1_3 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
   final private JJCalls[] jj_2_rtns = new JJCalls[4];
   private boolean jj_rescan = false;
@@ -1332,7 +1330,7 @@ l.add(funcProp);
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[96];
+    boolean[] la1tokens = new boolean[97];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -1349,10 +1347,13 @@ l.add(funcProp);
           if ((jj_la1_2[i] & (1<<j)) != 0) {
             la1tokens[64+j] = true;
           }
+          if ((jj_la1_3[i] & (1<<j)) != 0) {
+            la1tokens[96+j] = true;
+          }
         }
       }
     }
-    for (int i = 0; i < 96; i++) {
+    for (int i = 0; i < 97; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

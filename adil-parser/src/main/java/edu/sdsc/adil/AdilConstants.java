@@ -155,41 +155,43 @@ public interface AdilConstants {
   /** RegularExpression Id. */
   int GROUP = 77;
   /** RegularExpression Id. */
-  int ENV = 78;
+  int USE = 78;
   /** RegularExpression Id. */
-  int IN = 79;
+  int ENV = 79;
   /** RegularExpression Id. */
-  int ANNOTATE = 80;
+  int IN = 80;
   /** RegularExpression Id. */
-  int FILTER = 81;
+  int ANNOTATE = 81;
   /** RegularExpression Id. */
-  int EXECUTESQLPP = 82;
+  int FILTER = 82;
   /** RegularExpression Id. */
-  int CONSTRUCTGRAPH = 83;
+  int EXECUTESQLPP = 83;
   /** RegularExpression Id. */
-  int CYPHERQUERY = 84;
+  int CONSTRUCTGRAPH = 84;
   /** RegularExpression Id. */
-  int EXECUTECYPHER = 85;
+  int CYPHERQUERY = 85;
   /** RegularExpression Id. */
-  int EXECUTESQL = 86;
+  int EXECUTECYPHER = 86;
   /** RegularExpression Id. */
-  int FORALL = 87;
+  int EXECUTESQL = 87;
   /** RegularExpression Id. */
-  int DIGIT = 88;
+  int FORALL = 88;
   /** RegularExpression Id. */
-  int LETTER = 89;
+  int DIGIT = 89;
   /** RegularExpression Id. */
-  int ALPHANUM = 90;
+  int LETTER = 90;
   /** RegularExpression Id. */
-  int FIELDNAME = 91;
+  int ALPHANUM = 91;
   /** RegularExpression Id. */
-  int QUOTED_IDENTIFIER = 92;
+  int FIELDNAME = 92;
   /** RegularExpression Id. */
-  int GraphElementType = 93;
+  int QUOTED_IDENTIFIER = 93;
   /** RegularExpression Id. */
-  int INPATH = 94;
+  int GraphElementType = 94;
   /** RegularExpression Id. */
-  int OUTPATH = 95;
+  int INPATH = 95;
+  /** RegularExpression Id. */
+  int OUTPATH = 96;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -274,6 +276,7 @@ public interface AdilConstants {
     "\"select\"",
     "\"order\"",
     "\"group\"",
+    "\"use\"",
     "\"env\"",
     "\"in\"",
     "\"annotate\"",

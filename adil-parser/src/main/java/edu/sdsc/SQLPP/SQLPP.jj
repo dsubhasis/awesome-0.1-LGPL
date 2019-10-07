@@ -90,7 +90,7 @@ TOKEN [IGNORE_CASE]:
   | <FROM : "from">
   | <FULL : "full">
   | <FULLTEXT : "fulltext">
-  | <FUNCTION : "function">
+  | <FUNCTION : "Function">
   | <GROUP : "group">
   | <HAVING : "having">
   | <HINTS : "hints">

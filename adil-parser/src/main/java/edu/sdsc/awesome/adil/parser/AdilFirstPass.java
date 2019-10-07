@@ -26,6 +26,7 @@ import javax.json.*;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
@@ -249,6 +250,8 @@ public class AdilFirstPass {
 
         } catch (ParseException pe) {
             pe.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
         }
 
         JsonObject temp = js.build();
@@ -897,7 +900,7 @@ return projectObject.build();
                                 typeannotTupel.add("COMPUTE:POLICY", "STREAM");
                                 typeannotTupel.add("COMPUTE:PROVIDER", "AWESOME");
                             }
-                            typeannotTupel.add("function", expression.getJsonObject("firstfunction"));
+                            typeannotTupel.add("Function", expression.getJsonObject("firstfunction"));
 
                         }
 
@@ -944,7 +947,7 @@ return projectObject.build();
                             typeannotTupel.add("COMPUTE:POLICY", "STREAM");
                             typeannotTupel.add("COMPUTE:PROVIDER", "AWESOME");
                         }
-                        typeannotTupel.add("function", expression.getJsonObject("firstfunction"));
+                        typeannotTupel.add("Function", expression.getJsonObject("firstfunction"));
 
                     }
 

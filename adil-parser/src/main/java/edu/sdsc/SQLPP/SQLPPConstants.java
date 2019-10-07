@@ -406,7 +406,7 @@ public interface SQLPPConstants {
     "\"from\"",
     "\"full\"",
     "\"fulltext\"",
-    "\"function\"",
+    "\"Function\"",
     "\"group\"",
     "\"having\"",
     "\"hints\"",

@@ -62,7 +62,7 @@ public static void main(String[] args) {
      jjtree.closeNodeScope(jjtn000, true);
    }
     }
-    throw new Error("Missing return statement in function");
+    throw new Error("Missing return statement in Function");
   }
 
   static final public void Statement() throws ParseException {

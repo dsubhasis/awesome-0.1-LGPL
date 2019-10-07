@@ -87,7 +87,7 @@ public class SQLPP/*@bgen(jjtree)*/implements SQLPPTreeConstants, SQLPPConstants
     jjtree.closeNodeScope(jjtn000, true);
   }
     }
-    throw new Error("Missing return statement in function");
+    throw new Error("Missing return statement in Function");
   }
 
   final public JsonObjectBuilder Statement(JsonObjectBuilder selectObject) throws ParseException {
@@ -133,7 +133,7 @@ public class SQLPP/*@bgen(jjtree)*/implements SQLPPTreeConstants, SQLPPConstants
       jjtree.closeNodeScope(jjtn000, true);
     }
     }
-    throw new Error("Missing return statement in function");
+    throw new Error("Missing return statement in Function");
   }
 
   final public JsonObjectBuilder SelectStatement(JsonObjectBuilder selectObject) throws ParseException {
@@ -374,7 +374,7 @@ boolean selectRenameFlag = false; Token unnest; Token unnestRename = null; boole
       jjtree.closeNodeScope(jjtn000, true);
     }
     }
-    throw new Error("Missing return statement in function");
+    throw new Error("Missing return statement in Function");
   }
 
   final public JsonObjectBuilder GetConditionExpression(JsonObjectBuilder l) throws ParseException {
@@ -517,7 +517,7 @@ boolean selectRenameFlag = false; Token unnest; Token unnestRename = null; boole
             jjtree.closeNodeScope(jjtn000, true);
           }
     }
-    throw new Error("Missing return statement in function");
+    throw new Error("Missing return statement in Function");
   }
 
   final public JsonObjectBuilder notINstatement(JsonObjectBuilder j1) throws ParseException {
@@ -552,7 +552,7 @@ boolean selectRenameFlag = false; Token unnest; Token unnestRename = null; boole
      jjtree.closeNodeScope(jjtn000, true);
    }
     }
-    throw new Error("Missing return statement in function");
+    throw new Error("Missing return statement in Function");
   }
 
   final public void Aggregate(List count) throws ParseException {
@@ -613,7 +613,7 @@ boolean selectRenameFlag = false; Token unnest; Token unnestRename = null; boole
       jjtree.closeNodeScope(jjtn000, true);
     }
     }
-    throw new Error("Missing return statement in function");
+    throw new Error("Missing return statement in Function");
   }
 
   final public void Operator() throws ParseException {
