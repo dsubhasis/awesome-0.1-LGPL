@@ -1,0 +1,58 @@
+use newsDB as db
+create analysis politician as (
+Relation newsofSenator := select newsID, text from db.news n where ATLEAST(2) db.senators.name WITHIN n.text;
+newsSent := sentenceTokenizer(newsofSenator.text, 'docID' = newsofSenator.newsID);
+Relation sentenceofSenator := select sentence, sentID from newsSent s where ATLEAST(1) db.senators.name WITHIN s.sentence;
+entities := NETokenizer(sentenceofSenator.sentence, ['sentID' = sentenceofSenator.sentID]);
+peopleofInterest[] := select entity from entities e, db.senators s where e.entity = s.senatorName;
+people[] := select entity from entities where entity not in s.senatorName;
+graphs[] := [];
+docIDList[] := select distinct docID from newsSent;
+for (d in docIDList){
+	sentIDList := select distinct sentID from newsSent where docID = d;
+	for (s in sentIDList){
+		sentence := select sentence from entities where docID = d and sentID = s;
+		poi := select entity from entities e, db.senators s where docID = d and sentID = s and e.entity = s.senatorName; 
+		p := select entity from entities where docID = d and sentID = s and entity not in s.senatorName; 
+		Graph g := sentence.dependencyParse();
+		for (x in poi){
+			words := x.split();
+			g.executeCypher(MATCH path = LINKED($words, :COMPOUND)
+							COMPRESS(path) as n 
+							SET n:D_PERSON, n.words = $x);
+		}
+		for (x in p){
+			words := x.split();
+			g.executeCypher(MATCH path = LINKED($words, :COMPOUND) 
+							COMPRESS(path) as n 
+							SET n:D_PERSON, n.words = $x);
+		}
+		g.executeCypher(MATCH path = (:D_PEOPLE)-[:AND*0..]->(person:D_PEOPLE)
+						WHERE NOT (person)-[:AND]->()
+						FOREACH(pt IN path|
+							WITH nodes(pt) AS ns
+							MATCH (p:D_PEOPLE) where p in ns
+							WITH collect(p.words) as wordList
+							WITH REDUCE(s = HEAD(wordList), n IN TAIL(wordList) | s + '_' + n) AS entities
+							CREATE (n:D_PEOPLE_GROUP{words: entities})
+							MATCH (m)-[r1]-(p)
+							CREATE (m)-[r2]->(n)
+							SET r2=r1
+							DELETE r1
+							CREATE (p)-[:MEMBER]->(n)
+							)
+						MATCH path2 = (n) - [*0..] - (:People) WHERE n:D_PEOPLE or n:D_PEOPLE_GROUP
+						FOREACH(p IN path2|
+							MATCH (m:Verb) where m IN p
+							collect(m.word) as words
+							WITH REDUCE(s = HEAD(words), n IN TAIL(words) | s + ',' + n) AS verbs
+							CREATE (nodes(p)[0])-[:Inferred{words:verbs}]->(last(nodes(p)))
+							)
+						);
+
+		MATCH (n)
+		set n.sentID = s and n.docID = d
+	}
+	graphs.add(g);
+}
+);	
