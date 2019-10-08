@@ -1,0 +1,36 @@
+use newsDb as db
+create analysis entityNetworkAnalysis as (
+selectedNewsID := select newsID from db.newsDataTable n where ATLEAST(1)  db.politicalDictionary.entityName WITHIN n.newsText;
+baseData := executeSQL(select newsID, newsText, newspaperName, newsDate from newsDataTable where newsDate > '2018-1-1'::date and newsID in selectedNewsID);
+stopWords[] := readFile('myStopWords.txt', split = ',');
+terms[] := get_vocabulary(baseData.newsText) - stopWords;
+newpaperList[] := ["ABC", "BBC"]
+tdms := count_Matrix(baseData.newsText, features = (terms, [newsDate]), newspaperName in newpaperList);
+M_ds, M_ts := [], [];
+for (tdm in tdms) {
+	M_d, M_t := topic_model(tdm, k = 100); 
+	M_ds.add(M_d); 
+	M_ts.add(M_t)};
+newsSent := sentenceTokenizer(baseData.newsText, 'docID' = baseData.newsID, ['date' = baseData.newsDate]);
+noun := nounPhrase(newsSent.sentence, language = 'en', maxLength = 4, 'docID' = newsSent.docID, 'sentenceID' = newsSent.sentenceID, ['date' = newsSent.newsDate]);
+entity := namedEntity(noun.nounphrase, 'docID' = noun.docID, 'sentenceID' = noun.sentenceID, ['date' = noun.newsDate]);
+entityNetwork := create propertygraph view (
+Relation R := select docID dID, sentenceID sID, e1.entityID id1, e2.entityID id2, e1.entityTerm et1, e2.entityTerm et2, e1.entityType t1, e2.entityType t2 
+from entity e1, entity e2
+where e1.dID = e2.dID and e1.sentenceID = e1.sentenceID and e1.entityID != e2.entityID 
+View m := executeCypher(
+ASSERT Entity.id IS UNIQUE
+# create nodes 
+Merge (:Entity {id:$R.id1, name: $R.s1, type: $R.t1)
+Merge (:Entity {id:$R.id2, name: $R.s2, type: $R.t2)
+# create relations
+MATCH (e1: Entity {id:$R.id1})
+MATCH (e2: Entity {id:$R.id2})
+Merge (e1)-[co:CO-OCCUR]->(e2)
+ON CREATE SET co.docID = $R.dID, co.sentenceID = $R.sID
+) store;
+);
+
+users := entityNetwork.pageRank(top_k = True, returnCount = 10) return ([:Entity.name]);
+
+);
