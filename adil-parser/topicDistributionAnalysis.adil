@@ -3,11 +3,11 @@ use tweetDB as tdb, use newsDB as ndb,
 create analysis topicDistributionAnalysis as (
 newsEntity := NETokenizer(news.newsText, 'docID' = news.newsID, ['text' = news.newsText]);
 // count_Matrix return tdm which is a martix, docMatID and termMatID which are relations with schema (docID, mid), and (term, mid), which returns document ids or terms with their correponding matrix index. 
-Matrix tdm, Relation docMatID, Relation termMatID;
+Matrix tdm; Relation docMatID; Relation termMatID;
 count_Matrix(tdm, docMatID, termMatID, news.newsText, features = (get_vocubulary(news.newsText), []));
 
 // topic model for all news. M_d is topic document matrix and M_t is term topic matrix. M_d is of dimension 100 \times N where N is the vocubulary size.
-Matrix M_d, Matrix M_t;
+Matrix M_d; Matrix M_t;
 topic_model(M_d, M_t, tdm, k = 10);
 
 // get count matrix for famous people
@@ -17,7 +17,7 @@ for (id in mid){
 	tdm_famous.add(tdm[id, :]);
 }
 // topic model for news about famous people
-Matrix M_d_famous, Matrix M_t_famous;
+Matrix M_d_famous; Matrix M_t_famous;
 topic_model(M_d_famous, M_t_famous, tdm_famous, k = 10);
 // community detection 
 Relation userCommunity := twitterNetwork.executeCypher(louvain('User', 'Reply') RETURN userName AS user, community ORDER BY community) store; 
@@ -28,9 +28,9 @@ for (c  in communities) {
 	users[] := select user from userCommunity where community = c;
 	Collection tweets := twitterNetwork.executeCypher(match (u1:User) - [r:Reply] - (u2:User) where u1 in $users and u2 in $users return r.tweet);
 	Relation tweets := Scan(tweets);
-	Matrix tdm_c, Relation dMID_c, Relation tMID_c;
+	Matrix tdm_c; Relation dMID_c; Relation tMID_c;
     count_Matrix(tdm_c, dMID_c, tMID_c, tweets.text, features = (get_vocubulary(tweets), []));
-	Matrix M_dc, Matrix M_tc;
+	Matrix M_dc; Matrix M_tc;
 	topic_model(M_dc, M_tc, tdm_c, k = 10);
 	newMatrix := mergeFeatureMatrix(termMatID, tMID_c, feature = 'col');
 	M_d_new := featureMatrixReconstruct(M_d, termMatID, newMatrix, feature = 'col');
