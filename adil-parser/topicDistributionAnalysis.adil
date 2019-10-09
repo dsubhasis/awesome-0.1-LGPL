@@ -26,7 +26,7 @@ similarity := []
 //termMatID_c[], M_t_c := [], [];
 for (c  in communities) {
 	users[] := select user from userCommunity where community = c;
-	Collection tweets := twitterNetwork.executeCypher(match ([u1:User] - [r:Reply] - [u2:User]) where u1 in $users and u2 in $users return r.tweet);
+	Collection tweets := twitterNetwork.executeCypher(match (u1:User) - [r:Reply] - (u2:User) where u1 in $users and u2 in $users return r.tweet);
 	Relation tweets := Scan(tweets);
 	tdm_c, dMID_c, tMID := count_Matrix(tweets.text, features = (get_vocubulary(tweets), []));
 	M_dc, M_tc := topic_model(tdm_c, k = 10);
