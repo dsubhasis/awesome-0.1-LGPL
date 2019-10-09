@@ -4,11 +4,13 @@ selectedNewsID := select newsID from db.newsDataTable n where ATLEAST(1)  db.pol
 baseData := executeSQL(select newsID, newsText, newspaperName, newsDate from newsDataTable where newsDate > '2018-1-1'::date and newsID in selectedNewsID);
 stopWords[] := readFile('myStopWords.txt', split = ',');
 terms[] := get_vocabulary(baseData.newsText) - stopWords;
-newpaperList[] := ["ABC", "BBC"]
-tdms[] := count_Matrix(baseData.newsText, features = (terms, [newsDate]), newspaperName in newpaperList);
+newpaperList[] := ["ABC", "BBC"];
+tdms[] := [];
+count_Matrix(tdms, ~, ~, baseData.newsText, features = (terms, [newsDate]), newspaperName in newpaperList);
 M_ds, M_ts := [], [];
 for (tdm in tdms) {
-	M_d, M_t := topic_model(tdm, k = 100); 
+    Matrix M_d, Matrix M_t;
+	topic_model(M_d, M_t, tdm, k = 100); 
 	M_ds.add(M_d); 
 	M_ts.add(M_t)};
 newsSent := sentenceTokenizer(baseData.newsText, 'docID' = baseData.newsID, ['date' = baseData.newsDate]);
@@ -31,6 +33,6 @@ ON CREATE SET co.docID = $R.dID, co.sentenceID = $R.sID
 ) store;
 );
 
-users := entityNetwork.pageRank(top_k = True, returnCount = 10) return ([:Entity.name]);
+users[] := entityNetwork.pageRank(top_k = True, returnCount = 10) return ([:Entity.name]);
 
 );
