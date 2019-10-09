@@ -2,17 +2,15 @@ use newsDB as db
 create analysis politician as (
 Relation newsofSenator := select newsID, text from db.news n where ATLEAST(2) db.senators.name WITHIN n.text;
 newsSent := sentenceTokenizer(newsofSenator.text, 'docID' = newsofSenator.newsID);
-Relation sentenceofSenator := select sentence, sentID from newsSent s where ATLEAST(1) db.senators.name WITHIN s.sentence;
-entities := NETokenizer(sentenceofSenator.sentence, ['sentID' = sentenceofSenator.sentID]);
-peopleofInterest[] := select entity from entities e, db.senators s where e.entity = s.senatorName;
-people[] := select entity from entities where entity not in s.senatorName;
+Relation sentenceofSenator := select docID, sentID,sentence from newsSent s where ATLEAST(1) db.senators.name WITHIN s.sentence;
+entities := NETokenizer(sentenceofSenator.sentence);
 graphs[] := [];
 docIDList[] := select distinct docID from newsSent;
 for (d in docIDList){
 	sentIDList := select distinct sentID from newsSent where docID = d;
 	for (s in sentIDList){
 		sentence := select sentence from entities where docID = d and sentID = s;
-		poi := select entity from entities e, db.senators s where docID = d and sentID = s and e.entity = s.senatorName; 
+		poi := select entity from entities e, db.senators t where docID = d and sentID = s and e.entity = t.senatorName; 
 		p := select entity from entities where docID = d and sentID = s and entity not in s.senatorName; 
 		Graph g := sentence.dependencyParse();
 		for (x in poi){
