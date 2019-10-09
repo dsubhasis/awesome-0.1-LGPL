@@ -1,6 +1,6 @@
 use tweetDb as db
 create analysis ProminentUserAnalysis as (
-htSet[] := ["h1", ..., "hn"]
+htSet[] := ["h1", ..., "hn"];
 baseData := executeSQL(
 with temp as (select userid, json_array_elements((entities-> 'entities' -> 'hashtags')::json) ->>'text' as ht from db.twitterstatus),
 users as (select u.screen_name as name, s.id, s.created_at, s.entities-> 'entities' -> 'user_mentions' as mention from db.twitteruser u, db.twitterstatus s where u.userid in (select userid from temp where ht in $htSet) and u.userid = s.userid),
