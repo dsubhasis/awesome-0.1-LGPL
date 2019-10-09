@@ -5,7 +5,7 @@ baseData := executeSQL(select newsID, newsText, newspaperName, newsDate from new
 stopWords[] := readFile('myStopWords.txt', split = ',');
 terms[] := get_vocabulary(baseData.newsText) - stopWords;
 newpaperList[] := ["ABC", "BBC"]
-tdms := count_Matrix(baseData.newsText, features = (terms, [newsDate]), newspaperName in newpaperList);
+tdms[] := count_Matrix(baseData.newsText, features = (terms, [newsDate]), newspaperName in newpaperList);
 M_ds, M_ts := [], [];
 for (tdm in tdms) {
 	M_d, M_t := topic_model(tdm, k = 100); 
@@ -13,7 +13,7 @@ for (tdm in tdms) {
 	M_ts.add(M_t)};
 newsSent := sentenceTokenizer(baseData.newsText, 'docID' = baseData.newsID, ['date' = baseData.newsDate]);
 noun := nounPhrase(newsSent.sentence, language = 'en', maxLength = 4, 'docID' = newsSent.docID, 'sentenceID' = newsSent.sentenceID, ['date' = newsSent.newsDate]);
-entity := namedEntity(noun.nounphrase, 'docID' = noun.docID, 'sentenceID' = noun.sentenceID, ['date' = noun.newsDate]);
+entity := NETokenizer(noun.nounphrase, 'docID' = noun.docID, 'sentenceID' = noun.sentenceID, ['date' = noun.newsDate]);
 entityNetwork := create propertygraph view (
 Relation R := select docID dID, sentenceID sID, e1.entityID id1, e2.entityID id2, e1.entityTerm et1, e2.entityTerm et2, e1.entityType t1, e2.entityType t2 
 from entity e1, entity e2
