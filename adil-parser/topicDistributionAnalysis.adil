@@ -14,7 +14,7 @@ topicModel(docTopicMat, topicTermMat, tdm, k = 10);
 mid[] := select docMatID.mid from docMatID, newsEntity where newsEntity.entityTerm in executeSQL(select userName from ndb.famoususer where year = 2019) and docMatID.did; = newsEntity.docID;
 tdmFamous[] := [];
 for (id in mid){
-	tdmFamous.add(tdm[id, :]);
+    tdmFamous.add(tdm[id, :]);
 }
 // topic model for news about famous people
 Matrix docTopicMatFamous; Matrix topicTermMatFamous;
@@ -26,16 +26,16 @@ communities[] := select distinct community from userCommunity;
 similarity := [];
 for (c  in communities) {
     users[] := select user from userCommunity where community = c;
-	Relation tweets := twitterNetwork.executeCypher(match (u1:User) - [r:Reply] - (u2:User) where u1 in $users and u2 in $users return r.tweet.text);
-	Matrix tdmCom; Relation docMatIDCom; Relation termMatIDCom;
+    Relation tweets := twitterNetwork.executeCypher(match (u1:User) - [r:Reply] - (u2:User) where u1 in $users and u2 in $users return r.tweet.text);
+    Matrix tdmCom; Relation docMatIDCom; Relation termMatIDCom;
     countMatrix(tdmCom, docMatIDCom, termMatIDCom, tweets.text, features = (getVocubulary(tweets), []));
-	Matrix docTopicMatCom; topicTermMatCom;
-	topicModel(docTopicMatCom, topicTermMatCom, tdmCom, k = 10);
-	newMatrix := mergeFeatureMatrix(termMatID, termMatIDCom, feature = 'col');
-	topicTermMatNew := featureMatrixReconstruct(topicTermMat, termMatID, newMatrix, feature = 'col');
-	topicTermMatComNew := featureMatrixReconstruct(topicTermMatCom, termMatIDCom, newMatrix, feature = 'col');
-	sim[] := matrixSimilarity(topicTermMatNew, topicTermMatComNew, function = 'optimal match');
-	similarity.add(ave(sim));
+    Matrix docTopicMatCom; topicTermMatCom;
+    topicModel(docTopicMatCom, topicTermMatCom, tdmCom, k = 10);
+    newMatrix := mergeFeatureMatrix(termMatID, termMatIDCom, feature = 'col');
+    topicTermMatNew := featureMatrixReconstruct(topicTermMat, termMatID, newMatrix, feature = 'col');
+    topicTermMatComNew := featureMatrixReconstruct(topicTermMatCom, termMatIDCom, newMatrix, feature = 'col');
+    sim[] := matrixSimilarity(topicTermMatNew, topicTermMatComNew, function = 'optimal match');
+    similarity.add(ave(sim));
 }
 communityID ：= similarity.indexOf(max(similarity));
 sim := matrixSimilarity(topicTermMat, topicTermMatFamous, function = 'optimal match');
