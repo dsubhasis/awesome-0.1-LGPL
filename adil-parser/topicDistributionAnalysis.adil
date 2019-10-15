@@ -2,11 +2,11 @@
 use tweetDB as tdb, use newsDB as ndb,
 create analysis topicDistributionAnalysis as (
 newsEntity := NETokenizer(news.newsText, 'docID' = news.newsID, ['text' = news.newsText]);
-// count_Matrix return tdm which is a martix, docMatID and termMatID which are relations with schema (docID, mid), and (term, mid), which returns document ids or terms with their correponding matrix index. 
+// countMatrix return tdm which is a martix, docMatID and termMatID which are relations with schema (docID, mid), and (term, mid), which returns document ids or terms with their correponding matrix index. 
 Matrix tdm; Relation docMatID; Relation termMatID;
-countMatrix(tdm, docMatID, termMatID, news.newsText, features = (get_vocubulary(news.newsText), []));
+countMatrix(tdm, docMatID, termMatID, news.newsText, features = (getVocubulary(news.newsText), []));
 
-// topic model for all news. M_d is topic document matrix and M_t is term topic matrix. M_d is of dimension 100 \times N where N is the vocubulary size.
+// topic model for all news. docTopicMat is topic document matrix and topicTermMat is term topic matrix. topicTermMat is of dimension 10 \times N where N is the vocubulary size.
 Matrix docTopicMat; Matrix topicTermMat;
 topicModel(docTopicMat, topicTermMat, tdm, k = 10);
 
@@ -28,7 +28,7 @@ for (c  in communities) {
 	users[] := select user from userCommunity where community = c;
 	Relation tweets := twitterNetwork.executeCypher(match (u1:User) - [r:Reply] - (u2:User) where u1 in $users and u2 in $users return r.tweet.text);
 	Matrix tdmCom; Relation docMatIDCom; Relation termMatIDCom;
-    countMatrix(tdmCom, docMatIDCom, termMatIDCom, tweets.text, features = (get_vocubulary(tweets), []));
+    countMatrix(tdmCom, docMatIDCom, termMatIDCom, tweets.text, features = (getVocubulary(tweets), []));
 	Matrix docTopicMatCom; topicTermMatCom;
 	topicModel(docTopicMatCom, topicTermMatCom, tdmCom, k = 10);
 	newMatrix := mergeFeatureMatrix(termMatID, termMatIDCom, feature = 'col');
