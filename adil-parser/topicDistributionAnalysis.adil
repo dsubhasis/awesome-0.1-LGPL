@@ -25,7 +25,7 @@ communities[] := select distinct community from userCommunity;
 // for each community, get the tweets text when group members reply each other and do the topic model for each community. 
 similarity := [];
 for (c  in communities) {
-	users[] := select user from userCommunity where community = c;
+    users[] := select user from userCommunity where community = c;
 	Relation tweets := twitterNetwork.executeCypher(match (u1:User) - [r:Reply] - (u2:User) where u1 in $users and u2 in $users return r.tweet.text);
 	Matrix tdmCom; Relation docMatIDCom; Relation termMatIDCom;
     countMatrix(tdmCom, docMatIDCom, termMatIDCom, tweets.text, features = (getVocubulary(tweets), []));
