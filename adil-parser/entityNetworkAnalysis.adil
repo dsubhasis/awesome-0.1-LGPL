@@ -30,8 +30,8 @@ MATCH (e1: Entity {id:$R.id1})
 MATCH (e2: Entity {id:$R.id2})
 Merge (e1)-[co:CO-OCCUR]->(e2)
 ON CREATE SET co.docID = $R.dID, co.sentenceID = $R.sID
-) store;
 );
+) store;
 
 users[] := entityNetwork.pageRank(top_k = True, returnCount = 10) return ([:Entity.name]);
 
