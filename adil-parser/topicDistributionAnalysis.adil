@@ -4,21 +4,21 @@ create analysis topicDistributionAnalysis as (
 newsEntity := NETokenizer(news.newsText, 'docID' = news.newsID, ['text' = news.newsText]);
 // count_Matrix return tdm which is a martix, docMatID and termMatID which are relations with schema (docID, mid), and (term, mid), which returns document ids or terms with their correponding matrix index. 
 Matrix tdm; Relation docMatID; Relation termMatID;
-count_Matrix(tdm, docMatID, termMatID, news.newsText, features = (get_vocubulary(news.newsText), []));
+countMatrix(tdm, docMatID, termMatID, news.newsText, features = (get_vocubulary(news.newsText), []));
 
 // topic model for all news. M_d is topic document matrix and M_t is term topic matrix. M_d is of dimension 100 \times N where N is the vocubulary size.
-Matrix M_d; Matrix M_t;
-topic_model(M_d, M_t, tdm, k = 10);
+Matrix docTopicMat; Matrix topicTermMat;
+topicModel(docTopicMat, topicTermMat, tdm, k = 10);
 
 // get count matrix for famous people
 mid[] := select docMatID.mid from docMatID, newsEntity where newsEntity.entityTerm in executeSQL(select userName from ndb.famoususer where year = 2019) and docMatID.did; = newsEntity.docID;
-tdm_famous[] := [];
+tdmFamous[] := [];
 for (id in mid){
-	tdm_famous.add(tdm[id, :]);
+	tdmFamous.add(tdm[id, :]);
 }
 // topic model for news about famous people
-Matrix M_d_famous; Matrix M_t_famous;
-topic_model(M_d_famous, M_t_famous, tdm_famous, k = 10);
+Matrix docTopicMatFamous; Matrix topicTermMatFamous;
+topicModel(docTopicMatFamous, topicTermMatFamous, tdmFamous, k = 10);
 // community detection 
 Relation userCommunity := twitterNetwork.executeCypher(louvain('User', 'Reply') RETURN userName AS user, community ORDER BY community) store; 
 communities[] := select distinct community from userCommunity;
@@ -26,18 +26,17 @@ communities[] := select distinct community from userCommunity;
 similarity := [];
 for (c  in communities) {
 	users[] := select user from userCommunity where community = c;
-	Collection tweets := twitterNetwork.executeCypher(match (u1:User) - [r:Reply] - (u2:User) where u1 in $users and u2 in $users return r.tweet);
-	Relation tweets := Scan(tweets);
-	Matrix tdm_c; Relation dMID_c; Relation tMID_c;
-    count_Matrix(tdm_c, dMID_c, tMID_c, tweets.text, features = (get_vocubulary(tweets), []));
-	Matrix M_dc; Matrix M_tc;
-	topic_model(M_dc, M_tc, tdm_c, k = 10);
-	newMatrix := mergeFeatureMatrix(termMatID, tMID_c, feature = 'col');
-	M_d_new := featureMatrixReconstruct(M_d, termMatID, newMatrix, feature = 'col');
-	M_dc_new := featureMatrixReconstruct(M_dc, tMID_c, newMatrix, feature = 'col');
-	sim := matrixSimilarity(M_d_new, M_dc_new, function = 'optimal match');
-	similarity.add(sim);
+	Relation tweets := twitterNetwork.executeCypher(match (u1:User) - [r:Reply] - (u2:User) where u1 in $users and u2 in $users return r.tweet.text);
+	Matrix tdmCom; Relation docMatIDCom; Relation termMatIDCom;
+    countMatrix(tdmCom, docMatIDCom, termMatIDCom, tweets.text, features = (get_vocubulary(tweets), []));
+	Matrix docTopicMatCom; topicTermMatCom;
+	topicModel(docTopicMatCom, topicTermMatCom, tdmCom, k = 10);
+	newMatrix := mergeFeatureMatrix(termMatID, termMatIDCom, feature = 'col');
+	topicTermMatNew := featureMatrixReconstruct(topicTermMat, termMatID, newMatrix, feature = 'col');
+	topicTermMatComNew := featureMatrixReconstruct(topicTermMatCom, termMatIDCom, newMatrix, feature = 'col');
+	sim[] := matrixSimilarity(topicTermMatNew, topicTermMatComNew, function = 'optimal match');
+	similarity.add(ave(sim));
 }
 communityID ：= similarity.indexOf(max(similarity));
-sim := matrixSimilarity(M_d, M_d_famous, function = 'optimal match');
+sim := matrixSimilarity(topicTermMat, topicTermMatFamous, function = 'optimal match');
 );
