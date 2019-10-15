@@ -1,25 +1,24 @@
 use newsDb as db
 create analysis entityNetworkAnalysis as (
-selectedNewsID := select newsID from db.newsDataTable n where ATLEAST(1)  db.politicalDictionary.entityName WITHIN n.newsText;
+selectedNewsID := select newsID from db.newsDataTable n where ATLEAST(1) db.politicalDictionary.entityName WITHIN n.newsText;
 baseData := executeSQL(select newsID, newsText, newspaperName, newsDate from newsDataTable where newsDate > '2018-1-1'::date and newsID in selectedNewsID);
 stopWords[] := readFile('myStopWords.txt', split = ',');
-terms[] := get_vocabulary(baseData.newsText) - stopWords;
-newpaperList[] := ["ABC", "BBC"];
+terms[] := getVocabulary(baseData.newsText) - stopWords;
 tdms[] := [];
-count_Matrix(tdms, ~, ~, baseData.newsText, features = (terms, [newsDate]), newspaperName in newpaperList);
-M_ds, M_ts := [], [];
+countMatrix(tdms, ~, ~, baseData.newsText, features = (terms, [newspaperName]));
+docTopicMat, topTermMat := [], [];
 for (tdm in tdms) {
-    Matrix M_d, Matrix M_t;
-	topic_model(M_d, M_t, tdm, k = 100); 
-	M_ds.add(M_d); 
-	M_ts.add(M_t)};
+    Matrix d, Matrix t;
+	topicModel(d, t, tdm, k = 100); 
+	docTopicMat.add(d); 
+	topTermMat.add(t)};
 newsSent := sentenceTokenizer(baseData.newsText, 'docID' = baseData.newsID, ['date' = baseData.newsDate]);
 noun := nounPhrase(newsSent.sentence, language = 'en', maxLength = 4, 'docID' = newsSent.docID, 'sentenceID' = newsSent.sentenceID, ['date' = newsSent.newsDate]);
 entity := NETokenizer(noun.nounphrase, 'docID' = noun.docID, 'sentenceID' = noun.sentenceID, ['date' = noun.newsDate]);
 entityNetwork := create propertygraph view (
 Relation R := select docID dID, sentenceID sID, e1.entityID id1, e2.entityID id2, e1.entityTerm et1, e2.entityTerm et2, e1.entityType t1, e2.entityType t2 
 from entity e1, entity e2
-where e1.dID = e2.dID and e1.sentenceID = e1.sentenceID and e1.entityID != e2.entityID 
+where e1.dID = e2.dID and e1.sentenceID = e1.sentenceID and e1.entityID != e2.entityID; 
 View m := executeCypher(
 ASSERT Entity.id IS UNIQUE
 # create nodes 
@@ -32,7 +31,5 @@ Merge (e1)-[co:CO-OCCUR]->(e2)
 ON CREATE SET co.docID = $R.dID, co.sentenceID = $R.sID
 );
 ) store;
-
 users[] := entityNetwork.pageRank(top_k = True, returnCount = 10) return ([:Entity.name]);
-
 );
