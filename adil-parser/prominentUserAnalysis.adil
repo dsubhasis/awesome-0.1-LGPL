@@ -24,6 +24,5 @@ ON CREATE SET mt.date = $R.date, mt.count = $R.cnt
 );
 
 users := mentionGraph.pageRank(top_k = True, returnCount = 10) return ([:User.userName]);
-
-tweetsu:= executeSQL(select text from db.twitterstatus where userid in (select userid from db.twitteruser where screen_name in $users));
+tweetofSelectedUser:= executeSQL(select text from db.twitterstatus where userid in (select userid from db.twitteruser where screen_name in $users));
 );
