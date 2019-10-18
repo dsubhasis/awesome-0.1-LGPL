@@ -1,17 +1,17 @@
 use tweetDb as db
 create analysis ProminentUserAnalysis as (
-htSet[] := ["h1", ..., "hn"]
+htSet[] := ["h1", ..., "hn"];
 baseData := executeSQL(
-with temp as (select userid, json_array_elements((entities-> 'entities' -> 'hashtags')::json) ->>'text' as ht from db.twitterstatus),
+"with temp as (select userid, json_array_elements((entities-> 'entities' -> 'hashtags')::json) ->>'text' as ht from db.twitterstatus),
 users as (select u.screen_name as name, s.id, s.created_at, s.entities-> 'entities' -> 'user_mentions' as mention from db.twitteruser u, db.twitterstatus s where u.userid in (select userid from temp where ht in $htSet) and u.userid = s.userid),
-select created_at::TIMESTAMP::DATE as date, name, json_array_elements(mention) ->> 'name'  as mentionedName from users;
+select created_at::TIMESTAMP::DATE as date, name, json_array_elements(mention) ->> 'name'  as mentionedName from users;"
 );
 
 mentionGraph := create propertygraph view (
 Relation R := select name, mentionedName, date,count(*) as cnt from baseData group by name, mentionedName, date;
 
 View m :=  executeCypher(
-ASSERT user.userName IS UNIQUE
+"ASSERT user.userName IS UNIQUE
 # create nodes 
 Merge (:User {userName: $R.name)
 Merge (:User {userName: $R.mentionedName)
@@ -20,10 +20,9 @@ MATCH (user: User {userName: $R.name})
 MATCH (mentioned: User {userName: $R.mentionedName})
 Merge (user)-[mt:MENTION]->(mentioned)
 ON CREATE SET mt.date = $R.date, mt.count = $R.cnt
-) store;
+) store;"
 );
 
 users := mentionGraph.pageRank(top_k = True, returnCount = 10) return ([:User.userName]);
-
-tweetsu:= executeSQL(select text from db.twitterstatus where userid in (select userid from db.twitteruser where screen_name in $users));
+tweetofSelectedUser:= executeSQL(select text from db.twitterstatus where userid in (select userid from db.twitteruser where screen_name in $users));
 );
