@@ -120,6 +120,7 @@ TOKEN : {
   | < GREATER : ">">
   | < LESS : "<" >
   | <FBRACKETSTART : "(">
+  |<RETURN:"return">
   | <FBRACKETEND : ")">
   | <DOT : ".">
   | <COMMA : ",">
@@ -132,6 +133,7 @@ TOKEN : {
                                                             |<WHITESPACE><GREATERTHANEQUALS>|<WHITESPACE><MINORTHANEQUALS>
                                                             |<WHITESPACE><NOTEQUALSSTANDARD>|<WHITESPACE><NOTEQUALSBANG>|<WHITESPACE><NOTEQUALSBANG><WHITESPACE><CONCAT>>
   |< MINUS : "-" >
+
 }
 TOKEN [IGNORE_CASE]: {
 <CREATE : "create" >
@@ -182,6 +184,14 @@ TOKEN [IGNORE_CASE]: {
 |<ORDER : "order">
 |<GROUP : "group">
 |<USE : "use">
+|<RELATION : "relation">
+|<CSV: "csv">
+|< GRAPHQL : "graphql">
+|<JSON : "json">
+|<XML : "xml">
+|<SCHEMA : "schema">
+
+
 }
 TOKEN [IGNORE_CASE]: {
 <ENV : "env" >
@@ -201,8 +211,10 @@ TOKEN :
  | < #LETTER   : ["a"-"z","A"-"Z"] >
  | < ALPHANUM : (<LETTER>|<DIGITS>)(<LETTER>|<DIGITS>)*>
  |<FIELDNAME : (<ALPHANUM>(<DOT><ALPHANUM>)*)>
- |< QUOTED_IDENTIFIER : "\"" (~["\n","\r","\""])+ "\"" | ("`" (~["\n","\r","`"])+ "`") >
- |<GraphElementType : <COLON><ALPHANUM>>
+ |< UNQUOTED_IDENTIFIER : <FBRACKETSTART>(<WHITESPACE><ALPHANUM>)* <WHITESPACE> <FBRACKETEND> >
+ |<QUOTED_IDENTIFIER : "\"" (~["\n","\r","\""])+ "\"" | ("`" (~["\n","\r","`"])+ "`" )>
+
+
  |<INPATH : (<MINUS><GREATER>) >
  |<OUTPATH : (<LESS><MINUS>) >
 
@@ -264,7 +276,7 @@ JsonObjectBuilder Statement(JsonObjectBuilder jObject)  : {/*@bgen(jjtree) State
 {/*@bgen(jjtree) Statement */
  try {
 /*@egen*/
- ( LOOKAHEAD(1) CreateAnalysis(jObject)| ImportLibrary(jObject) )/*@bgen(jjtree)*/
+ ( LOOKAHEAD(2) CreateAnalysis(jObject)| ImportLibrary(jObject) | UseClause(jObject))/*@bgen(jjtree)*/
  {
    jjtree.closeNodeScope(jjtn000, true);
    jjtc000 = false;
@@ -296,8 +308,36 @@ JsonObjectBuilder Statement(JsonObjectBuilder jObject)  : {/*@bgen(jjtree) State
 // USE Database Syntax
 
 
+JsonObjectBuilder UseClause(JsonObjectBuilder jObject) : {/*@bgen(jjtree) UseClause */
+                                                          ASTUseClause jjtn000 = new ASTUseClause(JJTUSECLAUSE);
+                                                          boolean jjtc000 = true;
+                                                          jjtree.openNodeScope(jjtn000);
+/*@egen*/Token t; Token z; JsonArrayBuilder array = Json.createArrayBuilder(); String ltype; JsonObjectBuilder tempjObject = Json.createObjectBuilder();}
+{/*@bgen(jjtree) UseClause */
+try {
+/*@egen*/
 
-
+<USE>  t= <ALPHANUM>{array.add(t.image);}{variableTable.add(t.image, "db" );}  <AS> z = <ALPHANUM>{variableTable.add(z.image, t.image);{tempjObject.add("as", z.image);}}
+{
+JsonObjectBuilder dbjObject = Json.createObjectBuilder();
+ImportLibraryDBCheck(dbjObject, z.image, array.build());
+tempjObject.add("name", dbjObject.build());
+tempjObject.add("alias", z.image);
+}
+{jObject.add("use", tempjObject.build());}/*@bgen(jjtree)*/
+{
+  jjtree.closeNodeScope(jjtn000, true);
+  jjtc000 = false;
+}
+/*@egen*/
+{return jObject;}/*@bgen(jjtree)*/
+} finally {
+  if (jjtc000) {
+    jjtree.closeNodeScope(jjtn000, true);
+  }
+}
+/*@egen*/
+}
 
 JsonObjectBuilder ImportLibrary(JsonObjectBuilder jObject) : {/*@bgen(jjtree) ImportLibrary */
                                                               ASTImportLibrary jjtn000 = new ASTImportLibrary(JJTIMPORTLIBRARY);
@@ -343,10 +383,12 @@ JsonObjectBuilder CreateAnalysis(JsonObjectBuilder jObject) : {/*@bgen(jjtree) C
 {/*@bgen(jjtree) CreateAnalysis */
   try {
 /*@egen*/
-  <CREATE> <ANALYSIS> k = <ALPHANUM>{jObject.add("name", k.image); vtable.insertName(k.image);vtable.updateType(k.image, DataTypeEnum.AnalysisVar.ordinal());} <AS> <FBRACKETSTART>
+  <CREATE> <ANALYSIS> k = <ALPHANUM>
+                        {jObject.add("name", k.image); vtable.insertName(k.image);vtable.updateType(k.image, DataTypeEnum.AnalysisVar.ordinal());}
+                        <AS> <FBRACKETSTART>
                                           (
                                           {JsonObjectBuilder tempJB = Json.createObjectBuilder();}
-                                           (LOOKAHEAD(1)(tempJB =  AssignmentStatement(tempJB))|(ForAllExpression(tempJB)))<SEMICOLON>
+                                           (LOOKAHEAD(2)(tempJB =  AssignmentStatement(tempJB))|(ForAllExpression(tempJB))|DBPASS(tempJB))<SEMICOLON>
                                            {array.add(tempJB.build());}
                                            )*
 <FBRACKETEND>
@@ -398,7 +440,8 @@ JsonArrayBuilder order = Json.createArrayBuilder();
     {int n = 0;
 
     }
-    t = <ALPHANUM>{tempJB.add("array", false);tempJB.add("type", "single");  tempJB.add("size",n); variableTable.add(t.image, "val"); vtable.insertName(t.image); vtable.updateType(t.image, DataTypeEnum.Undecided.ordinal());}
+    ((t = <ALPHANUM>)|(t = <FIELDNAME>){{tempJB.add("varpath", true);}})
+        {tempJB.add("array", false);tempJB.add("type", "single");  tempJB.add("size",n); variableTable.add(t.image, "val"); vtable.insertName(t.image); vtable.updateType(t.image, DataTypeEnum.Undecided.ordinal());}
                   (
 
                   <StartSQBracket><EndSQBracket>{tempJB.add("array", true);
@@ -409,15 +452,19 @@ JsonArrayBuilder order = Json.createArrayBuilder();
                   vtable.updateType(t.image, DataTypeEnum.Undecided.ordinal());
                   }
                   )*{vtable.addDimention(t.image, n);}
-                  <COLON><EQAL>(<FBRACKETSTART>(LOOKAHEAD(4)<PROPERTYGRAPH>{vtable.updateType(t.image, DataTypeEnum.PropertyGraph.ordinal());}
+                  <COLON><EQAL>(
+                                <FBRACKETSTART>(LOOKAHEAD(4)<PROPERTYGRAPH>{vtable.updateType(t.image, DataTypeEnum.PropertyGraph.ordinal());}
                                                            |<HISTOGRAM>{vtable.updateType(t.image, DataTypeEnum.Histogram.ordinal());}
                                                            |<LONG>{vtable.updateType(t.image, DataTypeEnum.Long.ordinal());}
                                                            |<STRING>{vtable.updateType(t.image, DataTypeEnum.String.ordinal());}
                                                            |<INTEGER>{vtable.updateType(t.image, DataTypeEnum.Integer.ordinal());}
                                                            |<TEXT>{vtable.updateType(t.image, DataTypeEnum.Text.ordinal());}
                                                 )
-                                   <FBRACKETEND>)?
-                    (SelectStament(tempJB)|AWSMFunction(tempJB))
+                                   <FBRACKETEND>
+                                )?
+                    (
+                        ((SelectStament(tempJB)|AWSMFunction(tempJB)|DBPASS(tempJB)|ASSIGNMENT(tempJB) | ConsturctGrpah(tempJB)))
+                    )
                    (
                         (<ORDER> <BY> or = <ALPHANUM>{ List ovar = new ArrayList(); order.add(or.image); ovar.add(or.image);}(<COMMA>  or = <ALPHANUM> { order.add(or.image); ovar.add(or.image);})?
                         {
@@ -429,8 +476,15 @@ JsonArrayBuilder order = Json.createArrayBuilder();
 
                     )?
                         (
-                            <GROUP> <BY> gr = <ALPHANUM>{ group.add(gr.image);}(<COMMA> gr = <ALPHANUM> { group.add(gr.image);})* {tempJB.add("GROUP",group.build());})?
-                            (<STORE> <AS> store = <ALPHANUM>{tempJB.add("STORE", true); tempJB.add("STORAGE", store.image);}
+                            <GROUP> <BY> gr = <ALPHANUM>{ group.add(gr.image);}(<COMMA> gr = <ALPHANUM> { group.add(gr.image);})* {tempJB.add("GROUP",group.build());}
+                        )?
+                        (
+                            <STORE> <AS> store = <ALPHANUM>{tempJB.add("STORE", true); tempJB.add("STORAGE", store.image);}
+                        )?
+                        (
+
+                        RetrunStatement(tempJB)
+
                         )?
 
                    )/*@bgen(jjtree)*/
@@ -465,7 +519,159 @@ JsonArrayBuilder order = Json.createArrayBuilder();
     }
 /*@egen*/
 }
+JsonObject RetrunStatement(JsonObjectBuilder jobject) : {/*@bgen(jjtree) RetrunStatement */
+ASTRetrunStatement jjtn000 = new ASTRetrunStatement(JJTRETRUNSTATEMENT);
+boolean jjtc000 = true;
+jjtree.openNodeScope(jjtn000);
+/*@egen*/
+Token t;
+JsonObjectBuilder tempJB = Json.createObjectBuilder();
 
+}
+{/*@bgen(jjtree) RetrunStatement */
+try {
+/*@egen*/
+<RETURN> <AS> <FBRACKETSTART>PropertyGraph(tempJB)<FBRACKETEND>/*@bgen(jjtree)*/
+} catch (Throwable jjte000) {
+  if (jjtc000) {
+    jjtree.clearNodeScope(jjtn000);
+    jjtc000 = false;
+  } else {
+    jjtree.popNode();
+  }
+  if (jjte000 instanceof RuntimeException) {
+    throw (RuntimeException)jjte000;
+  }
+  if (jjte000 instanceof ParseException) {
+    throw (ParseException)jjte000;
+  }
+  throw (Error)jjte000;
+} finally {
+  if (jjtc000) {
+    jjtree.closeNodeScope(jjtn000, true);
+  }
+}
+/*@egen*/
+}
+
+JsonObject PropertyGraph(JsonObjectBuilder jobject) : {/*@bgen(jjtree) PropertyGraph */
+ASTPropertyGraph jjtn000 = new ASTPropertyGraph(JJTPROPERTYGRAPH);
+boolean jjtc000 = true;
+jjtree.openNodeScope(jjtn000);
+/*@egen*/
+Token t;
+JsonArrayBuilder tempArray = Json.createArrayBuilder();
+JsonArrayBuilder tempJA = Json.createArrayBuilder();
+
+}
+{/*@bgen(jjtree) PropertyGraph */
+        try {
+/*@egen*/
+        GRAPHNODE(tempJA){tempArray.add(tempJA.build());}
+        (
+
+        {JsonArrayBuilder tempJB = Json.createArrayBuilder();}
+        GRAPHEDGE(tempJB)
+        {tempArray.add(tempJB.build());}
+
+        {JsonArrayBuilder tempJC = Json.createArrayBuilder();}
+        GRAPHNODE(tempJC){tempArray.add(tempJC.build());}
+
+        )*/*@bgen(jjtree)*/
+        {
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+        }
+/*@egen*/
+        {jobject.add("cypher",tempArray.build());}/*@bgen(jjtree)*/
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
+/*@egen*/
+}
+
+
+JsonArrayBuilder GRAPHNODE(JsonArrayBuilder jobject) : {/*@bgen(jjtree) GRAPHNODE */
+ASTGRAPHNODE jjtn000 = new ASTGRAPHNODE(JJTGRAPHNODE);
+boolean jjtc000 = true;
+jjtree.openNodeScope(jjtn000);
+/*@egen*/
+Token t; Token k;
+JsonObjectBuilder tempJB = Json.createObjectBuilder();
+}
+{/*@bgen(jjtree) GRAPHNODE */
+try {
+/*@egen*/
+<FBRACKETSTART>
+            ((t = <ALPHANUM>)| (t = <FIELDNAME>{tempJB.add("nodeName", t.image);}))? <COLON> (k = <ALPHANUM>| k = <FIELDNAME>)
+<FBRACKETEND>/*@bgen(jjtree)*/
+{
+  jjtree.closeNodeScope(jjtn000, true);
+  jjtc000 = false;
+}
+/*@egen*/
+
+{
+tempJB.add("nodeType",k.image);
+jobject.add(tempJB.build());
+return jobject;
+}/*@bgen(jjtree)*/
+} finally {
+  if (jjtc000) {
+    jjtree.closeNodeScope(jjtn000, true);
+  }
+}
+/*@egen*/
+}
+
+JsonArrayBuilder GRAPHEDGE(JsonArrayBuilder jobject):{/*@bgen(jjtree) GRAPHEDGE */
+                                                      ASTGRAPHEDGE jjtn000 = new ASTGRAPHEDGE(JJTGRAPHEDGE);
+                                                      boolean jjtc000 = true;
+                                                      jjtree.openNodeScope(jjtn000);
+/*@egen*/Token t; Token k; Token s;}{/*@bgen(jjtree) GRAPHEDGE */
+try {
+/*@egen*/
+
+{JsonObjectBuilder tempJB = Json.createObjectBuilder();
+
+}
+<MINUS><StartSQBracket>
+    t = <ALPHANUM><COLON> s = <ALPHANUM>
+<EndSQBracket><MINUS>/*@bgen(jjtree)*/
+{
+  jjtree.closeNodeScope(jjtn000, true);
+  jjtc000 = false;
+}
+/*@egen*/
+{
+tempJB.add("edgeName", t.image);
+tempJB.add("edgeType",s.image);
+jobject.add(tempJB.build());
+return jobject;
+}/*@bgen(jjtree)*/
+} finally {
+  if (jjtc000) {
+    jjtree.closeNodeScope(jjtn000, true);
+  }
+}
+/*@egen*/
+}
 
 
 JsonObjectBuilder DeclareAnalysis(JsonObjectBuilder jObject) : {/*@bgen(jjtree) DeclareAnalysis */
@@ -505,13 +711,99 @@ try {
 }
 /*@egen*/
 }
+// Construct Graph
+
+JsonObjectBuilder ConsturctGrpah(JsonObjectBuilder jObject) : {/*@bgen(jjtree) ConsturctGrpah */
+                                                               ASTConsturctGrpah jjtn000 = new ASTConsturctGrpah(JJTCONSTURCTGRPAH);
+                                                               boolean jjtc000 = true;
+                                                               jjtree.openNodeScope(jjtn000);
+/*@egen*/JsonObjectBuilder tempJA = Json.createObjectBuilder();
+JsonObjectBuilder tempJB = Json.createObjectBuilder();
+JsonObjectBuilder tempJC = Json.createObjectBuilder();
+JsonArrayBuilder order = Json.createArrayBuilder();
+
+JsonArrayBuilder group = Json.createArrayBuilder();
+
+}
+{/*@bgen(jjtree) ConsturctGrpah */
+ try {
+/*@egen*/{Token v, or, gr;}
+                      <CONSTRUCTGRAPH>  <FBRACKETSTART> <VIEW> v = <ALPHANUM> <COLON><EQAL>{tempJA.add("view",v.image );}
+                          ((SelectStament(tempJC))|(DBPASS(tempJB))| (AWSMFunction(tempJB))) <SEMICOLON>
+
+                            ( {Token r;}<RELATION> r = <ALPHANUM> {tempJA.add("relation", r.image);}<COLON><EQAL>
+                                                        ((SelectStament(tempJC))|(DBPASS(tempJB))| (AWSMFunction(tempJB)))
+
+                                                        (
+                                                                                (<ORDER> <BY> or = <ALPHANUM>{ List ovar = new ArrayList(); order.add(or.image); ovar.add(or.image);}(<COMMA>  or = <ALPHANUM> { order.add(or.image); ovar.add(or.image);})?
+                                                                                {
+
+                                                                                tempJB.add("ORDER",order.build());
+                                                                                vtable.setOrder(ovar);
+
+                                                                                }
+
+                                                                            )?
+                                                                                (
+                                                                                    <GROUP> <BY> gr = <ALPHANUM>{ group.add(gr.image);}(<COMMA> gr = <ALPHANUM> { group.add(gr.image);})* {tempJB.add("GROUP",group.build());}
+                                                                                )?
+                                                        )
+
+
+
+
+                                                        <SEMICOLON>{tempJB.add("relation-def", tempJB.build());}
+                            )?
+                <FBRACKETEND>/*@bgen(jjtree)*/
+{
+  jjtree.closeNodeScope(jjtn000, true);
+  jjtc000 = false;
+}
+/*@egen*/
+{
+
+tempJA.add("view-def", tempJC.build());
+return jObject;
+}/*@bgen(jjtree)*/
+ } catch (Throwable jjte000) {
+   if (jjtc000) {
+     jjtree.clearNodeScope(jjtn000);
+     jjtc000 = false;
+   } else {
+     jjtree.popNode();
+   }
+   if (jjte000 instanceof RuntimeException) {
+     throw (RuntimeException)jjte000;
+   }
+   if (jjte000 instanceof ParseException) {
+     throw (ParseException)jjte000;
+   }
+   throw (Error)jjte000;
+ } finally {
+   if (jjtc000) {
+     jjtree.closeNodeScope(jjtn000, true);
+   }
+ }
+/*@egen*/
+}
+
+
+
 //SELECT Statement of ADIL 1.0
 JsonObjectBuilder SelectStament(JsonObjectBuilder jObject) : {/*@bgen(jjtree) SelectStament */
-                                                              ASTSelectStament jjtn000 = new ASTSelectStament(JJTSELECTSTAMENT);
-                                                              boolean jjtc000 = true;
-                                                              jjtree.openNodeScope(jjtn000);
-/*@egen*/Token t, tuple, db; JsonObjectBuilder tempJB = Json.createObjectBuilder(); boolean variableArray = false ;
-JsonArrayBuilder tempTuple = Json.createArrayBuilder();JsonArrayBuilder tempDB = Json.createArrayBuilder();}
+ASTSelectStament jjtn000 = new ASTSelectStament(JJTSELECTSTAMENT);
+boolean jjtc000 = true;
+jjtree.openNodeScope(jjtn000);
+/*@egen*/
+Token t, tuple, db, alias  ;
+JsonObjectBuilder tempJB = Json.createObjectBuilder();
+JsonObjectBuilder aliasList = Json.createObjectBuilder();
+JsonArrayBuilder func = Json.createArrayBuilder();
+boolean variableArray = false ;
+JsonArrayBuilder tempTuple = Json.createArrayBuilder();
+JsonArrayBuilder tempDB = Json.createArrayBuilder();
+tempJB.add("isFunction", false);
+}
 {/*@bgen(jjtree) SelectStament */
 try {
 /*@egen*/
@@ -519,11 +811,25 @@ try {
 int tu = 0;
 int src = 1;
 }
-        <SELECT> tuple = <ALPHANUM> { tempTuple.add(tuple.image); vtable.insertName(tuple.image); vtable.updateType(tuple.image, DataTypeEnum.Undecided.ordinal());}
+       <SELECT> tuple = <ALPHANUM>{tempJB.add("name", tuple.image);}(GetFunction(func, tuple.image){JsonObjectBuilder tuplaDet = Json.createObjectBuilder();
+                        tempJB.add("isFunction", true);  })?
+
+
+       {tempTuple.add(func.build());}
+        (<AS> alias = <ALPHANUM>{aliasList.add(tuple.image, alias.image);}
+
+        )?
+
+
         (
-                                                 <COMMA> tuple =<ALPHANUM>
-                                                            {tempTuple.add(tuple.image);
-                                                             tu = tu + 1; vtable.insertName(tuple.image); vtable.updateType(tuple.image, DataTypeEnum.Undecided.ordinal());}
+                                                 <COMMA> tuple =<ALPHANUM>{tempJB.add("name", tuple.image);}
+                                                 ( GetFunction(func, tuple.image))?
+                                                 {JsonObjectBuilder tuplaDet = Json.createObjectBuilder();
+                                                                                        tempJB.add("isFunction", true);  }
+
+
+
+
          )*
                                                             <FROM> db = <ALPHANUM>
                                                             {
@@ -533,21 +839,37 @@ int src = 1;
 
                                                             }
                                                             (<COMMA> db =<ALPHANUM> { tempDB.add(db.image); src = src + 1; })?
-                                                            <WHERE>
                                                             (
-                                                            {
-                                                            JsonObjectBuilder pred = Json.createObjectBuilder();
-                                                            }
+                                                                <WHERE>
+
+                                                                {
+                                                                    JsonArrayBuilder predArray = Json.createArrayBuilder();
+                                                                    JsonObjectBuilder pred = Json.createObjectBuilder();
+                                                                }
                                                                 Expression(pred)
-                                                            {
-                                                                tempJB.add("PREDICATE", pred.build());
-                                                            }
+                                                                {
+                                                                    predArray.add(pred.build());
+                                                                }
+                                                                (
+                                                                {Token conj;}
+
+                                                                        (conj=<AND>|conj=<OR>|conj=<NOT>)
+                                                                        {predArray.add(conj.image);}
+                                                                        Expression(pred)
+                                                                        {
+                                                                            predArray.add(pred.build());
+                                                                        }
+                                                                 )
                                                             )?/*@bgen(jjtree)*/
 {
   jjtree.closeNodeScope(jjtn000, true);
   jjtc000 = false;
 }
 /*@egen*/
+
+                                                            //
+
+
 {
 if(tuple.image != "*"){
     tempJB.add("tuple", tempTuple.build());
@@ -595,9 +917,12 @@ JsonObjectBuilder AWSMFunction(JsonObjectBuilder l): {/*@bgen(jjtree) AWSMFuncti
                                                       jjtree.openNodeScope(jjtn000);
 /*@egen*/Token t; JsonArrayBuilder l1 = Json.createArrayBuilder();JsonObjectBuilder tempJB = Json.createObjectBuilder();}
 {/*@bgen(jjtree) AWSMFunction */
-try {
+   try {
 /*@egen*/
-t = <ALPHANUM>GetFunction(l1, t.image)(
+   ((t = <ALPHANUM>)|(t = <FIELDNAME>{{tempJB.add("varpath", true);}}))
+
+
+    GetFunction(l1, t.image)(
                                                                             <WHERE>
                                                                                    (
                                                                                                    {
@@ -620,25 +945,25 @@ t = <ALPHANUM>GetFunction(l1, t.image)(
     l.add("awsmfunc", tempJB.build());
     return l;
 }/*@bgen(jjtree)*/
-} catch (Throwable jjte000) {
-  if (jjtc000) {
-    jjtree.clearNodeScope(jjtn000);
-    jjtc000 = false;
-  } else {
-    jjtree.popNode();
-  }
-  if (jjte000 instanceof RuntimeException) {
-    throw (RuntimeException)jjte000;
-  }
-  if (jjte000 instanceof ParseException) {
-    throw (ParseException)jjte000;
-  }
-  throw (Error)jjte000;
-} finally {
-  if (jjtc000) {
-    jjtree.closeNodeScope(jjtn000, true);
-  }
-}
+   } catch (Throwable jjte000) {
+     if (jjtc000) {
+       jjtree.clearNodeScope(jjtn000);
+       jjtc000 = false;
+     } else {
+       jjtree.popNode();
+     }
+     if (jjte000 instanceof RuntimeException) {
+       throw (RuntimeException)jjte000;
+     }
+     if (jjte000 instanceof ParseException) {
+       throw (ParseException)jjte000;
+     }
+     throw (Error)jjte000;
+   } finally {
+     if (jjtc000) {
+       jjtree.closeNodeScope(jjtn000, true);
+     }
+   }
 /*@egen*/
 }
 // FOR ALL ADIL 1.0
@@ -727,6 +1052,180 @@ l.add("FORALL", tempJB.build());
 
 }
 
+//ExecuteSQL Database Direct
+
+void DBPASS(JsonObjectBuilder l) : {/*@bgen(jjtree) DBPASS */
+                                    ASTDBPASS jjtn000 = new ASTDBPASS(JJTDBPASS);
+                                    boolean jjtc000 = true;
+                                    jjtree.openNodeScope(jjtn000);
+/*@egen*/Token t; Token var; JsonObjectBuilder tempJB = Json.createObjectBuilder(); Token x;}
+{/*@bgen(jjtree) DBPASS */
+   try {
+/*@egen*/
+   (t = <EXECUTESQL> | t = <EXECUTECYPHER>)  x = quetedStatement()
+
+   {tempJB.add("statement",x.image);
+   tempJB.add("type",t.image);
+
+   }/*@bgen(jjtree)*/
+   {
+     jjtree.closeNodeScope(jjtn000, true);
+     jjtc000 = false;
+   }
+/*@egen*/
+
+
+
+
+   {l.add("ptq", tempJB.build());}/*@bgen(jjtree)*/
+   } catch (Throwable jjte000) {
+     if (jjtc000) {
+       jjtree.clearNodeScope(jjtn000);
+       jjtc000 = false;
+     } else {
+       jjtree.popNode();
+     }
+     if (jjte000 instanceof RuntimeException) {
+       throw (RuntimeException)jjte000;
+     }
+     if (jjte000 instanceof ParseException) {
+       throw (ParseException)jjte000;
+     }
+     throw (Error)jjte000;
+   } finally {
+     if (jjtc000) {
+       jjtree.closeNodeScope(jjtn000, true);
+     }
+   }
+/*@egen*/
+}
+
+//Inside Pass through
+
+
+Token quetedStatement() : {/*@bgen(jjtree) quetedStatement */
+                           ASTquetedStatement jjtn000 = new ASTquetedStatement(JJTQUETEDSTATEMENT);
+                           boolean jjtc000 = true;
+                           jjtree.openNodeScope(jjtn000);
+/*@egen*/Token t; Token x;}
+
+{/*@bgen(jjtree) quetedStatement */
+  try {
+/*@egen*/
+  (<FBRACKETSTART> x = <QUOTED_IDENTIFIER> <FBRACKETEND>){System.out.println(x.image);}/*@bgen(jjtree)*/
+  {
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+  }
+/*@egen*/
+  {return x;}/*@bgen(jjtree)*/
+  } finally {
+    if (jjtc000) {
+      jjtree.closeNodeScope(jjtn000, true);
+    }
+  }
+/*@egen*/
+}
+// Inside Assignment
+
+JsonObjectBuilder ASSIGNMENT(JsonObjectBuilder l) : {/*@bgen(jjtree) ASSIGNMENT */
+                                                     ASTASSIGNMENT jjtn000 = new ASTASSIGNMENT(JJTASSIGNMENT);
+                                                     boolean jjtc000 = true;
+                                                     jjtree.openNodeScope(jjtn000);
+/*@egen*/Token t; Token var; JsonObjectBuilder tempJB = Json.createObjectBuilder(); Integer type; Token dt; Token sc;}
+{/*@bgen(jjtree) ASSIGNMENT */
+    try {
+/*@egen*/
+    (
+    <StartSQBracket>  (
+                            t = <DIGITS> {type = 0;}
+                                | t = <QUOTED_IDENTIFIER>{ type = 1; tempJB.add("val", t.image); tempJB.add("type", type); }
+                        )
+                        (
+                    <COMMA>    (t = <DIGITS> {type = 0;}
+                                                              | t = <QUOTED_IDENTIFIER>{ type = 1; tempJB.add("val", t.image); tempJB.add("type", type); })
+                        )*
+
+              (<LOAD> <FROM> t = <QUOTED_IDENTIFIER> <AS>
+                                            (
+                                                ( dt = <CSV>)
+                                                | ( dt = <GRAPHQL>)
+                                                |( dt = <JSON>)
+                                                |( dt = <XML>)
+                                                |( dt = <RELATION>)
+                                                    {tempJB.add("load-data-type", dt.image);
+                                                     tempJB.add("data-path", t.image);
+                                                    }
+                                            )
+                                    (
+
+                                        <SCHEMA> <FROM> (sc = <QUOTED_IDENTIFIER>{tempJB.add("schema-path", sc.image);})
+                                                                            <AS> (
+                                                                                     ( dt = <CSV>)
+                                                                                   | ( dt = <GRAPHQL>)
+                                                                                   |( dt = <JSON>)
+                                                                                   |( dt = <XML>)
+                                                                                   |( dt = <RELATION>)
+                                                                                   {
+                                                                                     tempJB.add("load-schema-type", dt.image);
+
+                                                                                    }
+                                                                                  )
+                                    )?
+              )?
+      <EndSQBracket>
+      )/*@bgen(jjtree)*/
+  {
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+  }
+/*@egen*/
+
+
+
+  {
+
+
+    return l;
+   }/*@bgen(jjtree)*/
+    } finally {
+      if (jjtc000) {
+        jjtree.closeNodeScope(jjtn000, true);
+      }
+    }
+/*@egen*/
+
+
+
+}
+
+JsonObjectBuilder STRINGASSIGNMENT(JsonObjectBuilder l) : {/*@bgen(jjtree) STRINGASSIGNMENT */
+                                                           ASTSTRINGASSIGNMENT jjtn000 = new ASTSTRINGASSIGNMENT(JJTSTRINGASSIGNMENT);
+                                                           boolean jjtc000 = true;
+                                                           jjtree.openNodeScope(jjtn000);
+/*@egen*/Token t; Token var; JsonObjectBuilder tempJB = Json.createObjectBuilder(); Token x;}
+{/*@bgen(jjtree) STRINGASSIGNMENT */
+  try {
+/*@egen*//*@bgen(jjtree)*/
+  {
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+  }
+/*@egen*/
+
+
+
+
+
+  {return l;}/*@bgen(jjtree)*/
+  } finally {
+    if (jjtc000) {
+      jjtree.closeNodeScope(jjtn000, true);
+    }
+  }
+/*@egen*/
+}
+
 JsonObjectBuilder Expression(JsonObjectBuilder l) :
 {/*@bgen(jjtree) Expression */
     ASTExpression jjtn000 = new ASTExpression(JJTEXPRESSION);
@@ -748,11 +1247,8 @@ JsonObjectBuilder Expression(JsonObjectBuilder l) :
                                                         (t = <ALPHANUM>{m.add("op2", 0);}|t = <DIGITS>{m.add("op2", 1);})
                                                                             {k.add(t.image);}
                                                                             (GetFunction(l1, t.image){
-
                                                                             m.add("op2", 3);
-
                                                                             l.add(t.image,l1.build());}
-
                                                                             )?/*@bgen(jjtree)*/
 {
   jjtree.closeNodeScope(jjtn000, true);
@@ -802,7 +1298,8 @@ l.add(funcProp);
 }
             (
 
-                LOOKAHEAD(3)(x = <ALPHANUM>{f1.add("vp1",x.image);} (GetFunction(l, x.image) {f1.add(x.image,l.build());})? (<EQAL> y = <ALPHANUM>{map.add(x.image, y.image); f1.add("map", map.build());})? )
+                LOOKAHEAD(3)(x = <ALPHANUM>{f1.add("vp1",x.image);} (GetFunction(l, x.image) {f1.add(x.image,l.build());})? (<EQAL> ((y = <ALPHANUM>)|(y = <DIGITS>)|(y=<FIELDNAME>))
+                                                    {map.add(x.image, y.image); f1.add("map", map.build());})? )
                 |(x = <DIGITS>{f1.add("digi1",x.image);})
                 |(x = <FIELDNAME>{f1.add("vpt1",x.image);}(GetFunction(l, x.image){f1.add(x.image,l.build());})?(<EQAL> y = <ALPHANUM>{map.add(x.image, y.image); f1.add("map",map.build());})?)
 
@@ -811,7 +1308,9 @@ l.add(funcProp);
             {l1.add(f1.build());}
             (
  {JsonObjectBuilder f2 = Json.createObjectBuilder();JsonObjectBuilder m2 = Json.createObjectBuilder();}
-                  <COMMA> ( LOOKAHEAD(3)(x = <ALPHANUM>{f2.add("vp1",x.image);} (GetFunction(l, x.image) {f2.add(x.image,l.build());})? (<EQAL> y = <ALPHANUM>{m2.add(x.image, y.image); f2.add("map", m2.build());})? )
+                  <COMMA> ( LOOKAHEAD(3)(x = <ALPHANUM>{f2.add("vp1",x.image);} (GetFunction(l, x.image) {f2.add(x.image,l.build());})? (<EQAL> ((y = <ALPHANUM>)|(y = <DIGITS>)|(y=<FIELDNAME>))
+
+                                                                            {m2.add(x.image, y.image); f2.add("map", m2.build());})? )
                             |(x = <DIGITS>{f2.add("digi1",x.image);})
                             |(x = <FIELDNAME>{f2.add("vpt1",x.image);}(GetFunction(l, x.image){f2.add(x.image,l.build());})?(<EQAL> y = <ALPHANUM>{m2.add(x.image, y.image); f2.add("map",m2.build());})?)
                             )
@@ -848,5 +1347,7 @@ l.add(funcProp);
 }
 /*@egen*/
 }
+
+
 
 

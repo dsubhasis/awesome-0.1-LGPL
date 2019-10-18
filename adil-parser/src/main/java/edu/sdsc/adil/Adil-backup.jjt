@@ -179,12 +179,6 @@ void ConstructGRAPH(String name) : {Token t; Token var; JsonObjectBuilder tempJB
    {jjtThis.setImage(t.image);}
 }
 
-
-
-
-
-
-
 Token quetedStatement() : {Token t; Token x;}
 
 {

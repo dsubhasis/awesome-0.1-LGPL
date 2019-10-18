@@ -80,6 +80,7 @@ public static void main(String[] args) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case CREATE:
         case IMPORT:
+        case USE:
           ;
           break;
         default:
@@ -129,17 +130,21 @@ public static void main(String[] args) {
                                                            boolean jjtc000 = true;
                                                            jjtree.openNodeScope(jjtn000);Token t;
     try {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case CREATE:
+      if (jj_2_1(2)) {
         CreateAnalysis(jObject);
-        break;
-      case IMPORT:
-        ImportLibrary(jObject);
-        break;
-      default:
-        jj_la1[1] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
+      } else {
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case IMPORT:
+          ImportLibrary(jObject);
+          break;
+        case USE:
+          UseClause(jObject);
+          break;
+        default:
+          jj_la1[1] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
       }
    jjtree.closeNodeScope(jjtn000, true);
    jjtc000 = false;
@@ -167,6 +172,35 @@ public static void main(String[] args) {
   }
 
 // USE Database Syntax
+  final public JsonObjectBuilder UseClause(JsonObjectBuilder jObject) throws ParseException {
+                                                          /*@bgen(jjtree) UseClause */
+                                                          ASTUseClause jjtn000 = new ASTUseClause(JJTUSECLAUSE);
+                                                          boolean jjtc000 = true;
+                                                          jjtree.openNodeScope(jjtn000);Token t; Token z; JsonArrayBuilder array = Json.createArrayBuilder(); String ltype; JsonObjectBuilder tempjObject = Json.createObjectBuilder();
+    try {
+      jj_consume_token(USE);
+      t = jj_consume_token(ALPHANUM);
+                     array.add(t.image);
+                                          variableTable.add(t.image, "db" );
+      jj_consume_token(AS);
+      z = jj_consume_token(ALPHANUM);
+                                                                                                   variableTable.add(z.image, t.image);{tempjObject.add("as", z.image);}
+JsonObjectBuilder dbjObject = Json.createObjectBuilder();
+ImportLibraryDBCheck(dbjObject, z.image, array.build());
+tempjObject.add("name", dbjObject.build());
+tempjObject.add("alias", z.image);
+ jObject.add("use", tempjObject.build());
+  jjtree.closeNodeScope(jjtn000, true);
+  jjtc000 = false;
+ {if (true) return jObject;}
+    } finally {
+  if (jjtc000) {
+    jjtree.closeNodeScope(jjtn000, true);
+  }
+    }
+    throw new Error("Missing return statement in function");
+  }
+
   final public JsonObjectBuilder ImportLibrary(JsonObjectBuilder jObject) throws ParseException {
                                                               /*@bgen(jjtree) ImportLibrary */
                                                               ASTImportLibrary jjtn000 = new ASTImportLibrary(JJTIMPORTLIBRARY);
@@ -174,7 +208,7 @@ public static void main(String[] args) {
                                                               jjtree.openNodeScope(jjtn000);Token t; Token z; JsonArrayBuilder array = Json.createArrayBuilder(); String ltype; JsonObjectBuilder tempjObject = Json.createObjectBuilder();
     try {
       jj_consume_token(IMPORT);
-      if (jj_2_1(2)) {
+      if (jj_2_2(2)) {
         jj_consume_token(LIBRARY);
                                   ltype = "LIBRARY";
       } else {
@@ -238,14 +272,17 @@ tempjObject.add("type", ltype);
       jj_consume_token(CREATE);
       jj_consume_token(ANALYSIS);
       k = jj_consume_token(ALPHANUM);
-                                     jObject.add("name", k.image); vtable.insertName(k.image);vtable.updateType(k.image, DataTypeEnum.AnalysisVar.ordinal());
+                         jObject.add("name", k.image); vtable.insertName(k.image);vtable.updateType(k.image, DataTypeEnum.AnalysisVar.ordinal());
       jj_consume_token(AS);
       jj_consume_token(FBRACKETSTART);
       label_3:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case EXECUTECYPHER:
+        case EXECUTESQL:
         case FORALL:
         case ALPHANUM:
+        case FIELDNAME:
           ;
           break;
         default:
@@ -253,17 +290,22 @@ tempjObject.add("type", ltype);
           break label_3;
         }
                                            JsonObjectBuilder tempJB = Json.createObjectBuilder();
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case ALPHANUM:
+        if (jj_2_3(2)) {
           tempJB = AssignmentStatement(tempJB);
-          break;
-        case FORALL:
-          ForAllExpression(tempJB);
-          break;
-        default:
-          jj_la1[5] = jj_gen;
-          jj_consume_token(-1);
-          throw new ParseException();
+        } else {
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          case FORALL:
+            ForAllExpression(tempJB);
+            break;
+          case EXECUTECYPHER:
+          case EXECUTESQL:
+            DBPASS(tempJB);
+            break;
+          default:
+            jj_la1[5] = jj_gen;
+            jj_consume_token(-1);
+            throw new ParseException();
+          }
         }
         jj_consume_token(SEMICOLON);
                                             array.add(tempJB.build());
@@ -318,8 +360,20 @@ JsonArrayBuilder group = Json.createArrayBuilder();
 JsonArrayBuilder order = Json.createArrayBuilder();
     try {
      int n = 0;
-      t = jj_consume_token(ALPHANUM);
-                   tempJB.add("array", false);tempJB.add("type", "single");  tempJB.add("size",n); variableTable.add(t.image, "val"); vtable.insertName(t.image); vtable.updateType(t.image, DataTypeEnum.Undecided.ordinal());
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case ALPHANUM:
+        t = jj_consume_token(ALPHANUM);
+        break;
+      case FIELDNAME:
+        t = jj_consume_token(FIELDNAME);
+                                        {tempJB.add("varpath", true);}
+        break;
+      default:
+        jj_la1[7] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+         tempJB.add("array", false);tempJB.add("type", "single");  tempJB.add("size",n); variableTable.add(t.image, "val"); vtable.insertName(t.image); vtable.updateType(t.image, DataTypeEnum.Undecided.ordinal());
       label_4:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -327,7 +381,7 @@ JsonArrayBuilder order = Json.createArrayBuilder();
           ;
           break;
         default:
-          jj_la1[7] = jj_gen;
+          jj_la1[8] = jj_gen;
           break label_4;
         }
         jj_consume_token(StartSQBracket);
@@ -345,7 +399,7 @@ JsonArrayBuilder order = Json.createArrayBuilder();
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case FBRACKETSTART:
         jj_consume_token(FBRACKETSTART);
-        if (jj_2_2(4)) {
+        if (jj_2_4(4)) {
           jj_consume_token(PROPERTYGRAPH);
                                                                             vtable.updateType(t.image, DataTypeEnum.PropertyGraph.ordinal());
         } else {
@@ -371,7 +425,7 @@ JsonArrayBuilder order = Json.createArrayBuilder();
                                                                    vtable.updateType(t.image, DataTypeEnum.Text.ordinal());
             break;
           default:
-            jj_la1[8] = jj_gen;
+            jj_la1[9] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
@@ -379,7 +433,7 @@ JsonArrayBuilder order = Json.createArrayBuilder();
         jj_consume_token(FBRACKETEND);
         break;
       default:
-        jj_la1[9] = jj_gen;
+        jj_la1[10] = jj_gen;
         ;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -387,10 +441,21 @@ JsonArrayBuilder order = Json.createArrayBuilder();
         SelectStament(tempJB);
         break;
       case ALPHANUM:
+      case FIELDNAME:
         AWSMFunction(tempJB);
         break;
+      case EXECUTECYPHER:
+      case EXECUTESQL:
+        DBPASS(tempJB);
+        break;
+      case StartSQBracket:
+        ASSIGNMENT(tempJB);
+        break;
+      case CONSTRUCTGRAPH:
+        ConsturctGrpah(tempJB);
+        break;
       default:
-        jj_la1[10] = jj_gen;
+        jj_la1[11] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -407,14 +472,14 @@ JsonArrayBuilder order = Json.createArrayBuilder();
                                                                                                                                                          order.add(or.image); ovar.add(or.image);
           break;
         default:
-          jj_la1[11] = jj_gen;
+          jj_la1[12] = jj_gen;
           ;
         }
                         tempJB.add("ORDER",order.build());
                         vtable.setOrder(ovar);
         break;
       default:
-        jj_la1[12] = jj_gen;
+        jj_la1[13] = jj_gen;
         ;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -430,7 +495,7 @@ JsonArrayBuilder order = Json.createArrayBuilder();
             ;
             break;
           default:
-            jj_la1[13] = jj_gen;
+            jj_la1[14] = jj_gen;
             break label_5;
           }
           jj_consume_token(COMMA);
@@ -440,7 +505,7 @@ JsonArrayBuilder order = Json.createArrayBuilder();
                                                                                                                                    tempJB.add("GROUP",group.build());
         break;
       default:
-        jj_la1[14] = jj_gen;
+        jj_la1[15] = jj_gen;
         ;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -448,10 +513,18 @@ JsonArrayBuilder order = Json.createArrayBuilder();
         jj_consume_token(STORE);
         jj_consume_token(AS);
         store = jj_consume_token(ALPHANUM);
-                                                             tempJB.add("STORE", true); tempJB.add("STORAGE", store.image);
+                                                            tempJB.add("STORE", true); tempJB.add("STORAGE", store.image);
         break;
       default:
-        jj_la1[15] = jj_gen;
+        jj_la1[16] = jj_gen;
+        ;
+      }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case RETURN:
+        RetrunStatement(tempJB);
+        break;
+      default:
+        jj_la1[17] = jj_gen;
         ;
       }
       jjtree.closeNodeScope(jjtn000, true);
@@ -481,6 +554,176 @@ JsonArrayBuilder order = Json.createArrayBuilder();
     throw new Error("Missing return statement in function");
   }
 
+  final public JsonObject RetrunStatement(JsonObjectBuilder jobject) throws ParseException {
+                                                         /*@bgen(jjtree) RetrunStatement */
+ASTRetrunStatement jjtn000 = new ASTRetrunStatement(JJTRETRUNSTATEMENT);
+boolean jjtc000 = true;
+jjtree.openNodeScope(jjtn000);Token t;
+JsonObjectBuilder tempJB = Json.createObjectBuilder();
+    try {
+      jj_consume_token(RETURN);
+      jj_consume_token(AS);
+      jj_consume_token(FBRACKETSTART);
+      PropertyGraph(tempJB);
+      jj_consume_token(FBRACKETEND);
+    } catch (Throwable jjte000) {
+  if (jjtc000) {
+    jjtree.clearNodeScope(jjtn000);
+    jjtc000 = false;
+  } else {
+    jjtree.popNode();
+  }
+  if (jjte000 instanceof RuntimeException) {
+    {if (true) throw (RuntimeException)jjte000;}
+  }
+  if (jjte000 instanceof ParseException) {
+    {if (true) throw (ParseException)jjte000;}
+  }
+  {if (true) throw (Error)jjte000;}
+    } finally {
+  if (jjtc000) {
+    jjtree.closeNodeScope(jjtn000, true);
+  }
+    }
+    throw new Error("Missing return statement in function");
+  }
+
+  final public JsonObject PropertyGraph(JsonObjectBuilder jobject) throws ParseException {
+                                                       /*@bgen(jjtree) PropertyGraph */
+ASTPropertyGraph jjtn000 = new ASTPropertyGraph(JJTPROPERTYGRAPH);
+boolean jjtc000 = true;
+jjtree.openNodeScope(jjtn000);Token t;
+JsonArrayBuilder tempArray = Json.createArrayBuilder();
+JsonArrayBuilder tempJA = Json.createArrayBuilder();
+    try {
+      GRAPHNODE(tempJA);
+                          tempArray.add(tempJA.build());
+      label_6:
+      while (true) {
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case MINUS:
+          ;
+          break;
+        default:
+          jj_la1[18] = jj_gen;
+          break label_6;
+        }
+         JsonArrayBuilder tempJB = Json.createArrayBuilder();
+        GRAPHEDGE(tempJB);
+         tempArray.add(tempJB.build());
+         JsonArrayBuilder tempJC = Json.createArrayBuilder();
+        GRAPHNODE(tempJC);
+                          tempArray.add(tempJC.build());
+      }
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+         jobject.add("cypher",tempArray.build());
+    } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            {if (true) throw (RuntimeException)jjte000;}
+          }
+          if (jjte000 instanceof ParseException) {
+            {if (true) throw (ParseException)jjte000;}
+          }
+          {if (true) throw (Error)jjte000;}
+    } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+    }
+    throw new Error("Missing return statement in function");
+  }
+
+  final public JsonArrayBuilder GRAPHNODE(JsonArrayBuilder jobject) throws ParseException {
+                                                        /*@bgen(jjtree) GRAPHNODE */
+ASTGRAPHNODE jjtn000 = new ASTGRAPHNODE(JJTGRAPHNODE);
+boolean jjtc000 = true;
+jjtree.openNodeScope(jjtn000);Token t; Token k;
+JsonObjectBuilder tempJB = Json.createObjectBuilder();
+    try {
+      jj_consume_token(FBRACKETSTART);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case ALPHANUM:
+      case FIELDNAME:
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case ALPHANUM:
+          t = jj_consume_token(ALPHANUM);
+          break;
+        case FIELDNAME:
+          t = jj_consume_token(FIELDNAME);
+                                                tempJB.add("nodeName", t.image);
+          break;
+        default:
+          jj_la1[19] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
+        break;
+      default:
+        jj_la1[20] = jj_gen;
+        ;
+      }
+      jj_consume_token(COLON);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case ALPHANUM:
+        k = jj_consume_token(ALPHANUM);
+        break;
+      case FIELDNAME:
+        k = jj_consume_token(FIELDNAME);
+        break;
+      default:
+        jj_la1[21] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+      jj_consume_token(FBRACKETEND);
+  jjtree.closeNodeScope(jjtn000, true);
+  jjtc000 = false;
+tempJB.add("nodeType",k.image);
+jobject.add(tempJB.build());
+{if (true) return jobject;}
+    } finally {
+  if (jjtc000) {
+    jjtree.closeNodeScope(jjtn000, true);
+  }
+    }
+    throw new Error("Missing return statement in function");
+  }
+
+  final public JsonArrayBuilder GRAPHEDGE(JsonArrayBuilder jobject) throws ParseException {
+                                                      /*@bgen(jjtree) GRAPHEDGE */
+                                                      ASTGRAPHEDGE jjtn000 = new ASTGRAPHEDGE(JJTGRAPHEDGE);
+                                                      boolean jjtc000 = true;
+                                                      jjtree.openNodeScope(jjtn000);Token t; Token k; Token s;
+    try {
+ JsonObjectBuilder tempJB = Json.createObjectBuilder();
+      jj_consume_token(MINUS);
+      jj_consume_token(StartSQBracket);
+      t = jj_consume_token(ALPHANUM);
+      jj_consume_token(COLON);
+      s = jj_consume_token(ALPHANUM);
+      jj_consume_token(EndSQBracket);
+      jj_consume_token(MINUS);
+  jjtree.closeNodeScope(jjtn000, true);
+  jjtc000 = false;
+tempJB.add("edgeName", t.image);
+tempJB.add("edgeType",s.image);
+jobject.add(tempJB.build());
+{if (true) return jobject;}
+    } finally {
+  if (jjtc000) {
+    jjtree.closeNodeScope(jjtn000, true);
+  }
+    }
+    throw new Error("Missing return statement in function");
+  }
+
   final public JsonObjectBuilder DeclareAnalysis(JsonObjectBuilder jObject) throws ParseException {
                                                                 /*@bgen(jjtree) DeclareAnalysis */
 ASTDeclareAnalysis jjtn000 = new ASTDeclareAnalysis(JJTDECLAREANALYSIS);
@@ -498,7 +741,7 @@ boolean variableArray = false;
             n = n + 1;
         break;
       default:
-        jj_la1[16] = jj_gen;
+        jj_la1[22] = jj_gen;
         ;
       }
             variableArray = true;
@@ -514,33 +757,215 @@ boolean variableArray = false;
     throw new Error("Missing return statement in function");
   }
 
+// Construct Graph
+  final public JsonObjectBuilder ConsturctGrpah(JsonObjectBuilder jObject) throws ParseException {
+                                                               /*@bgen(jjtree) ConsturctGrpah */
+                                                               ASTConsturctGrpah jjtn000 = new ASTConsturctGrpah(JJTCONSTURCTGRPAH);
+                                                               boolean jjtc000 = true;
+                                                               jjtree.openNodeScope(jjtn000);JsonObjectBuilder tempJA = Json.createObjectBuilder();
+JsonObjectBuilder tempJB = Json.createObjectBuilder();
+JsonObjectBuilder tempJC = Json.createObjectBuilder();
+JsonArrayBuilder order = Json.createArrayBuilder();
+
+JsonArrayBuilder group = Json.createArrayBuilder();
+    try {
+  Token v, or, gr;
+      jj_consume_token(CONSTRUCTGRAPH);
+      jj_consume_token(FBRACKETSTART);
+      jj_consume_token(VIEW);
+      v = jj_consume_token(ALPHANUM);
+      jj_consume_token(COLON);
+      jj_consume_token(EQAL);
+                                                                                            tempJA.add("view",v.image );
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SELECT:
+        SelectStament(tempJC);
+        break;
+      case EXECUTECYPHER:
+      case EXECUTESQL:
+        DBPASS(tempJB);
+        break;
+      case ALPHANUM:
+      case FIELDNAME:
+        AWSMFunction(tempJB);
+        break;
+      default:
+        jj_la1[23] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+      jj_consume_token(SEMICOLON);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case RELATION:
+                               Token r;
+        jj_consume_token(RELATION);
+        r = jj_consume_token(ALPHANUM);
+                                                                   tempJA.add("relation", r.image);
+        jj_consume_token(COLON);
+        jj_consume_token(EQAL);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case SELECT:
+          SelectStament(tempJC);
+          break;
+        case EXECUTECYPHER:
+        case EXECUTESQL:
+          DBPASS(tempJB);
+          break;
+        case ALPHANUM:
+        case FIELDNAME:
+          AWSMFunction(tempJB);
+          break;
+        default:
+          jj_la1[24] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case ORDER:
+          jj_consume_token(ORDER);
+          jj_consume_token(BY);
+          or = jj_consume_token(ALPHANUM);
+                                                                                                               List ovar = new ArrayList(); order.add(or.image); ovar.add(or.image);
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          case COMMA:
+            jj_consume_token(COMMA);
+            or = jj_consume_token(ALPHANUM);
+                                                                                                                                                                                                                 order.add(or.image); ovar.add(or.image);
+            break;
+          default:
+            jj_la1[25] = jj_gen;
+            ;
+          }
+                                                                                tempJB.add("ORDER",order.build());
+                                                                                vtable.setOrder(ovar);
+          break;
+        default:
+          jj_la1[26] = jj_gen;
+          ;
+        }
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case GROUP:
+          jj_consume_token(GROUP);
+          jj_consume_token(BY);
+          gr = jj_consume_token(ALPHANUM);
+                                                                                                                  group.add(gr.image);
+          label_7:
+          while (true) {
+            switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+            case COMMA:
+              ;
+              break;
+            default:
+              jj_la1[27] = jj_gen;
+              break label_7;
+            }
+            jj_consume_token(COMMA);
+            gr = jj_consume_token(ALPHANUM);
+                                                                                                                                                                  group.add(gr.image);
+          }
+                                                                                                                                                                                           tempJB.add("GROUP",group.build());
+          break;
+        default:
+          jj_la1[28] = jj_gen;
+          ;
+        }
+        jj_consume_token(SEMICOLON);
+                                                                    tempJB.add("relation-def", tempJB.build());
+        break;
+      default:
+        jj_la1[29] = jj_gen;
+        ;
+      }
+      jj_consume_token(FBRACKETEND);
+  jjtree.closeNodeScope(jjtn000, true);
+  jjtc000 = false;
+tempJA.add("view-def", tempJC.build());
+{if (true) return jObject;}
+    } catch (Throwable jjte000) {
+   if (jjtc000) {
+     jjtree.clearNodeScope(jjtn000);
+     jjtc000 = false;
+   } else {
+     jjtree.popNode();
+   }
+   if (jjte000 instanceof RuntimeException) {
+     {if (true) throw (RuntimeException)jjte000;}
+   }
+   if (jjte000 instanceof ParseException) {
+     {if (true) throw (ParseException)jjte000;}
+   }
+   {if (true) throw (Error)jjte000;}
+    } finally {
+   if (jjtc000) {
+     jjtree.closeNodeScope(jjtn000, true);
+   }
+    }
+    throw new Error("Missing return statement in function");
+  }
+
 //SELECT Statement of ADIL 1.0
   final public JsonObjectBuilder SelectStament(JsonObjectBuilder jObject) throws ParseException {
                                                               /*@bgen(jjtree) SelectStament */
-                                                              ASTSelectStament jjtn000 = new ASTSelectStament(JJTSELECTSTAMENT);
-                                                              boolean jjtc000 = true;
-                                                              jjtree.openNodeScope(jjtn000);Token t, tuple, db; JsonObjectBuilder tempJB = Json.createObjectBuilder(); boolean variableArray = false ;
-JsonArrayBuilder tempTuple = Json.createArrayBuilder();JsonArrayBuilder tempDB = Json.createArrayBuilder();
+ASTSelectStament jjtn000 = new ASTSelectStament(JJTSELECTSTAMENT);
+boolean jjtc000 = true;
+jjtree.openNodeScope(jjtn000);Token t, tuple, db, alias  ;
+JsonObjectBuilder tempJB = Json.createObjectBuilder();
+JsonObjectBuilder aliasList = Json.createObjectBuilder();
+JsonArrayBuilder func = Json.createArrayBuilder();
+boolean variableArray = false ;
+JsonArrayBuilder tempTuple = Json.createArrayBuilder();
+JsonArrayBuilder tempDB = Json.createArrayBuilder();
+tempJB.add("isFunction", false);
     try {
 int tu = 0;
 int src = 1;
       jj_consume_token(SELECT);
       tuple = jj_consume_token(ALPHANUM);
-                                      tempTuple.add(tuple.image); vtable.insertName(tuple.image); vtable.updateType(tuple.image, DataTypeEnum.Undecided.ordinal());
-      label_6:
+                                   tempJB.add("name", tuple.image);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case FBRACKETSTART:
+        GetFunction(func, tuple.image);
+                                                                                                    JsonObjectBuilder tuplaDet = Json.createObjectBuilder();
+                        tempJB.add("isFunction", true);
+        break;
+      default:
+        jj_la1[30] = jj_gen;
+        ;
+      }
+        tempTuple.add(func.build());
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case AS:
+        jj_consume_token(AS);
+        alias = jj_consume_token(ALPHANUM);
+                                 aliasList.add(tuple.image, alias.image);
+        break;
+      default:
+        jj_la1[31] = jj_gen;
+        ;
+      }
+      label_8:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case COMMA:
           ;
           break;
         default:
-          jj_la1[17] = jj_gen;
-          break label_6;
+          jj_la1[32] = jj_gen;
+          break label_8;
         }
         jj_consume_token(COMMA);
         tuple = jj_consume_token(ALPHANUM);
-                                                             tempTuple.add(tuple.image);
-                                                             tu = tu + 1; vtable.insertName(tuple.image); vtable.updateType(tuple.image, DataTypeEnum.Undecided.ordinal());
+                                                                           tempJB.add("name", tuple.image);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case FBRACKETSTART:
+          GetFunction(func, tuple.image);
+          break;
+        default:
+          jj_la1[33] = jj_gen;
+          ;
+        }
+                                                  JsonObjectBuilder tuplaDet = Json.createObjectBuilder();
+                                                                                        tempJB.add("isFunction", true);
       }
       jj_consume_token(FROM);
       db = jj_consume_token(ALPHANUM);
@@ -554,18 +979,38 @@ int src = 1;
                                                                                       tempDB.add(db.image); src = src + 1;
         break;
       default:
-        jj_la1[18] = jj_gen;
+        jj_la1[34] = jj_gen;
         ;
       }
-      jj_consume_token(WHERE);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case ALPHANUM:
-                                                            JsonObjectBuilder pred = Json.createObjectBuilder();
+      case WHERE:
+        jj_consume_token(WHERE);
+                                                                    JsonArrayBuilder predArray = Json.createArrayBuilder();
+                                                                    JsonObjectBuilder pred = Json.createObjectBuilder();
         Expression(pred);
-                                                                tempJB.add("PREDICATE", pred.build());
+                                                                    predArray.add(pred.build());
+                                                                 Token conj;
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case AND:
+          conj = jj_consume_token(AND);
+          break;
+        case OR:
+          conj = jj_consume_token(OR);
+          break;
+        case NOT:
+          conj = jj_consume_token(NOT);
+          break;
+        default:
+          jj_la1[35] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
+                                                                         predArray.add(conj.image);
+        Expression(pred);
+                                                                            predArray.add(pred.build());
         break;
       default:
-        jj_la1[19] = jj_gen;
+        jj_la1[36] = jj_gen;
         ;
       }
   jjtree.closeNodeScope(jjtn000, true);
@@ -612,7 +1057,19 @@ jObject.add("SELECT", source);
                                                       boolean jjtc000 = true;
                                                       jjtree.openNodeScope(jjtn000);Token t; JsonArrayBuilder l1 = Json.createArrayBuilder();JsonObjectBuilder tempJB = Json.createObjectBuilder();
     try {
-      t = jj_consume_token(ALPHANUM);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case ALPHANUM:
+        t = jj_consume_token(ALPHANUM);
+        break;
+      case FIELDNAME:
+        t = jj_consume_token(FIELDNAME);
+                                      {tempJB.add("varpath", true);}
+        break;
+      default:
+        jj_la1[37] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
       GetFunction(l1, t.image);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case WHERE:
@@ -622,7 +1079,7 @@ jObject.add("SELECT", source);
                                                                                                        tempJB.add("PREDICATE", pred.build());
         break;
       default:
-        jj_la1[20] = jj_gen;
+        jj_la1[38] = jj_gen;
         ;
       }
   jjtree.closeNodeScope(jjtn000, true);
@@ -631,23 +1088,23 @@ jObject.add("SELECT", source);
     l.add("awsmfunc", tempJB.build());
     {if (true) return l;}
     } catch (Throwable jjte000) {
-  if (jjtc000) {
-    jjtree.clearNodeScope(jjtn000);
-    jjtc000 = false;
-  } else {
-    jjtree.popNode();
-  }
-  if (jjte000 instanceof RuntimeException) {
-    {if (true) throw (RuntimeException)jjte000;}
-  }
-  if (jjte000 instanceof ParseException) {
-    {if (true) throw (ParseException)jjte000;}
-  }
-  {if (true) throw (Error)jjte000;}
+     if (jjtc000) {
+       jjtree.clearNodeScope(jjtn000);
+       jjtc000 = false;
+     } else {
+       jjtree.popNode();
+     }
+     if (jjte000 instanceof RuntimeException) {
+       {if (true) throw (RuntimeException)jjte000;}
+     }
+     if (jjte000 instanceof ParseException) {
+       {if (true) throw (ParseException)jjte000;}
+     }
+     {if (true) throw (Error)jjte000;}
     } finally {
-  if (jjtc000) {
-    jjtree.closeNodeScope(jjtn000, true);
-  }
+     if (jjtc000) {
+       jjtree.closeNodeScope(jjtn000, true);
+     }
     }
     throw new Error("Missing return statement in function");
   }
@@ -684,29 +1141,31 @@ jObject.add("SELECT", source);
                                                                 tempJB.add("partfield",partVar.image);
           break;
         default:
-          jj_la1[21] = jj_gen;
+          jj_la1[39] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
         break;
       default:
-        jj_la1[22] = jj_gen;
+        jj_la1[40] = jj_gen;
         ;
       }
       jj_consume_token(StartCurlyBracket);
-      label_7:
+      label_9:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case FORALL:
         case ALPHANUM:
+        case FIELDNAME:
           ;
           break;
         default:
-          jj_la1[23] = jj_gen;
-          break label_7;
+          jj_la1[41] = jj_gen;
+          break label_9;
         }
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case ALPHANUM:
+        case FIELDNAME:
                                                           JsonObjectBuilder tempx = Json.createObjectBuilder();
           AssignmentStatement(tempx);
           jj_consume_token(SEMICOLON);
@@ -719,7 +1178,7 @@ jObject.add("SELECT", source);
                                                                                                                                                     array.add(tempy.build());
           break;
         default:
-          jj_la1[24] = jj_gen;
+          jj_la1[42] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -761,6 +1220,219 @@ l.add("FORALL", tempJB.build());
     throw new Error("Missing return statement in function");
   }
 
+//ExecuteSQL Database Direct
+  final public void DBPASS(JsonObjectBuilder l) throws ParseException {
+                                    /*@bgen(jjtree) DBPASS */
+                                    ASTDBPASS jjtn000 = new ASTDBPASS(JJTDBPASS);
+                                    boolean jjtc000 = true;
+                                    jjtree.openNodeScope(jjtn000);Token t; Token var; JsonObjectBuilder tempJB = Json.createObjectBuilder(); Token x;
+    try {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case EXECUTESQL:
+        t = jj_consume_token(EXECUTESQL);
+        break;
+      case EXECUTECYPHER:
+        t = jj_consume_token(EXECUTECYPHER);
+        break;
+      default:
+        jj_la1[43] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+      x = quetedStatement();
+    tempJB.add("statement",x.image);
+   tempJB.add("type",t.image);
+     jjtree.closeNodeScope(jjtn000, true);
+     jjtc000 = false;
+    l.add("ptq", tempJB.build());
+    } catch (Throwable jjte000) {
+     if (jjtc000) {
+       jjtree.clearNodeScope(jjtn000);
+       jjtc000 = false;
+     } else {
+       jjtree.popNode();
+     }
+     if (jjte000 instanceof RuntimeException) {
+       {if (true) throw (RuntimeException)jjte000;}
+     }
+     if (jjte000 instanceof ParseException) {
+       {if (true) throw (ParseException)jjte000;}
+     }
+     {if (true) throw (Error)jjte000;}
+    } finally {
+     if (jjtc000) {
+       jjtree.closeNodeScope(jjtn000, true);
+     }
+    }
+  }
+
+//Inside Pass through
+  final public Token quetedStatement() throws ParseException {
+                           /*@bgen(jjtree) quetedStatement */
+                           ASTquetedStatement jjtn000 = new ASTquetedStatement(JJTQUETEDSTATEMENT);
+                           boolean jjtc000 = true;
+                           jjtree.openNodeScope(jjtn000);Token t; Token x;
+    try {
+      jj_consume_token(FBRACKETSTART);
+      x = jj_consume_token(QUOTED_IDENTIFIER);
+      jj_consume_token(FBRACKETEND);
+                                                          System.out.println(x.image);
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+   {if (true) return x;}
+    } finally {
+    if (jjtc000) {
+      jjtree.closeNodeScope(jjtn000, true);
+    }
+    }
+    throw new Error("Missing return statement in function");
+  }
+
+// Inside Assignment
+  final public JsonObjectBuilder ASSIGNMENT(JsonObjectBuilder l) throws ParseException {
+                                                     /*@bgen(jjtree) ASSIGNMENT */
+                                                     ASTASSIGNMENT jjtn000 = new ASTASSIGNMENT(JJTASSIGNMENT);
+                                                     boolean jjtc000 = true;
+                                                     jjtree.openNodeScope(jjtn000);Token t; Token var; JsonObjectBuilder tempJB = Json.createObjectBuilder(); Integer type; Token dt; Token sc;
+    try {
+      jj_consume_token(StartSQBracket);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case DIGITS:
+        t = jj_consume_token(DIGITS);
+                                          type = 0;
+        break;
+      case QUOTED_IDENTIFIER:
+        t = jj_consume_token(QUOTED_IDENTIFIER);
+                                                           type = 1; tempJB.add("val", t.image); tempJB.add("type", type);
+        break;
+      default:
+        jj_la1[44] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+      label_10:
+      while (true) {
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case COMMA:
+          ;
+          break;
+        default:
+          jj_la1[45] = jj_gen;
+          break label_10;
+        }
+        jj_consume_token(COMMA);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case DIGITS:
+          t = jj_consume_token(DIGITS);
+                                              type = 0;
+          break;
+        case QUOTED_IDENTIFIER:
+          t = jj_consume_token(QUOTED_IDENTIFIER);
+                                                                                         type = 1; tempJB.add("val", t.image); tempJB.add("type", type);
+          break;
+        default:
+          jj_la1[46] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
+      }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LOAD:
+        jj_consume_token(LOAD);
+        jj_consume_token(FROM);
+        t = jj_consume_token(QUOTED_IDENTIFIER);
+        jj_consume_token(AS);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case CSV:
+          dt = jj_consume_token(CSV);
+          break;
+        case GRAPHQL:
+          dt = jj_consume_token(GRAPHQL);
+          break;
+        case JSON:
+          dt = jj_consume_token(JSON);
+          break;
+        case XML:
+          dt = jj_consume_token(XML);
+          break;
+        case RELATION:
+          dt = jj_consume_token(RELATION);
+                                                     tempJB.add("load-data-type", dt.image);
+                                                     tempJB.add("data-path", t.image);
+          break;
+        default:
+          jj_la1[47] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case SCHEMA:
+          jj_consume_token(SCHEMA);
+          jj_consume_token(FROM);
+          sc = jj_consume_token(QUOTED_IDENTIFIER);
+                                                                                  tempJB.add("schema-path", sc.image);
+          jj_consume_token(AS);
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          case CSV:
+            dt = jj_consume_token(CSV);
+            break;
+          case GRAPHQL:
+            dt = jj_consume_token(GRAPHQL);
+            break;
+          case JSON:
+            dt = jj_consume_token(JSON);
+            break;
+          case XML:
+            dt = jj_consume_token(XML);
+            break;
+          case RELATION:
+            dt = jj_consume_token(RELATION);
+                                                                                     tempJB.add("load-schema-type", dt.image);
+            break;
+          default:
+            jj_la1[48] = jj_gen;
+            jj_consume_token(-1);
+            throw new ParseException();
+          }
+          break;
+        default:
+          jj_la1[49] = jj_gen;
+          ;
+        }
+        break;
+      default:
+        jj_la1[50] = jj_gen;
+        ;
+      }
+      jj_consume_token(EndSQBracket);
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+    {if (true) return l;}
+    } finally {
+      if (jjtc000) {
+        jjtree.closeNodeScope(jjtn000, true);
+      }
+    }
+    throw new Error("Missing return statement in function");
+  }
+
+  final public JsonObjectBuilder STRINGASSIGNMENT(JsonObjectBuilder l) throws ParseException {
+                                                           /*@bgen(jjtree) STRINGASSIGNMENT */
+                                                           ASTSTRINGASSIGNMENT jjtn000 = new ASTSTRINGASSIGNMENT(JJTSTRINGASSIGNMENT);
+                                                           boolean jjtc000 = true;
+                                                           jjtree.openNodeScope(jjtn000);Token t; Token var; JsonObjectBuilder tempJB = Json.createObjectBuilder(); Token x;
+    try {
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+   {if (true) return l;}
+    } finally {
+    if (jjtc000) {
+      jjtree.closeNodeScope(jjtn000, true);
+    }
+    }
+    throw new Error("Missing return statement in function");
+  }
+
   final public JsonObjectBuilder Expression(JsonObjectBuilder l) throws ParseException {
  /*@bgen(jjtree) Expression */
     ASTExpression jjtn000 = new ASTExpression(JJTEXPRESSION);
@@ -779,7 +1451,7 @@ l.add("FORALL", tempJB.build());
         GetFunction(l1, o1.image);
         break;
       default:
-        jj_la1[25] = jj_gen;
+        jj_la1[51] = jj_gen;
         ;
       }
                                                                  m.add("op1", 3); l.add(o1.image,l1.build());
@@ -795,7 +1467,7 @@ l.add("FORALL", tempJB.build());
                                                                                                        m.add("op2", 1);
         break;
       default:
-        jj_la1[26] = jj_gen;
+        jj_la1[52] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -804,11 +1476,10 @@ l.add("FORALL", tempJB.build());
       case FBRACKETSTART:
         GetFunction(l1, t.image);
                                                                             m.add("op2", 3);
-
                                                                             l.add(t.image,l1.build());
         break;
       default:
-        jj_la1[27] = jj_gen;
+        jj_la1[53] = jj_gen;
         ;
       }
   jjtree.closeNodeScope(jjtn000, true);
@@ -850,7 +1521,7 @@ JsonObjectBuilder f1 = Json.createObjectBuilder();
 JsonObjectBuilder map = Json.createObjectBuilder();
 JsonObject funcProp = ParserUtil.validateFunction(name);
 l.add(funcProp);
-      if (jj_2_3(3)) {
+      if (jj_2_5(3)) {
         x = jj_consume_token(ALPHANUM);
                                             f1.add("vp1",x.image);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -859,17 +1530,31 @@ l.add(funcProp);
                                                                                               f1.add(x.image,l.build());
           break;
         default:
-          jj_la1[28] = jj_gen;
+          jj_la1[54] = jj_gen;
           ;
         }
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case EQAL:
           jj_consume_token(EQAL);
-          y = jj_consume_token(ALPHANUM);
-                                                                                                                                                   map.add(x.image, y.image); f1.add("map", map.build());
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          case ALPHANUM:
+            y = jj_consume_token(ALPHANUM);
+            break;
+          case DIGITS:
+            y = jj_consume_token(DIGITS);
+            break;
+          case FIELDNAME:
+            y = jj_consume_token(FIELDNAME);
+            break;
+          default:
+            jj_la1[55] = jj_gen;
+            jj_consume_token(-1);
+            throw new ParseException();
+          }
+                                                     map.add(x.image, y.image); f1.add("map", map.build());
           break;
         default:
-          jj_la1[29] = jj_gen;
+          jj_la1[56] = jj_gen;
           ;
         }
       } else {
@@ -887,7 +1572,7 @@ l.add(funcProp);
                                                                                    f1.add(x.image,l.build());
             break;
           default:
-            jj_la1[30] = jj_gen;
+            jj_la1[57] = jj_gen;
             ;
           }
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -897,12 +1582,12 @@ l.add(funcProp);
                                                                                                                                        map.add(x.image, y.image); f1.add("map",map.build());
             break;
           default:
-            jj_la1[31] = jj_gen;
+            jj_la1[58] = jj_gen;
             ;
           }
           break;
         default:
-          jj_la1[32] = jj_gen;
+          jj_la1[59] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -912,7 +1597,7 @@ l.add(funcProp);
       case COMMA:
   JsonObjectBuilder f2 = Json.createObjectBuilder();JsonObjectBuilder m2 = Json.createObjectBuilder();
         jj_consume_token(COMMA);
-        if (jj_2_4(3)) {
+        if (jj_2_6(3)) {
           x = jj_consume_token(ALPHANUM);
                                                         f2.add("vp1",x.image);
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -921,17 +1606,31 @@ l.add(funcProp);
                                                                                                           f2.add(x.image,l.build());
             break;
           default:
-            jj_la1[33] = jj_gen;
+            jj_la1[60] = jj_gen;
             ;
           }
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case EQAL:
             jj_consume_token(EQAL);
-            y = jj_consume_token(ALPHANUM);
-                                                                                                                                                               m2.add(x.image, y.image); f2.add("map", m2.build());
+            switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+            case ALPHANUM:
+              y = jj_consume_token(ALPHANUM);
+              break;
+            case DIGITS:
+              y = jj_consume_token(DIGITS);
+              break;
+            case FIELDNAME:
+              y = jj_consume_token(FIELDNAME);
+              break;
+            default:
+              jj_la1[61] = jj_gen;
+              jj_consume_token(-1);
+              throw new ParseException();
+            }
+                                                                             m2.add(x.image, y.image); f2.add("map", m2.build());
             break;
           default:
-            jj_la1[34] = jj_gen;
+            jj_la1[62] = jj_gen;
             ;
           }
         } else {
@@ -949,7 +1648,7 @@ l.add(funcProp);
                                                                                                f2.add(x.image,l.build());
               break;
             default:
-              jj_la1[35] = jj_gen;
+              jj_la1[63] = jj_gen;
               ;
             }
             switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -959,12 +1658,12 @@ l.add(funcProp);
                                                                                                                                                    m2.add(x.image, y.image); f2.add("map",m2.build());
               break;
             default:
-              jj_la1[36] = jj_gen;
+              jj_la1[64] = jj_gen;
               ;
             }
             break;
           default:
-            jj_la1[37] = jj_gen;
+            jj_la1[65] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
@@ -972,7 +1671,7 @@ l.add(funcProp);
                l1.add(f2.build());
         break;
       default:
-        jj_la1[38] = jj_gen;
+        jj_la1[66] = jj_gen;
         ;
       }
       jj_consume_token(FBRACKETEND);
@@ -1030,79 +1729,150 @@ l.add(funcProp);
     finally { jj_save(3, xla); }
   }
 
-  private boolean jj_3_4() {
+  private boolean jj_2_5(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_5(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(4, xla); }
+  }
+
+  private boolean jj_2_6(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_6(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(5, xla); }
+  }
+
+  private boolean jj_3_6() {
     if (jj_scan_token(ALPHANUM)) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_10()) jj_scanpos = xsp;
+    if (jj_3R_15()) jj_scanpos = xsp;
     xsp = jj_scanpos;
-    if (jj_3R_11()) jj_scanpos = xsp;
+    if (jj_3R_16()) jj_scanpos = xsp;
     return false;
   }
 
-  private boolean jj_3R_12() {
+  private boolean jj_3R_19() {
     if (jj_scan_token(FBRACKETSTART)) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_3()) {
+    if (jj_3_5()) {
     jj_scanpos = xsp;
-    if (jj_3R_13()) {
+    if (jj_3R_20()) {
     jj_scanpos = xsp;
-    if (jj_3R_14()) return true;
+    if (jj_3R_21()) return true;
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3_2() {
+    if (jj_scan_token(LIBRARY)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_14() {
+    if (jj_scan_token(EQAL)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(98)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(12)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(99)) return true;
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_16() {
+    if (jj_scan_token(EQAL)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(98)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(12)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(99)) return true;
     }
     }
     return false;
   }
 
   private boolean jj_3_1() {
-    if (jj_scan_token(LIBRARY)) return true;
+    if (jj_3R_11()) return true;
     return false;
   }
 
-  private boolean jj_3_2() {
-    if (jj_scan_token(PROPERTYGRAPH)) return true;
+  private boolean jj_3R_12() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(98)) {
+    jj_scanpos = xsp;
+    if (jj_3R_17()) return true;
+    }
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_18()) { jj_scanpos = xsp; break; }
+    }
+    if (jj_scan_token(COLON)) return true;
     return false;
   }
 
-  private boolean jj_3R_9() {
-    if (jj_scan_token(EQAL)) return true;
-    if (jj_scan_token(ALPHANUM)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_11() {
-    if (jj_scan_token(EQAL)) return true;
-    if (jj_scan_token(ALPHANUM)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_8() {
+  private boolean jj_3_3() {
     if (jj_3R_12()) return true;
     return false;
   }
 
-  private boolean jj_3R_10() {
-    if (jj_3R_12()) return true;
+  private boolean jj_3R_18() {
+    if (jj_scan_token(StartSQBracket)) return true;
     return false;
   }
 
-  private boolean jj_3R_14() {
+  private boolean jj_3R_17() {
     if (jj_scan_token(FIELDNAME)) return true;
     return false;
   }
 
   private boolean jj_3R_13() {
+    if (jj_3R_19()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_11() {
+    if (jj_scan_token(CREATE)) return true;
+    if (jj_scan_token(ANALYSIS)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_15() {
+    if (jj_3R_19()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_21() {
+    if (jj_scan_token(FIELDNAME)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_20() {
     if (jj_scan_token(DIGITS)) return true;
     return false;
   }
 
-  private boolean jj_3_3() {
+  private boolean jj_3_5() {
     if (jj_scan_token(ALPHANUM)) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_8()) jj_scanpos = xsp;
+    if (jj_3R_13()) jj_scanpos = xsp;
     xsp = jj_scanpos;
-    if (jj_3R_9()) jj_scanpos = xsp;
+    if (jj_3R_14()) jj_scanpos = xsp;
+    return false;
+  }
+
+  private boolean jj_3_4() {
+    if (jj_scan_token(PROPERTYGRAPH)) return true;
     return false;
   }
 
@@ -1117,7 +1887,7 @@ l.add(funcProp);
   private Token jj_scanpos, jj_lastpos;
   private int jj_la;
   private int jj_gen;
-  final private int[] jj_la1 = new int[39];
+  final private int[] jj_la1 = new int[67];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static private int[] jj_la1_2;
@@ -1129,18 +1899,18 @@ l.add(funcProp);
       jj_la1_init_3();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x80000000,0x80000000,0x0,0x800000,0x0,0x0,0x0,0x1000000,0x0,0x100000,0x0,0x800000,0x0,0x800000,0x0,0x0,0x1000000,0x800000,0x800000,0x0,0x0,0x1000000,0x1000000,0x0,0x0,0x100000,0x1000,0x100000,0x100000,0x20000,0x100000,0x20000,0x1000,0x100000,0x20000,0x100000,0x20000,0x1000,0x800000,};
+      jj_la1_0 = new int[] {0x0,0x0,0x0,0x1000000,0x0,0x0,0x0,0x0,0x2000000,0x0,0x100000,0x2000000,0x1000000,0x0,0x1000000,0x0,0x0,0x200000,0x80000000,0x0,0x0,0x0,0x2000000,0x0,0x0,0x1000000,0x0,0x1000000,0x0,0x0,0x100000,0x0,0x1000000,0x100000,0x1000000,0x4000,0x0,0x0,0x0,0x2000000,0x2000000,0x0,0x0,0x0,0x1000,0x1000000,0x1000,0x0,0x0,0x0,0x0,0x100000,0x1000,0x100000,0x100000,0x1000,0x20000,0x100000,0x20000,0x1000,0x100000,0x1000,0x20000,0x100000,0x20000,0x1000,0x1000000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x8,0x8,0x0,0x0,0x0,0x0,0x80000,0x0,0x17800000,0x0,0x0,0x0,0x0,0x0,0x0,0x200,0x0,0x0,0x0,0x0,0x40,0x800,0x800,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_1 = new int[] {0x11,0x10,0x0,0x0,0x0,0x0,0x100000,0x0,0x0,0x2f000000,0x0,0x0,0x0,0x0,0x0,0x0,0x400,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x4000,0x0,0x0,0x0,0x300,0x80,0x0,0x80,0x1000,0x1000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x8,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
    private static void jj_la1_init_2() {
-      jj_la1_2 = new int[] {0x0,0x0,0x18,0x0,0x9000000,0x9000000,0x0,0x0,0x0,0x0,0x8000800,0x0,0x1000,0x0,0x2000,0x0,0x0,0x0,0x0,0x8000000,0x0,0x0,0x0,0x9000000,0x9000000,0x0,0x8000000,0x0,0x0,0x0,0x0,0x0,0x10000000,0x0,0x0,0x0,0x0,0x10000000,0x0,};
+      jj_la1_2 = new int[] {0x8000,0x8000,0x30,0x0,0xe0000000,0xe0000000,0x0,0x0,0x0,0x0,0x0,0x68001000,0x0,0x2000,0x0,0x4000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x60001000,0x60001000,0x0,0x2000,0x0,0x4000,0x10000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x80000000,0x80000000,0x60000000,0x0,0x0,0x0,0x1f0000,0x1f0000,0x200000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
    private static void jj_la1_init_3() {
-      jj_la1_3 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_3 = new int[] {0x0,0x0,0x0,0x0,0xc,0x0,0x0,0xc,0x0,0x0,0x0,0xc,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xc,0xc,0xc,0x0,0xc,0xc,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xc,0x0,0x0,0x0,0xc,0xc,0x0,0x20,0x0,0x20,0x0,0x0,0x0,0x0,0x0,0x4,0x0,0x0,0xc,0x0,0x0,0x0,0x8,0x0,0xc,0x0,0x0,0x0,0x8,0x0,};
    }
-  final private JJCalls[] jj_2_rtns = new JJCalls[4];
+  final private JJCalls[] jj_2_rtns = new JJCalls[6];
   private boolean jj_rescan = false;
   private int jj_gc = 0;
 
@@ -1155,7 +1925,7 @@ l.add(funcProp);
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 67; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1171,7 +1941,7 @@ l.add(funcProp);
     jj_ntk = -1;
     jjtree.reset();
     jj_gen = 0;
-    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 67; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1182,7 +1952,7 @@ l.add(funcProp);
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 67; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1194,7 +1964,7 @@ l.add(funcProp);
     jj_ntk = -1;
     jjtree.reset();
     jj_gen = 0;
-    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 67; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1204,7 +1974,7 @@ l.add(funcProp);
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 67; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1215,7 +1985,7 @@ l.add(funcProp);
     jj_ntk = -1;
     jjtree.reset();
     jj_gen = 0;
-    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 67; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1330,12 +2100,12 @@ l.add(funcProp);
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[97];
+    boolean[] la1tokens = new boolean[104];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 39; i++) {
+    for (int i = 0; i < 67; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -1353,7 +2123,7 @@ l.add(funcProp);
         }
       }
     }
-    for (int i = 0; i < 97; i++) {
+    for (int i = 0; i < 104; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
@@ -1380,7 +2150,7 @@ l.add(funcProp);
 
   private void jj_rescan_token() {
     jj_rescan = true;
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 6; i++) {
     try {
       JJCalls p = jj_2_rtns[i];
       do {
@@ -1391,6 +2161,8 @@ l.add(funcProp);
             case 1: jj_3_2(); break;
             case 2: jj_3_3(); break;
             case 3: jj_3_4(); break;
+            case 4: jj_3_5(); break;
+            case 5: jj_3_6(); break;
           }
         }
         p = p.next;

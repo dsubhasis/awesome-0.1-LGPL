@@ -116,6 +116,7 @@ TOKEN : {
   | < GREATER : ">">
   | < LESS : "<" >
   | <FBRACKETSTART : "(">
+  |<RETURN:"return">
   | <FBRACKETEND : ")">
   | <DOT : ".">
   | <COMMA : ",">
@@ -128,6 +129,7 @@ TOKEN : {
                                                             |<WHITESPACE><GREATERTHANEQUALS>|<WHITESPACE><MINORTHANEQUALS>
                                                             |<WHITESPACE><NOTEQUALSSTANDARD>|<WHITESPACE><NOTEQUALSBANG>|<WHITESPACE><NOTEQUALSBANG><WHITESPACE><CONCAT>>
   |< MINUS : "-" >
+
 }
 TOKEN [IGNORE_CASE]: {
 <CREATE : "create" >
@@ -178,6 +180,14 @@ TOKEN [IGNORE_CASE]: {
 |<ORDER : "order">
 |<GROUP : "group">
 |<USE : "use">
+|<RELATION : "relation">
+|<CSV: "csv">
+|< GRAPHQL : "graphql">
+|<JSON : "json">
+|<XML : "xml">
+|<SCHEMA : "schema">
+
+
 }
 TOKEN [IGNORE_CASE]: {
 <ENV : "env" >
@@ -197,8 +207,10 @@ TOKEN :
  | < #LETTER   : ["a"-"z","A"-"Z"] >
  | < ALPHANUM : (<LETTER>|<DIGITS>)(<LETTER>|<DIGITS>)*>
  |<FIELDNAME : (<ALPHANUM>(<DOT><ALPHANUM>)*)>
- |< QUOTED_IDENTIFIER : "\"" (~["\n","\r","\""])+ "\"" | ("`" (~["\n","\r","`"])+ "`") >
- |<GraphElementType : <COLON><ALPHANUM>>
+ |< UNQUOTED_IDENTIFIER : <FBRACKETSTART>(<WHITESPACE><ALPHANUM>)* <WHITESPACE> <FBRACKETEND> >
+ |<QUOTED_IDENTIFIER : "\"" (~["\n","\r","\""])+ "\"" | ("`" (~["\n","\r","`"])+ "`" )>
+
+
  |<INPATH : (<MINUS><GREATER>) >
  |<OUTPATH : (<LESS><MINUS>) >
 
@@ -223,15 +235,26 @@ JsonObjectBuilder ADILStatement(JsonObjectBuilder jObject)  :
 
 JsonObjectBuilder Statement(JsonObjectBuilder jObject)  : {Token t;}
 {
- ( LOOKAHEAD(1) CreateAnalysis(jObject)| ImportLibrary(jObject) )
+ ( LOOKAHEAD(2) CreateAnalysis(jObject)| ImportLibrary(jObject) | UseClause(jObject))
  {return jObject; }
 }
 
 // USE Database Syntax
 
 
+JsonObjectBuilder UseClause(JsonObjectBuilder jObject) : {Token t; Token z; JsonArrayBuilder array = Json.createArrayBuilder(); String ltype; JsonObjectBuilder tempjObject = Json.createObjectBuilder();}
+{
 
-
+<USE>  t= <ALPHANUM>{array.add(t.image);}{variableTable.add(t.image, "db" );}  <AS> z = <ALPHANUM>{variableTable.add(z.image, t.image);{tempjObject.add("as", z.image);}}
+{
+JsonObjectBuilder dbjObject = Json.createObjectBuilder();
+ImportLibraryDBCheck(dbjObject, z.image, array.build());
+tempjObject.add("name", dbjObject.build());
+tempjObject.add("alias", z.image);
+}
+{jObject.add("use", tempjObject.build());}
+{return jObject;}
+}
 
 JsonObjectBuilder ImportLibrary(JsonObjectBuilder jObject) : {Token t; Token z; JsonArrayBuilder array = Json.createArrayBuilder(); String ltype; JsonObjectBuilder tempjObject = Json.createObjectBuilder();}
 {
@@ -254,10 +277,12 @@ tempjObject.add("type", ltype);
 
 JsonObjectBuilder CreateAnalysis(JsonObjectBuilder jObject) : {Token t; Token k; boolean scheduleFlag = true; JsonArrayBuilder array = Json.createArrayBuilder();}
 {
-  <CREATE> <ANALYSIS> k = <ALPHANUM>{jObject.add("name", k.image); vtable.insertName(k.image);vtable.updateType(k.image, DataTypeEnum.AnalysisVar.ordinal());} <AS> <FBRACKETSTART>
+  <CREATE> <ANALYSIS> k = <ALPHANUM>
+                        {jObject.add("name", k.image); vtable.insertName(k.image);vtable.updateType(k.image, DataTypeEnum.AnalysisVar.ordinal());}
+                        <AS> <FBRACKETSTART>
                                           (
                                           {JsonObjectBuilder tempJB = Json.createObjectBuilder();}
-                                           (LOOKAHEAD(1)(tempJB =  AssignmentStatement(tempJB))|(ForAllExpression(tempJB)))<SEMICOLON>
+                                           (LOOKAHEAD(2)(tempJB =  AssignmentStatement(tempJB))|(ForAllExpression(tempJB))|DBPASS(tempJB))<SEMICOLON>
                                            {array.add(tempJB.build());}
                                            )*
 <FBRACKETEND>
@@ -278,7 +303,8 @@ JsonArrayBuilder order = Json.createArrayBuilder();
     {int n = 0;
 
     }
-    t = <ALPHANUM>{tempJB.add("array", false);tempJB.add("type", "single");  tempJB.add("size",n); variableTable.add(t.image, "val"); vtable.insertName(t.image); vtable.updateType(t.image, DataTypeEnum.Undecided.ordinal());}
+    ((t = <ALPHANUM>)|(t = <FIELDNAME>){{tempJB.add("varpath", true);}})
+        {tempJB.add("array", false);tempJB.add("type", "single");  tempJB.add("size",n); variableTable.add(t.image, "val"); vtable.insertName(t.image); vtable.updateType(t.image, DataTypeEnum.Undecided.ordinal());}
                   (
 
                   <StartSQBracket><EndSQBracket>{tempJB.add("array", true);
@@ -299,7 +325,9 @@ JsonArrayBuilder order = Json.createArrayBuilder();
                                                 )
                                    <FBRACKETEND>
                                 )?
-                    (SelectStament(tempJB)|AWSMFunction(tempJB))
+                    (
+                        ((SelectStament(tempJB)|AWSMFunction(tempJB)|DBPASS(tempJB)|ASSIGNMENT(tempJB) | ConsturctGrpah(tempJB)))
+                    )
                    (
                         (<ORDER> <BY> or = <ALPHANUM>{ List ovar = new ArrayList(); order.add(or.image); ovar.add(or.image);}(<COMMA>  or = <ALPHANUM> { order.add(or.image); ovar.add(or.image);})?
                         {
@@ -329,52 +357,54 @@ JsonArrayBuilder order = Json.createArrayBuilder();
         return jObject;
     }
 }
-
-JosonObject RetrunStatement(JsonObjectBuilder jobject) : {
+JsonObject RetrunStatement(JsonObjectBuilder jobject) : {
 Token t;
 JsonObjectBuilder tempJB = Json.createObjectBuilder();
 
 }
 {
-<RETURN> <AS> <FBRACKETSTART>PropertyGraph() <FBRACKETEND>
+<RETURN> <AS> <FBRACKETSTART>PropertyGraph(tempJB)<FBRACKETEND>
 }
 
-JosonObject Graph(JsonObjectBuilder jobject) : {
+JsonObject PropertyGraph(JsonObjectBuilder jobject) : {
 Token t;
 JsonArrayBuilder tempArray = Json.createArrayBuilder();
-JsonObjectBuilder tempJA = Json.createObjectBuilder();
+JsonArrayBuilder tempJA = Json.createArrayBuilder();
 
 }
 {
         GRAPHNODE(tempJA){tempArray.add(tempJA.build());}
         (
 
-        {JsonObjectBuilder tempJB = Json.createObjectBuilder();}GRAPHEDGE(tempJB){tempArray.add(tempJB.build());}
+        {JsonArrayBuilder tempJB = Json.createArrayBuilder();}
+        GRAPHEDGE(tempJB)
+        {tempArray.add(tempJB.build());}
 
-        {JsonObjectBuilder tempJC = Json.createObjectBuilder();}
+        {JsonArrayBuilder tempJC = Json.createArrayBuilder();}
         GRAPHNODE(tempJC){tempArray.add(tempJC.build());}
 
-        )+
+        )*
         {jobject.add("cypher",tempArray.build());}
 }
 
-JosonObject GRAPHNODE(JsonArrayBuilder jobject) : {
+
+JsonArrayBuilder GRAPHNODE(JsonArrayBuilder jobject) : {
 Token t; Token k;
 JsonObjectBuilder tempJB = Json.createObjectBuilder();
 }
 {
-(<FBRACKETSTART>
-            (t = <ALPHANUM>| t = <FIELDNAME>)<COLON> k = <ALPHANUM>
-<FBRACKETEND>)
+<FBRACKETSTART>
+            ((t = <ALPHANUM>)| (t = <FIELDNAME>{tempJB.add("nodeName", t.image);}))? <COLON> (k = <ALPHANUM>| k = <FIELDNAME>)
+<FBRACKETEND>
 
-{tempJB.add("nodeName", t.image);
-tempJB.add("nodeType",s.image);
+{
+tempJB.add("nodeType",k.image);
 jobject.add(tempJB.build());
 return jobject;
 }
 }
 
-JsonObject GRAPHEDGE(JsonArrayBuilder jobject):{Token t; Token k; Token s;}{
+JsonArrayBuilder GRAPHEDGE(JsonArrayBuilder jobject):{Token t; Token k; Token s;}{
 
 {JsonObjectBuilder tempJB = Json.createObjectBuilder();
 
@@ -411,19 +441,88 @@ boolean variableArray = false;
 }
 {return tempJB;}
 }
+// Construct Graph
+
+JsonObjectBuilder ConsturctGrpah(JsonObjectBuilder jObject) : {JsonObjectBuilder tempJA = Json.createObjectBuilder();
+JsonObjectBuilder tempJB = Json.createObjectBuilder();
+JsonObjectBuilder tempJC = Json.createObjectBuilder();
+JsonArrayBuilder order = Json.createArrayBuilder();
+
+JsonArrayBuilder group = Json.createArrayBuilder();
+
+}
+{{Token v, or, gr;}
+                      <CONSTRUCTGRAPH>  <FBRACKETSTART> <VIEW> v = <ALPHANUM> <COLON><EQAL>{tempJA.add("view",v.image );}
+                          ((SelectStament(tempJC))|(DBPASS(tempJB))| (AWSMFunction(tempJB))) <SEMICOLON>
+
+                            ( {Token r;}<RELATION> r = <ALPHANUM> {tempJA.add("relation", r.image);}<COLON><EQAL>
+                                                        ((SelectStament(tempJC))|(DBPASS(tempJB))| (AWSMFunction(tempJB)))
+
+                                                        (
+                                                                                (<ORDER> <BY> or = <ALPHANUM>{ List ovar = new ArrayList(); order.add(or.image); ovar.add(or.image);}(<COMMA>  or = <ALPHANUM> { order.add(or.image); ovar.add(or.image);})?
+                                                                                {
+
+                                                                                tempJB.add("ORDER",order.build());
+                                                                                vtable.setOrder(ovar);
+
+                                                                                }
+
+                                                                            )?
+                                                                                (
+                                                                                    <GROUP> <BY> gr = <ALPHANUM>{ group.add(gr.image);}(<COMMA> gr = <ALPHANUM> { group.add(gr.image);})* {tempJB.add("GROUP",group.build());}
+                                                                                )?
+                                                        )
+
+
+
+
+                                                        <SEMICOLON>{tempJB.add("relation-def", tempJB.build());}
+                            )?
+                <FBRACKETEND>
+{
+
+tempJA.add("view-def", tempJC.build());
+return jObject;
+}
+}
+
+
+
 //SELECT Statement of ADIL 1.0
-JsonObjectBuilder SelectStament(JsonObjectBuilder jObject) : {Token t, tuple, db; JsonObjectBuilder tempJB = Json.createObjectBuilder(); boolean variableArray = false ;
-JsonArrayBuilder tempTuple = Json.createArrayBuilder();JsonArrayBuilder tempDB = Json.createArrayBuilder();}
+JsonObjectBuilder SelectStament(JsonObjectBuilder jObject) : {
+Token t, tuple, db, alias  ;
+JsonObjectBuilder tempJB = Json.createObjectBuilder();
+JsonObjectBuilder aliasList = Json.createObjectBuilder();
+JsonArrayBuilder func = Json.createArrayBuilder();
+boolean variableArray = false ;
+JsonArrayBuilder tempTuple = Json.createArrayBuilder();
+JsonArrayBuilder tempDB = Json.createArrayBuilder();
+tempJB.add("isFunction", false);
+}
 {
 {
 int tu = 0;
 int src = 1;
 }
-        <SELECT> tuple = <ALPHANUM> { tempTuple.add(tuple.image); vtable.insertName(tuple.image); vtable.updateType(tuple.image, DataTypeEnum.Undecided.ordinal());}
+       <SELECT> tuple = <ALPHANUM>{tempJB.add("name", tuple.image);}(GetFunction(func, tuple.image){JsonObjectBuilder tuplaDet = Json.createObjectBuilder();
+                        tempJB.add("isFunction", true);  })?
+
+
+       {tempTuple.add(func.build());}
+        (<AS> alias = <ALPHANUM>{aliasList.add(tuple.image, alias.image);}
+
+        )?
+
+
         (
-                                                 <COMMA> tuple =<ALPHANUM>
-                                                            {tempTuple.add(tuple.image);
-                                                             tu = tu + 1; vtable.insertName(tuple.image); vtable.updateType(tuple.image, DataTypeEnum.Undecided.ordinal());}
+                                                 <COMMA> tuple =<ALPHANUM>{tempJB.add("name", tuple.image);}
+                                                 ( GetFunction(func, tuple.image))?
+                                                 {JsonObjectBuilder tuplaDet = Json.createObjectBuilder();
+                                                                                        tempJB.add("isFunction", true);  }
+
+
+
+
          )*
                                                             <FROM> db = <ALPHANUM>
                                                             {
@@ -433,16 +532,32 @@ int src = 1;
 
                                                             }
                                                             (<COMMA> db =<ALPHANUM> { tempDB.add(db.image); src = src + 1; })?
-                                                            <WHERE>
                                                             (
-                                                            {
-                                                            JsonObjectBuilder pred = Json.createObjectBuilder();
-                                                            }
+                                                                <WHERE>
+
+                                                                {
+                                                                    JsonArrayBuilder predArray = Json.createArrayBuilder();
+                                                                    JsonObjectBuilder pred = Json.createObjectBuilder();
+                                                                }
                                                                 Expression(pred)
-                                                            {
-                                                                tempJB.add("PREDICATE", pred.build());
-                                                            }
+                                                                {
+                                                                    predArray.add(pred.build());
+                                                                }
+                                                                (
+                                                                {Token conj;}
+
+                                                                        (conj=<AND>|conj=<OR>|conj=<NOT>)
+                                                                        {predArray.add(conj.image);}
+                                                                        Expression(pred)
+                                                                        {
+                                                                            predArray.add(pred.build());
+                                                                        }
+                                                                 )
                                                             )?
+
+                                                            //
+
+
 {
 if(tuple.image != "*"){
     tempJB.add("tuple", tempTuple.build());
@@ -466,7 +581,10 @@ return jObject;
 
 JsonObjectBuilder AWSMFunction(JsonObjectBuilder l): {Token t; JsonArrayBuilder l1 = Json.createArrayBuilder();JsonObjectBuilder tempJB = Json.createObjectBuilder();}
 {
-t = <ALPHANUM>GetFunction(l1, t.image)(
+   ((t = <ALPHANUM>)|(t = <FIELDNAME>{{tempJB.add("varpath", true);}}))
+
+
+    GetFunction(l1, t.image)(
                                                                             <WHERE>
                                                                                    (
                                                                                                    {
@@ -540,6 +658,98 @@ l.add("FORALL", tempJB.build());
 
 }
 
+//ExecuteSQL Database Direct
+
+void DBPASS(JsonObjectBuilder l) : {Token t; Token var; JsonObjectBuilder tempJB = Json.createObjectBuilder(); Token x;}
+{
+   (t = <EXECUTESQL> | t = <EXECUTECYPHER>)  x = quetedStatement()
+
+   {tempJB.add("statement",x.image);
+   tempJB.add("type",t.image);
+
+   }
+
+
+
+
+   {l.add("ptq", tempJB.build());}
+}
+
+//Inside Pass through
+
+
+Token quetedStatement() : {Token t; Token x;}
+
+{
+  (<FBRACKETSTART> x = <QUOTED_IDENTIFIER> <FBRACKETEND>){System.out.println(x.image);}
+  {return x;}
+}
+// Inside Assignment
+
+JsonObjectBuilder ASSIGNMENT(JsonObjectBuilder l) : {Token t; Token var; JsonObjectBuilder tempJB = Json.createObjectBuilder(); Integer type; Token dt; Token sc;}
+{
+    (
+    <StartSQBracket>  (
+                            t = <DIGITS> {type = 0;}
+                                | t = <QUOTED_IDENTIFIER>{ type = 1; tempJB.add("val", t.image); tempJB.add("type", type); }
+                        )
+                        (
+                    <COMMA>    (t = <DIGITS> {type = 0;}
+                                                              | t = <QUOTED_IDENTIFIER>{ type = 1; tempJB.add("val", t.image); tempJB.add("type", type); })
+                        )*
+
+              (<LOAD> <FROM> t = <QUOTED_IDENTIFIER> <AS>
+                                            (
+                                                ( dt = <CSV>)
+                                                | ( dt = <GRAPHQL>)
+                                                |( dt = <JSON>)
+                                                |( dt = <XML>)
+                                                |( dt = <RELATION>)
+                                                    {tempJB.add("load-data-type", dt.image);
+                                                     tempJB.add("data-path", t.image);
+                                                    }
+                                            )
+                                    (
+
+                                        <SCHEMA> <FROM> (sc = <QUOTED_IDENTIFIER>{tempJB.add("schema-path", sc.image);})
+                                                                            <AS> (
+                                                                                     ( dt = <CSV>)
+                                                                                   | ( dt = <GRAPHQL>)
+                                                                                   |( dt = <JSON>)
+                                                                                   |( dt = <XML>)
+                                                                                   |( dt = <RELATION>)
+                                                                                   {
+                                                                                     tempJB.add("load-schema-type", dt.image);
+
+                                                                                    }
+                                                                                  )
+                                    )?
+              )?
+      <EndSQBracket>
+      )
+
+
+
+  {
+
+
+    return l;
+   }
+
+
+
+}
+
+JsonObjectBuilder STRINGASSIGNMENT(JsonObjectBuilder l) : {Token t; Token var; JsonObjectBuilder tempJB = Json.createObjectBuilder(); Token x;}
+{
+
+
+
+
+
+  {return l;}
+}
+
 JsonObjectBuilder Expression(JsonObjectBuilder l) :
 {
     Token t;
@@ -555,11 +765,8 @@ JsonObjectBuilder Expression(JsonObjectBuilder l) :
                                                         (t = <ALPHANUM>{m.add("op2", 0);}|t = <DIGITS>{m.add("op2", 1);})
                                                                             {k.add(t.image);}
                                                                             (GetFunction(l1, t.image){
-
                                                                             m.add("op2", 3);
-
                                                                             l.add(t.image,l1.build());}
-
                                                                             )?
 { l.add("ops", opn.image);
 l.add("desc", m.build());
@@ -578,7 +785,8 @@ l.add(funcProp);
 }
             (
 
-                LOOKAHEAD(3)(x = <ALPHANUM>{f1.add("vp1",x.image);} (GetFunction(l, x.image) {f1.add(x.image,l.build());})? (<EQAL> y = <ALPHANUM>{map.add(x.image, y.image); f1.add("map", map.build());})? )
+                LOOKAHEAD(3)(x = <ALPHANUM>{f1.add("vp1",x.image);} (GetFunction(l, x.image) {f1.add(x.image,l.build());})? (<EQAL> ((y = <ALPHANUM>)|(y = <DIGITS>)|(y=<FIELDNAME>))
+                                                    {map.add(x.image, y.image); f1.add("map", map.build());})? )
                 |(x = <DIGITS>{f1.add("digi1",x.image);})
                 |(x = <FIELDNAME>{f1.add("vpt1",x.image);}(GetFunction(l, x.image){f1.add(x.image,l.build());})?(<EQAL> y = <ALPHANUM>{map.add(x.image, y.image); f1.add("map",map.build());})?)
 
@@ -587,7 +795,9 @@ l.add(funcProp);
             {l1.add(f1.build());}
             (
  {JsonObjectBuilder f2 = Json.createObjectBuilder();JsonObjectBuilder m2 = Json.createObjectBuilder();}
-                  <COMMA> ( LOOKAHEAD(3)(x = <ALPHANUM>{f2.add("vp1",x.image);} (GetFunction(l, x.image) {f2.add(x.image,l.build());})? (<EQAL> y = <ALPHANUM>{m2.add(x.image, y.image); f2.add("map", m2.build());})? )
+                  <COMMA> ( LOOKAHEAD(3)(x = <ALPHANUM>{f2.add("vp1",x.image);} (GetFunction(l, x.image) {f2.add(x.image,l.build());})? (<EQAL> ((y = <ALPHANUM>)|(y = <DIGITS>)|(y=<FIELDNAME>))
+
+                                                                            {m2.add(x.image, y.image); f2.add("map", m2.build());})? )
                             |(x = <DIGITS>{f2.add("digi1",x.image);})
                             |(x = <FIELDNAME>{f2.add("vpt1",x.image);}(GetFunction(l, x.image){f2.add(x.image,l.build());})?(<EQAL> y = <ALPHANUM>{m2.add(x.image, y.image); f2.add("map",m2.build());})?)
                             )
@@ -599,5 +809,7 @@ l.add(funcProp);
  l.add(l1.build());}
 {return l;}
 }
+
+
 
 

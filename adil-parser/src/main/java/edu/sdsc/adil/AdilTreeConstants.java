@@ -5,29 +5,49 @@ public interface AdilTreeConstants
 {
   public int JJTADILSTATEMENT = 0;
   public int JJTSTATEMENT = 1;
-  public int JJTIMPORTLIBRARY = 2;
-  public int JJTCREATEANALYSIS = 3;
-  public int JJTASSIGNMENTSTATEMENT = 4;
-  public int JJTDECLAREANALYSIS = 5;
-  public int JJTSELECTSTAMENT = 6;
-  public int JJTAWSMFUNCTION = 7;
-  public int JJTFORALLEXPRESSION = 8;
-  public int JJTEXPRESSION = 9;
-  public int JJTGETFUNCTION = 10;
+  public int JJTUSECLAUSE = 2;
+  public int JJTIMPORTLIBRARY = 3;
+  public int JJTCREATEANALYSIS = 4;
+  public int JJTASSIGNMENTSTATEMENT = 5;
+  public int JJTRETRUNSTATEMENT = 6;
+  public int JJTPROPERTYGRAPH = 7;
+  public int JJTGRAPHNODE = 8;
+  public int JJTGRAPHEDGE = 9;
+  public int JJTDECLAREANALYSIS = 10;
+  public int JJTCONSTURCTGRPAH = 11;
+  public int JJTSELECTSTAMENT = 12;
+  public int JJTAWSMFUNCTION = 13;
+  public int JJTFORALLEXPRESSION = 14;
+  public int JJTDBPASS = 15;
+  public int JJTQUETEDSTATEMENT = 16;
+  public int JJTASSIGNMENT = 17;
+  public int JJTSTRINGASSIGNMENT = 18;
+  public int JJTEXPRESSION = 19;
+  public int JJTGETFUNCTION = 20;
 
 
   public String[] jjtNodeName = {
     "ADILStatement",
     "Statement",
+    "UseClause",
     "ImportLibrary",
     "CreateAnalysis",
     "AssignmentStatement",
+    "RetrunStatement",
+    "PropertyGraph",
+    "GRAPHNODE",
+    "GRAPHEDGE",
     "DeclareAnalysis",
+    "ConsturctGrpah",
     "SelectStament",
     "AWSMFunction",
     "ForAllExpression",
+    "DBPASS",
+    "quetedStatement",
+    "ASSIGNMENT",
+    "STRINGASSIGNMENT",
     "Expression",
     "GetFunction",
   };
 }
-/* JavaCC - OriginalChecksum=5debfc11ce5866370f98647b5999003e (do not edit this line) */
+/* JavaCC - OriginalChecksum=77320fbada045c6d2b11166e819d9ee6 (do not edit this line) */

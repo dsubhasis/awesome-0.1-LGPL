@@ -6,14 +6,24 @@ public interface AdilVisitor
   public Object visit(SimpleNode node, Object data);
   public Object visit(ASTADILStatement node, Object data);
   public Object visit(ASTStatement node, Object data);
+  public Object visit(ASTUseClause node, Object data);
   public Object visit(ASTImportLibrary node, Object data);
   public Object visit(ASTCreateAnalysis node, Object data);
   public Object visit(ASTAssignmentStatement node, Object data);
+  public Object visit(ASTRetrunStatement node, Object data);
+  public Object visit(ASTPropertyGraph node, Object data);
+  public Object visit(ASTGRAPHNODE node, Object data);
+  public Object visit(ASTGRAPHEDGE node, Object data);
   public Object visit(ASTDeclareAnalysis node, Object data);
+  public Object visit(ASTConsturctGrpah node, Object data);
   public Object visit(ASTSelectStament node, Object data);
   public Object visit(ASTAWSMFunction node, Object data);
   public Object visit(ASTForAllExpression node, Object data);
+  public Object visit(ASTDBPASS node, Object data);
+  public Object visit(ASTquetedStatement node, Object data);
+  public Object visit(ASTASSIGNMENT node, Object data);
+  public Object visit(ASTSTRINGASSIGNMENT node, Object data);
   public Object visit(ASTExpression node, Object data);
   public Object visit(ASTGetFunction node, Object data);
 }
-/* JavaCC - OriginalChecksum=6dcf7492e0d4b5a7f41b8bd1e3a75e6d (do not edit this line) */
+/* JavaCC - OriginalChecksum=d261bed37780597b4053be18f3f7721d (do not edit this line) */
