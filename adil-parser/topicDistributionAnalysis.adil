@@ -28,7 +28,7 @@ for (c  in communities) {
     users[] := select user from userCommunity where community = c;
     Relation tweets := twitterNetwork.executeCypher(match (u1:User) - [r:Reply] - (u2:User) where u1 in $users and u2 in $users return r.tweet.text);
     Matrix tdmCom; Relation docMatIDCom; Relation termMatIDCom;
-    countMatrix(tdmCom, docMatIDCom, termMatIDCom, tweets.text, features = (getVocubulary(tweets), []));
+    countMatrix(tdmCom, docMatIDCom, termMatIDCom, tweets.text, features = (getVocubulary(tweets)));
     Matrix docTopicMatCom; topicTermMatCom;
     topicModel(docTopicMatCom, topicTermMatCom, tdmCom, k = 10);
     newMatrix := mergeFeatureMatrix(termMatID, termMatIDCom, feature = 'col');

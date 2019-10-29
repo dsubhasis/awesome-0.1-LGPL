@@ -243,15 +243,14 @@ public class AdilFirstPass {
             js = p.ADILStatement(js);
             VariableTable vtable = p.getVariableTable();
             Plan naivePlan = new Plan();
-            naivePlan.initPlan(js.build(),vtable);
+            //naivePlan.initPlan(js.build(),vtable);
+            System.out.println(js.build());
 
 
 
 
         } catch (ParseException pe) {
             pe.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
         }
 
         JsonObject temp = js.build();

@@ -190,6 +190,7 @@ TOKEN [IGNORE_CASE]: {
 |<XML : "xml">
 |<SCHEMA : "schema">
 |<NULL:"null">
+|<LIST:"list">
 
 
 }
@@ -203,7 +204,7 @@ TOKEN [IGNORE_CASE]: {
 |<CYPHERQUERY : "cypherquery" >
 | <EXECUTECYPHER : "executecypher">
 | <EXECUTESQL :"executesql">
-| <FORALL : "forall">
+| <FORALL : "for">
 }
 TOKEN :
 {
@@ -353,7 +354,7 @@ JsonArrayBuilder order = Json.createArrayBuilder();
                             <GROUP> <BY> gr = <ALPHANUM>{ group.add(gr.image);}(<COMMA> gr = <ALPHANUM> { group.add(gr.image);})* {tempJB.add("GROUP",group.build());}
                         )?
                         (
-                            <STORE> <AS> store = <ALPHANUM>{tempJB.add("STORE", true); tempJB.add("STORAGE", store.image);}
+                            <STORE> (<AS> store = <ALPHANUM>{tempJB.add("STORAGE", store.image);})?{tempJB.add("STORE", true); }
                         )?
                         (
 
@@ -709,14 +710,14 @@ Token quetedStatement() : {Token t; Token x;}
 JsonObjectBuilder ASSIGNMENT(JsonObjectBuilder l) : {Token t; Token var; JsonObjectBuilder tempJB = Json.createObjectBuilder(); Integer type; Token dt; Token sc;}
 {
     (
-    <StartSQBracket>  (
+    <StartSQBracket>  ((
                             t = <DIGITS> {type = 0;}
                                 | t = <QUOTED_IDENTIFIER>| t = <NULL>{ type = 1; tempJB.add("val", t.image); tempJB.add("type", type); }
                         )
                         (
                     <COMMA>    (t = <DIGITS> {type = 0;}
                                                               | t = <QUOTED_IDENTIFIER>{ type = 1; tempJB.add("val", t.image); tempJB.add("type", type); })
-                        )*
+                        )*)?
 
               (<LOAD> <FROM> t = <QUOTED_IDENTIFIER> <AS>
                                             (
