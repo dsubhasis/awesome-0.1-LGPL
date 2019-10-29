@@ -90,7 +90,7 @@ public static void main(String[] args) {
         }
    JsonObjectBuilder tempjObject = Json.createObjectBuilder();
         tempjObject = Statement(tempjObject);
-                                                                                                       sqlPlan.add(tempjObject.build()); lineNum = lineNum+1; System.out.print("UNIT STATEMENT LINE: "+lineNum);
+                                                                                                       sqlPlan.add(tempjObject.build()); lineNum = lineNum+1;
         jj_consume_token(SEMICOLON);
       }
  tempJB.add("Variable", variableTable.build());
@@ -310,7 +310,7 @@ tempjObject.add("type", ltype);
             throw new ParseException();
           }
         }
-                                                                                                                                           lineNum = lineNum+1; System.out.print("CREATE ANALYSIS LINE :"+lineNum);
+                                                                                                                                           lineNum = lineNum+1;
         jj_consume_token(SEMICOLON);
                                             array.add(tempJB.build());
       }

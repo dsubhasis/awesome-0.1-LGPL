@@ -286,7 +286,7 @@ public class VariableTableEntry {
 
         //method 2 - via Date
         localdate = new Date();
-        System.out.println(new Timestamp(localdate.getTime()));
+        //System.out.println(new Timestamp(localdate.getTime()));
 
 
 

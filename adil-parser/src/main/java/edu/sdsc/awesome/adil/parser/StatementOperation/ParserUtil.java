@@ -199,7 +199,7 @@ public class ParserUtil {
         String name = "*";
 
         String query = "Select " + name + " from " + table + " where " + fieldName + " = " + value + " ";
-        System.out.println(query);
+       // System.out.println(query);
         Connection con = ParserUtil.dbConnection();
         Statement st = con.createStatement();
         ResultSet rs = st.executeQuery(query);
@@ -252,7 +252,7 @@ public class ParserUtil {
 
 
         try {
-            input = new FileInputStream("/home/subhasis/Documents/awesome-old/adil-parser/config.properties");
+            input = new FileInputStream("adil-parser/config.properties");
             ;
             try {
                 prop.load(input);
@@ -517,7 +517,7 @@ public class ParserUtil {
         Reader sr = new StringReader(name);
         SQLPP sqp = new SQLPP(sr);
         try {
-            System.out.println(name);
+            //System.out.println(name);
 
             stmt = CCJSqlParserUtil.parse(name);
 
@@ -558,7 +558,7 @@ public class ParserUtil {
                     try {
                         tableDetails = pgql.TableStats(tableList);
                         SelectElement = sql.SelectStatement(selectStmt);
-                        System.out.println("Statement parsed ");
+                        //System.out.println("Statement parsed ");
                         BasicSlice bs = new BasicSlice(tableDetails, SelectElement);
 
                     } catch (SQLException e) {
@@ -570,7 +570,7 @@ public class ParserUtil {
             }
 
 
-            System.out.println(stmt);
+            //System.out.println(stmt);
         } catch (JSQLParserException e) {
             e.printStackTrace();
         }
@@ -588,7 +588,7 @@ public static JsonObject validateFunction(String name) throws SQLException {
         JsonObjectBuilder object = Json.createObjectBuilder();
 
         String query = "Select * from functionsignaturetable WHERE name = \""+name+"\"";
-        System.out.println(query);
+        //System.out.println(query);
         Connection con = ParserUtil.dbConnection();
         Statement st = con.createStatement();
         ResultSet rs = st.executeQuery(query);

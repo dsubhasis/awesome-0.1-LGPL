@@ -226,7 +226,7 @@ TOKEN :
 JsonObjectBuilder ADILStatement(JsonObjectBuilder jObject)  :
 {JsonArrayBuilder sqlPlan = Json.createArrayBuilder(); JsonObjectBuilder tempJB = Json.createObjectBuilder();}
 { {int lineNum = 0;}
- ({JsonObjectBuilder tempjObject = Json.createObjectBuilder(); } tempjObject = Statement(tempjObject) {sqlPlan.add(tempjObject.build()); lineNum = lineNum+1; System.out.print("UNIT STATEMENT LINE: "+lineNum);} <SEMICOLON>)*
+ ({JsonObjectBuilder tempjObject = Json.createObjectBuilder(); } tempjObject = Statement(tempjObject) {sqlPlan.add(tempjObject.build()); lineNum = lineNum+1; } <SEMICOLON>)*
  {
  tempJB.add("Variable", variableTable.build());
 }
@@ -289,7 +289,7 @@ JsonObjectBuilder CreateAnalysis(JsonObjectBuilder jObject) : {Token t; Token k;
                         <AS> <FBRACKETSTART>
                                           (
                                           {JsonObjectBuilder tempJB = Json.createObjectBuilder();}
-                                           (LOOKAHEAD(2)(tempJB =  AssignmentStatement(tempJB))|(ForAllExpression(tempJB))|DBPASS(tempJB)){lineNum = lineNum+1; System.out.println("CREATE ANALYSIS LINE :"+lineNum);}<SEMICOLON>
+                                           (LOOKAHEAD(2)(tempJB =  AssignmentStatement(tempJB))|(ForAllExpression(tempJB))|DBPASS(tempJB)){lineNum = lineNum+1; }<SEMICOLON>
                                            {array.add(tempJB.build());}
                                            )*
 <FBRACKETEND>
