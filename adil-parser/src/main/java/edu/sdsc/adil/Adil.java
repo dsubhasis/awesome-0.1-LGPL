@@ -75,6 +75,7 @@ public static void main(String[] args) {
  boolean jjtc000 = true;
  jjtree.openNodeScope(jjtn000);JsonArrayBuilder sqlPlan = Json.createArrayBuilder(); JsonObjectBuilder tempJB = Json.createObjectBuilder();
     try {
+   int lineNum = 0;
       label_1:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -89,7 +90,7 @@ public static void main(String[] args) {
         }
    JsonObjectBuilder tempjObject = Json.createObjectBuilder();
         tempjObject = Statement(tempjObject);
-                                                                                                       sqlPlan.add(tempjObject.build());
+                                                                                                       sqlPlan.add(tempjObject.build()); lineNum = lineNum+1; System.out.print("UNIT STATEMENT LINE: "+lineNum);
         jj_consume_token(SEMICOLON);
       }
  tempJB.add("Variable", variableTable.build());
@@ -103,23 +104,23 @@ public static void main(String[] args) {
    jjtc000 = false;
   {if (true) return jObject;}
     } catch (Throwable jjte000) {
-   if (jjtc000) {
-     jjtree.clearNodeScope(jjtn000);
-     jjtc000 = false;
-   } else {
-     jjtree.popNode();
-   }
-   if (jjte000 instanceof RuntimeException) {
-     {if (true) throw (RuntimeException)jjte000;}
-   }
-   if (jjte000 instanceof ParseException) {
-     {if (true) throw (ParseException)jjte000;}
-   }
-   {if (true) throw (Error)jjte000;}
+    if (jjtc000) {
+      jjtree.clearNodeScope(jjtn000);
+      jjtc000 = false;
+    } else {
+      jjtree.popNode();
+    }
+    if (jjte000 instanceof RuntimeException) {
+      {if (true) throw (RuntimeException)jjte000;}
+    }
+    if (jjte000 instanceof ParseException) {
+      {if (true) throw (ParseException)jjte000;}
+    }
+    {if (true) throw (Error)jjte000;}
     } finally {
-   if (jjtc000) {
-     jjtree.closeNodeScope(jjtn000, true);
-   }
+    if (jjtc000) {
+      jjtree.closeNodeScope(jjtn000, true);
+    }
     }
     throw new Error("Missing return statement in function");
   }
@@ -267,7 +268,7 @@ tempjObject.add("type", ltype);
                                                                /*@bgen(jjtree) CreateAnalysis */
                                                                ASTCreateAnalysis jjtn000 = new ASTCreateAnalysis(JJTCREATEANALYSIS);
                                                                boolean jjtc000 = true;
-                                                               jjtree.openNodeScope(jjtn000);Token t; Token k; boolean scheduleFlag = true; JsonArrayBuilder array = Json.createArrayBuilder();
+                                                               jjtree.openNodeScope(jjtn000);Token t; Token k; Integer lineNum =0; boolean scheduleFlag = true; JsonArrayBuilder array = Json.createArrayBuilder();
     try {
       jj_consume_token(CREATE);
       jj_consume_token(ANALYSIS);
@@ -309,6 +310,7 @@ tempjObject.add("type", ltype);
             throw new ParseException();
           }
         }
+                                                                                                                                           lineNum = lineNum+1; System.out.print("CREATE ANALYSIS LINE :"+lineNum);
         jj_consume_token(SEMICOLON);
                                             array.add(tempJB.build());
       }

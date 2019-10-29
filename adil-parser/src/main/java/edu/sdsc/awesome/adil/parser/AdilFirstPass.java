@@ -245,15 +245,16 @@ public class AdilFirstPass {
             Plan naivePlan = new Plan();
             //naivePlan.initPlan(js.build(),vtable);
             System.out.println(js.build());
+            System.out.println("FIRST PASS [OK]");
 
 
 
 
         } catch (ParseException pe) {
-            pe.printStackTrace();
+            System.out.println(pe.getLocalizedMessage());
         }
 
-        JsonObject temp = js.build();
+ /*       JsonObject temp = js.build();
 
        System.out.println(temp.toString());
 
@@ -405,7 +406,7 @@ public class AdilFirstPass {
         }
 
 
-        System.out.println(finalObject.build());
+        System.out.println(finalObject.build());*/
     }
     public JsonObject generalFunction(JsonObject proObject, JsonObject variable, JsonObject schema, JsonObject store, JsonObject variableFirst, String avariablename,
                                      JsonObjectBuilder variableSecondPass, JsonObjectBuilder schemaSecondPass, JsonObjectBuilder storeSecondPass)

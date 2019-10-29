@@ -3,6 +3,8 @@
              
            
 STATIC = false;
+JDK_VERSION = "1.8";
+
 }
 
 PARSER_BEGIN(Adil)
@@ -232,9 +234,9 @@ JsonObjectBuilder ADILStatement(JsonObjectBuilder jObject)  :
  jjtree.openNodeScope(jjtn000);
 /*@egen*/JsonArrayBuilder sqlPlan = Json.createArrayBuilder(); JsonObjectBuilder tempJB = Json.createObjectBuilder();}
 {/*@bgen(jjtree) ADILStatement */
- try {
-/*@egen*/
- ({JsonObjectBuilder tempjObject = Json.createObjectBuilder(); } tempjObject = Statement(tempjObject) {sqlPlan.add(tempjObject.build());} <SEMICOLON>)*
+  try {
+/*@egen*/ {int lineNum = 0;}
+ ({JsonObjectBuilder tempjObject = Json.createObjectBuilder(); } tempjObject = Statement(tempjObject) {sqlPlan.add(tempjObject.build()); lineNum = lineNum+1; System.out.print("UNIT STATEMENT LINE: "+lineNum);} <SEMICOLON>)*
  {
  tempJB.add("Variable", variableTable.build());
 }
@@ -250,25 +252,25 @@ JsonObjectBuilder ADILStatement(JsonObjectBuilder jObject)  :
  }
 /*@egen*/
  {return jObject; }/*@bgen(jjtree)*/
- } catch (Throwable jjte000) {
-   if (jjtc000) {
-     jjtree.clearNodeScope(jjtn000);
-     jjtc000 = false;
-   } else {
-     jjtree.popNode();
-   }
-   if (jjte000 instanceof RuntimeException) {
-     throw (RuntimeException)jjte000;
-   }
-   if (jjte000 instanceof ParseException) {
-     throw (ParseException)jjte000;
-   }
-   throw (Error)jjte000;
- } finally {
-   if (jjtc000) {
-     jjtree.closeNodeScope(jjtn000, true);
-   }
- }
+  } catch (Throwable jjte000) {
+    if (jjtc000) {
+      jjtree.clearNodeScope(jjtn000);
+      jjtc000 = false;
+    } else {
+      jjtree.popNode();
+    }
+    if (jjte000 instanceof RuntimeException) {
+      throw (RuntimeException)jjte000;
+    }
+    if (jjte000 instanceof ParseException) {
+      throw (ParseException)jjte000;
+    }
+    throw (Error)jjte000;
+  } finally {
+    if (jjtc000) {
+      jjtree.closeNodeScope(jjtn000, true);
+    }
+  }
 /*@egen*/
 }
 
@@ -384,7 +386,7 @@ JsonObjectBuilder CreateAnalysis(JsonObjectBuilder jObject) : {/*@bgen(jjtree) C
                                                                ASTCreateAnalysis jjtn000 = new ASTCreateAnalysis(JJTCREATEANALYSIS);
                                                                boolean jjtc000 = true;
                                                                jjtree.openNodeScope(jjtn000);
-/*@egen*/Token t; Token k; boolean scheduleFlag = true; JsonArrayBuilder array = Json.createArrayBuilder();}
+/*@egen*/Token t; Token k; Integer lineNum =0; boolean scheduleFlag = true; JsonArrayBuilder array = Json.createArrayBuilder();}
 {/*@bgen(jjtree) CreateAnalysis */
   try {
 /*@egen*/
@@ -393,7 +395,7 @@ JsonObjectBuilder CreateAnalysis(JsonObjectBuilder jObject) : {/*@bgen(jjtree) C
                         <AS> <FBRACKETSTART>
                                           (
                                           {JsonObjectBuilder tempJB = Json.createObjectBuilder();}
-                                           (LOOKAHEAD(2)(tempJB =  AssignmentStatement(tempJB))|(ForAllExpression(tempJB))|DBPASS(tempJB))<SEMICOLON>
+                                           (LOOKAHEAD(2)(tempJB =  AssignmentStatement(tempJB))|(ForAllExpression(tempJB))|DBPASS(tempJB)){lineNum = lineNum+1; System.out.print("CREATE ANALYSIS LINE :"+lineNum);}<SEMICOLON>
                                            {array.add(tempJB.build());}
                                            )*
 <FBRACKETEND>
