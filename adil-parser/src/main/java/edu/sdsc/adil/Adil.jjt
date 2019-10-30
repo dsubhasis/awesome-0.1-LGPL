@@ -255,7 +255,7 @@ JsonObjectBuilder UseClause(JsonObjectBuilder jObject) : {Token t; Token z; Json
 <USE>  t= <ALPHANUM>{array.add(t.image);}{variableTable.add(t.image, "db" );}  <AS> z = <ALPHANUM>{variableTable.add(z.image, t.image);{tempjObject.add("as", z.image);}}
 {
 JsonObjectBuilder dbjObject = Json.createObjectBuilder();
-ImportLibraryDBCheck(dbjObject, z.image, array.build());
+//ImportLibraryDBCheck(dbjObject, z.image, array.build());
 tempjObject.add("name", dbjObject.build());
 tempjObject.add("alias", z.image);
 }
@@ -270,7 +270,7 @@ JsonObjectBuilder ImportLibrary(JsonObjectBuilder jObject) : {Token t; Token z; 
 ( <COMMA> t = <ALPHANUM> {array.add(t.image); variableTable.add(t.image,ltype ); Terminals.add(t.image, ltype);})*   <AS> z = <ALPHANUM>{variableTable.add(z.image, t.image);{tempjObject.add("as", z.image);}}
 {
 JsonObjectBuilder dbjObject = Json.createObjectBuilder();
-ImportLibraryDBCheck(dbjObject, z.image, array.build());
+//ImportLibraryDBCheck(dbjObject, z.image, array.build());
 tempjObject.add("System", dbjObject.build());
 tempjObject.add("type", ltype);
 }
