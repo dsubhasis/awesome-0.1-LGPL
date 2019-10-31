@@ -538,6 +538,10 @@ int src = 1;
                                                                                         tempJB.add("isFunction", true);  }
 
 
+                                                    {tempTuple.add(func.build());}
+                                                            (<AS> alias = <ALPHANUM>{aliasList.add(tuple.image, alias.image);}
+
+                                                            )?
 
 
          )*
