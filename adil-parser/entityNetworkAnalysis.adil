@@ -3,40 +3,35 @@ create analysis entityNetworkAnalysis as (
 selectedNewsID := select newsID from db.newsDataTable n where CountText(db.politicalDictionary.entityName, scope=doc) > 1 ;
 baseData := executeSQL("select newsID, newsText, newspaperName, newsDate from newsDataTable where newsDate > '2018-1-1'::date and newsID in selectedNewsID");
 stopwords := [LOAD FROM "myStopword.csv" AS CSV];
+terms[] := getVocabulary(baseData.newsText) where getVocabulary(baseData.newsText) NOT IN stopwords ;
+newspaperName[] := executeSQL("select distinct newspapername from db.newsDataTable");
+LIST docTopicMats, topTermMats := [];
+For newspaper : newspaperName {
+    tdm := countMatrix ( baseData.newsText, terms);
+    LIST dTMat, tTMat := [];
+    dTMat, tTMat := topicModel(d, t, tdm, k=100);
+    docTopicMats := docTopicMats.add(dTMat);
+    topTermMats := topTermMats.add(tTMat);
+    };
+newsSent := sentenceTokenizer(baseData.newsText,docID=baseData.newsID, date=baseData.newsDate);
+Relation R := select docID as dic, asd as f from entity e, ssda s;
+noun := nounPhrase(newsSent.sentence, language=en, maxLength=4, docID=newsSent.docID, sentenceID=newsSent.sentenceID, date=newsSent.date);
+entityNetwork := CONSTRUCTGRAPH(
+            Relation R := select docID as dID, sentenceID as sID, e1.entityID as id1, e2.entityID as id2, e1.entityTerm as et1, e2.entityTerm as et2, e1.entityType as t1, e2.entityType as t2
+                                    from entity e1, entity e2
+                                    where e1.dID = e2.dID and e1.sentenceID = e1.sentenceID and e1.entityID != e2.entityID;
 
-terms[] := getVocabulary(baseData.newsText)  where getVocabulary(baseData.newsText) NOT IN stopwords ;
-news := Select news from baseData;
-LIST docTopicMat, topTermMat := [];
-For n : news {
-    feature := features(terms, newspaperName);
-    b  := countMatrix ( baseData.newsText, feature);
-       for tdm : tdms  {
-                        docTopicMat, topTermMat := topicModel(d, t, tdm, k=100);
-            };
-
-            newsSent := sentenceTokenizer(baseData.newsText,docID=baseData.newsID,date=baseData.newsDate);
-            newsDate := SELECT newsDate from newsSent;
-            for tempNewsDate : newsDate  {
-                        nounNews := nounPhrase(newsSent.sentence, language=en, maxLength=4, docID=newsSent.docID, sentenceID=newsSent.sentenceID, date=tempNewsDate);
-                        nounNewsDate := Select newsDate from nounNews ;
-                        for tempNounNewsdate : nounNewsDate {
-                        entity := NETokenizer(noun.nounphrase, docID=noun.docID, sentenceID=noun.sentenceID, date=tempNounNewsdate );
-                        };
-            };
-            entityNetwork := executecypher("Relation R := select docID dID, sentenceID sID, e1.entityID id1, e2.entityID id2, e1.entityTerm et1, e2.entityTerm et2, e1.entityType t1, e2.entityType t2
-            from entity e1, entity e2
-            where e1.dID = e2.dID and e1.sentenceID = e1.sentenceID and e1.entityID != e2.entityID;
             View m := executeCypher(
-            ASSERT Entity.id IS UNIQUE
+            "ASSERT Entity.id IS UNIQUE
 
-            Merge (:Entity {id:$R.id1, name: $R.s1, type: $R.t1)
-            Merge (:Entity {id:$R.id2, name: $R.s2, type: $R.t2)
+            Merge (:Entity {id:$R.id1, name: $R.s1, type: $R.t1})
+            Merge (:Entity {id:$R.id2, name: $R.s2, type: $R.t2})
 
             MATCH (e1: Entity {id:$R.id1})
             MATCH (e2: Entity {id:$R.id2})
             Merge (e1)-[co:CO-OCCUR]->(e2)
-            ON CREATE SET co.docID = $R.dID, co.sentenceID = $R.sID") STORE;
-            };
+            ON CREATE SET co.docID = $R.dID, co.sentenceID = $R.sID");
 
+            );
 
 );
