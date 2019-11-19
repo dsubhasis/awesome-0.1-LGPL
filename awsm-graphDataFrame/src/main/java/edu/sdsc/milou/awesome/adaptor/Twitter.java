@@ -85,10 +85,10 @@ public class Twitter {
 		// GraphConnector graphNode = new GraphConnector();
 		ConfigurationBuilder cb = new ConfigurationBuilder();
 		// cb.setDebugEnabled(true);
-		cb.setOAuthConsumerKey("VGdt9CGXLstQeZSWIvEvinXf7");
-		cb.setOAuthConsumerSecret("OzdHxNNiIstREusgRaZrVJudqs93QUmrC1RwMAh0wVk6CMBAWk");
-		cb.setOAuthAccessToken("89229460-3los5HD1O2mQF3IpQrDtNqMkZvv7rEei6apjBBojW");
-		cb.setOAuthAccessTokenSecret("sqLHxZyqhz0CobBxyYcCOeJDqaWoIj9ejP13JidjB4Xjt");
+		cb.setOAuthConsumerKey("VXf7");
+		cb.setOAuthConsumerSecret("OzdHxNNiIstREusgRaZrVJ\0wVk6CMBAWk");
+		cb.setOAuthAccessToken("89229460-3kZvv7rEei6apjBBojW");
+		cb.setOAuthAccessTokenSecret("sqLHxZyqh4Xjt");
 		TwitterStream twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
 		StatusListener listener = new StatusListener() {
 			final long startTime = System.currentTimeMillis();
